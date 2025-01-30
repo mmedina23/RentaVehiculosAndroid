@@ -12,13 +12,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import com.pmd.rentavehiculos.data.RetofitService
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import com.pmd.rentavehiculos.ui.theme.navegacion.AppNavegacion
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val service = RetrofitServiceFactory.RetrofitService()
+        lifecycleScope.launch{
+            val vehiculo = service.lisVehiculos(token"", estado"disponible")
+        }
         setContent {
             RentaVehiculosTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
