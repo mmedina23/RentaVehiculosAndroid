@@ -20,5 +20,5 @@ object RetrofitServiceFactory{
     }
 }
 
-class RetofitService {
+class RetrofitService {
 }
