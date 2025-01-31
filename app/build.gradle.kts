@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -40,6 +41,21 @@ android {
 }
 
 dependencies {
+    //dependencias para el retro fit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //dependencia pra el google.code.gson
+    implementation("com.google.code.gson:gson:2.8.6")
+
+
+    //navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+
+    //LifecycleScope
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0") // Reemplaza con la última versión
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
