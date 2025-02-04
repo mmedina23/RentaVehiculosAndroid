@@ -59,7 +59,8 @@ fun VehiculosScreen(
                     Text(
                         text = "Vehículos Para Alquilar",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
+                        color = Color.White
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0077B7))
@@ -128,13 +129,21 @@ fun VehiculosScreen(
                             showDialog = false
                         }
                     }
-                }) {
+                },
+                        colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0077B7),
+                    contentColor = Color.White)) {
                     Text("Confirmar")
                 }
             },
-            dismissButton = { Button(onClick = { showDialog = false }) { Text("Cancelar") } }
+            dismissButton = { Button(onClick = { showDialog = false },colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0077B7),
+                contentColor = Color.White)) { Text("Cancelar") } },
+            containerColor = Color.White
+
         )
     }
+
 }
 
 

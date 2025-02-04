@@ -47,10 +47,11 @@ fun VehiculosRentadosScreen(
                     Text(
                         text = "Mis Vehículos Alquilados",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
+                        color = Color.White
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D47A1))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D77A1))
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

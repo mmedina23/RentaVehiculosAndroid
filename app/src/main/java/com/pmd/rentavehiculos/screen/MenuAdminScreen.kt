@@ -57,7 +57,7 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
             CenterAlignedTopAppBar(
                 title = { Text("Panel de Administrador", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF0D47A1),
+                    containerColor = Color(0xFF0D77A1),
                     titleContentColor = Color.White
                 )
             )
@@ -82,7 +82,7 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
                 text = "Bienvenido, Administrador",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D47A1),
+                color = Color.Black,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -116,10 +116,10 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
             if (isDialogOpen) {
                 AlertDialog(
                     onDismissRequest = { isDialogOpen = false },
-                    title = { Text("Buscar Historial de Rentas") },
+                    title = { Text("Buscar vehiculo") },
                     text = {
                         Column {
-                            Text("Ingrese el ID del vehículo:")
+                            Text("ID del vehículo:")
                             OutlinedTextField(
                                 value = vehiculoId,
                                 onValueChange = { vehiculoId = it },
@@ -135,16 +135,26 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
                                 if (vehiculoId.isNotEmpty()) {
                                     navController.navigate("vehiculos_rentados_admin/$vehiculoId")
                                 }
-                            }
-                        ) {
+                            },
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF0077B7),
+                                contentColor = Color.White
+                        ) ){
                             Text("Buscar")
                         }
                     },
                     dismissButton = {
-                        Button(onClick = { isDialogOpen = false }) {
+                        Button(onClick = { isDialogOpen = false },
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF0077B7),
+                                contentColor = Color.White)) {
                             Text("Cancelar")
                         }
-                    }
+                    },
+                    containerColor = Color.White
+
                 )
             }
         }

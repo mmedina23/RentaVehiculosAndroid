@@ -67,7 +67,7 @@ fun VehiculosAdminScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Panel de Administración") },
+                title = { Text("Panel de Administrador") },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFF0077B7),
                     titleContentColor = Color.White
