@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,12 +41,16 @@ fun MenuScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Menú Principal") },
+                title = { Text("") },
                 actions = {
                     IconButton(onClick = { showDialog = true }) {
-                        Icon(Icons.Default.Person, contentDescription = "Perfil de Usuario")
+                        Icon(Icons.Default.Person, contentDescription = "Perfil del Usuario")
                     }
-                }
+                },
+
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0077B7))
+                       , modifier = Modifier.height(38.dp)
             )
         }
     ) { paddingValues ->
@@ -103,14 +108,27 @@ fun MenuScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Perfil de Usuario") },
+            title = {
+                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                Text("Perfil de Usuario",
+                    fontWeight = FontWeight.ExtraBold )
+                        Spacer(modifier = Modifier.padding(3.dp))
+                        HorizontalDivider(color = Color.Gray , thickness = 2.dp , modifier = Modifier.width(280.dp))
+                        Spacer(modifier = Modifier.padding(3.dp))
+
+                }
+
+                    },
             text = {
                 usuario?.let {
                     Column {
-                        Text("Nombre: ${it.nombre} ${it.apellidos}")
-                        Text("Identificación: ${it.tipo_identificacion} ${it.identificacion}")
-                        Text("Teléfono: ${it.telefono}")
-                        Text("Dirección: ${it.direccion}")
+                        Text("\uD83D\uDC64 Nombre: ${it.nombre} ${it.apellidos}", fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("\uD83C\uDD94 Identificación: ${it.tipo_identificacion} ${it.identificacion}",fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("\uD83D\uDCDE Teléfono: ${it.telefono}",fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("\uD83D\uDCCD Dirección: ${it.direccion}",fontWeight = FontWeight.SemiBold)
                     }
                 } ?: Text("No hay usuario logueado")
             },
