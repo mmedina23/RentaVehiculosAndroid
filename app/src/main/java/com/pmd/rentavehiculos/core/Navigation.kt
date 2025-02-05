@@ -20,8 +20,7 @@ import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigation(navController: NavHostController) {
-    val loginViewModel: LoginViewModel = viewModel()
+fun Navigation(navController: NavHostController, loginViewModel: LoginViewModel) { // ✅ Recibe el ViewModel desde MainActivity
     val vehiculosViewModel: VehiculosViewModel = viewModel()
 
     NavHost(navController, startDestination = "splash") {
@@ -36,14 +35,14 @@ fun Navigation(navController: NavHostController) {
             if (perfil == "ADMIN") {
                 MenuAdminScreen(navController)
             } else {
-                MenuScreen(navController)
+                MenuScreen(navController, loginViewModel) // ✅ Ahora recibe el mismo LoginViewModel
             }
         }
         composable("menu_admin") {
             MenuAdminScreen(navController)
         }
         composable("menu_cliente") {
-            MenuScreen(navController)
+            MenuScreen(navController, loginViewModel) // ✅ Se lo pasamos aquí también
         }
         composable("vehiculos") {
             VehiculosScreen(navController, vehiculosViewModel, loginViewModel)
@@ -54,11 +53,9 @@ fun Navigation(navController: NavHostController) {
         composable("vehiculos_disponibles") {
             VehiculosAdminScreen(navController, vehiculosViewModel, loginViewModel)
         }
-
-        //ESTA FUNCION NO LA ENTIENDO MUY BIEN. VOLVER A CHQUEAR
         composable("vehiculos_rentados_admin/{vehiculoId}") { backStackEntry ->
             val vehiculoId = backStackEntry.arguments?.getString("vehiculoId")?.toIntOrNull() ?: 0
-            VehiculosRentadosAdminScreen(navController, vehiculoId, viewModel(), loginViewModel)
+            VehiculosRentadosAdminScreen(navController, vehiculoId, vehiculosViewModel, loginViewModel)
         }
     }
 }
