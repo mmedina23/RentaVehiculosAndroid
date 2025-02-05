@@ -44,7 +44,7 @@ fun MenuScreen(
                 title = { Text("") },
                 actions = {
                     IconButton(onClick = { showDialog = true }) {
-                        Icon(Icons.Default.Person, contentDescription = "Perfil del Usuario")
+                        Icon(Icons.Default.Person, contentDescription = "Perfil del Usuario", tint = Color.Black)
                     }
                 },
 

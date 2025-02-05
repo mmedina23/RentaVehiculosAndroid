@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -99,7 +100,7 @@ fun RentaCard(renta: RentaRequest, onEntregarVehiculo: (Int) -> Unit) {
             containerColor = if (yaEntregado) Color(0xFFE0E0E0) else Color.White
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = renta.vehiculo.marca,
                 fontSize = 22.sp,
@@ -107,13 +108,13 @@ fun RentaCard(renta: RentaRequest, onEntregarVehiculo: (Int) -> Unit) {
                 color = if (yaEntregado) Color.Gray else Color.Black
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Días alquilados: ${renta.dias_renta}")
+            Text(text = "\uD83D\uDCC5 Días alquilados: ${renta.dias_renta}", fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Total: ${renta.valor_total_renta} €")
+            Text(text = "\uD83D\uDCB0 Total: ${renta.valor_total_renta} €" , fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Fecha alquiler: ${renta.fecha_renta}")
+            Text(text = "\uD83D\uDDD3\uFE0F Fecha alquiler: ${renta.fecha_renta}" , fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Fecha entrega estimada: ${renta.fecha_estimada_entrega}")
+            Text(text = "⏳ Fecha entrega estimada: ${renta.fecha_estimada_entrega}" , fontWeight = FontWeight.SemiBold)
 
             if (yaEntregado) {
                 Text(

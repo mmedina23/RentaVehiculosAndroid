@@ -2,10 +2,12 @@ package com.pmd.rentavehiculos.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -29,7 +31,6 @@ import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import com.pmd.rentavehiculos.model.Vehiculo
 import kotlinx.coroutines.launch
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosScreen(
@@ -40,11 +41,25 @@ fun VehiculosScreen(
     val apiKey = loginViewModel.apiKey.value
     val usuario = loginViewModel.usuario.value
     val vehiculos = vehiculosViewModel.vehiculos
+
     var selectedVehiculo by remember { mutableStateOf<Vehiculo?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var diasRenta by remember { mutableStateOf("1") }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    // Estado para almacenar la selección del tipo de combustible
+    var tipoCombustibleSeleccionado by remember { mutableStateOf("TODOS") }
+
+    // Obtener la lista única de tipos de combustible
+    val tiposCombustible = listOf("TODOS") + vehiculos.map { it.tipo_combustible }.distinct()
+
+    // Filtrar los vehículos según el tipo de combustible seleccionado
+    val vehiculosFiltrados = if (tipoCombustibleSeleccionado == "TODOS") {
+        vehiculos
+    } else {
+        vehiculos.filter { it.tipo_combustible == tipoCombustibleSeleccionado }
+    }
 
     LaunchedEffect(apiKey) {
         if (apiKey != null) {
@@ -74,8 +89,49 @@ fun VehiculosScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Selector de Tipo de Combustible con RadioButtons en fila
+            Text(
+                text = "Filtrar por tipo de combustible:",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                    ,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                tiposCombustible.forEach { tipo ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .selectable(
+                                selected = (tipo == tipoCombustibleSeleccionado),
+                                onClick = { tipoCombustibleSeleccionado = tipo }
+                            )
+                            .padding(8.dp),
+
+
+                    ) {
+                        RadioButton(
+                            selected = (tipo == tipoCombustibleSeleccionado),
+                            onClick = { tipoCombustibleSeleccionado = tipo },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF0077B7))
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = tipo, fontSize = 15.sp,fontWeight = FontWeight.Bold,)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             LazyColumn {
-                items(vehiculos) { vehiculo ->
+                items(vehiculosFiltrados) { vehiculo ->
                     VehiculoCard(vehiculo) {
                         selectedVehiculo = vehiculo
                         showDialog = true
@@ -85,6 +141,7 @@ fun VehiculosScreen(
         }
     }
 
+    // Diálogo de reserva
     if (showDialog && selectedVehiculo != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -114,36 +171,45 @@ fun VehiculosScreen(
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    if (apiKey != null && usuario != null) {
-                        val dias = diasRenta.toIntOrNull() ?: 1
-                        vehiculosViewModel.reservarVehiculo(
-                            apiKey,
-                            usuario,
-                            selectedVehiculo!!,
-                            dias
-                        ) { success, message ->
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(message)
+                Button(
+                    onClick = {
+                        if (apiKey != null && usuario != null) {
+                            val dias = diasRenta.toIntOrNull() ?: 1
+                            vehiculosViewModel.reservarVehiculo(
+                                apiKey,
+                                usuario,
+                                selectedVehiculo!!,
+                                dias
+                            ) { success, message ->
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                                showDialog = false
                             }
-                            showDialog = false
                         }
-                    }
-                },
-                        colors = ButtonDefaults.buttonColors(
+                    },
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF0077B7),
-                    contentColor = Color.White)) {
+                        contentColor = Color.White
+                    )
+                ) {
                     Text("Confirmar")
                 }
             },
-            dismissButton = { Button(onClick = { showDialog = false },colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0077B7),
-                contentColor = Color.White)) { Text("Cancelar") } },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0077B7),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            },
             containerColor = Color.White
-
         )
     }
-
 }
 
 
@@ -155,12 +221,13 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
             .padding(12.dp)
             .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp) //
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // 🔹 Imagen del Vehículo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -178,69 +245,40 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = vehiculo.marca,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = Color(0xFF0055B7)
-                )
+            // 🔹 Marca del Vehículo
+            Text(
+                text = "🚗 ${vehiculo.marca}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = Color(0xFF0055B7)
+            )
 
-                Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Color: ${vehiculo.color}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Plazas: ${vehiculo.plazas}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
+            Text(text = "🎨 Color: ${vehiculo.color}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1 Plazas: ${vehiculo.plazas}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = "🚘 Carrocería: ${vehiculo.carroceria}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = "⚙️ Cambios: ${vehiculo.cambios}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = "⛽ Combustible: ${vehiculo.tipo_combustible}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
-                Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Carrocería: ${vehiculo.carroceria}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Cambios: ${vehiculo.cambios}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Precio/día: ${vehiculo.valor_dia} €",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp,
-                    color = Color.Red
-                )
-            }
+            Text(
+                text = "\uD83D\uDCB5 ${vehiculo.valor_dia} €/día",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 18.sp,
+                color = Color.Red
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-
+            // 🔹 Botón de Reservar
             Button(
                 onClick = { onReservarClick() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)), // Naranja llamativo
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(
