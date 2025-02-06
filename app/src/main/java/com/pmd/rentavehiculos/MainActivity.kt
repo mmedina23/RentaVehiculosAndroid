@@ -21,15 +21,25 @@ import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.pmd.rentavehiculos.ui.LoginScreen
+import com.pmd.rentavehiculos.ui.VehiculoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            LoginScreen { perfil, llave ->
-                println("🔑 Perfil: $perfil, Llave: $llave") // Aquí puedes redirigir al flujo de cliente o admin
+            var llaveApi by remember { mutableStateOf<String?>(null) }
+
+            if (llaveApi == null) {
+                LoginScreen { perfil, llave ->
+                    llaveApi = llave // Guardar la llave y redirigir
+                }
+            } else {
+                VehiculoScreen(llaveApi!!)
             }
         }
     }

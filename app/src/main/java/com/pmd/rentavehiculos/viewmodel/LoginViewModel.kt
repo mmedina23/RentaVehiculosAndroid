@@ -3,7 +3,6 @@ package com.pmd.rentavehiculos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pmd.rentavehiculos.network.LoginRequest
-import com.pmd.rentavehiculos.network.LoginResponse
 import com.pmd.rentavehiculos.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
