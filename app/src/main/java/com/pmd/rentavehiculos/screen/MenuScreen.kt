@@ -128,7 +128,7 @@ fun MenuScreen(
                         Spacer(modifier = Modifier.height(6.dp))
                         Text("\uD83D\uDCDE Teléfono: ${it.telefono}",fontWeight = FontWeight.SemiBold)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("\uD83D\uDCCD Dirección: ${it.direccion}",fontWeight = FontWeight.SemiBold)
+                        Text("\uD83D\uDCCD Localidad: ${it.direccion}",fontWeight = FontWeight.SemiBold)
                     }
                 } ?: Text("No hay usuario logueado")
             },
