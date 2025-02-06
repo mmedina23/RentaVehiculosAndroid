@@ -19,48 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
-import com.pmd.rentavehiculos.viewmodel.VehiculoViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
+import com.pmd.rentavehiculos.ui.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RentaVehiculosTheme {
-                MainScreen()
+            LoginScreen { perfil, llave ->
+                println("🔑 Perfil: $perfil, Llave: $llave") // Aquí puedes redirigir al flujo de cliente o admin
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen(viewModel: VehiculoViewModel = viewModel()) {
-    val listaVehiculos by viewModel.listaVehiculos.collectAsState()
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(title = { Text("Renta de Vehículos") })
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-            Text("Lista de Vehículos:", style = MaterialTheme.typography.headlineSmall)
-
-            listaVehiculos.forEach { vehiculo ->
-                Text(text = "${vehiculo.marca} - ${vehiculo.modelo}")
-            }
-        }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    RentaVehiculosTheme {
-        MainScreen()
     }
 }

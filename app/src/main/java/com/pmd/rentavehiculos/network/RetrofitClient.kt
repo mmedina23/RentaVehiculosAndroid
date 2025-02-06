@@ -4,15 +4,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://localhost:8085/api/v1" // bueno esto lo obtuve cuando
-    // ejecute el programa RentaVehiculosApi y así puedo ver la API con el swagger.
+    private const val BASE_URL = "http://10.221.85.122:8085/api/v1/"
 
-    val apiService: VehiculoApiService by lazy {
+    val authApi: AuthApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()) // esto es como el Stringify
-            // cuando convertimos JSON a objeto, pero en este caso objetos para Kotlin.
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(VehiculoApiService::class.java)
+            .create(AuthApiService::class.java)
     }
 }
