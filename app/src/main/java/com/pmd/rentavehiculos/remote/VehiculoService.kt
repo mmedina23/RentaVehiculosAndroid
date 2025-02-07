@@ -2,7 +2,10 @@ package com.pmd.rentavehiculos.remote
 
 import com.pmd.rentavehiculos.model.RentaRequest
 import com.pmd.rentavehiculos.model.Vehiculo
+import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -26,11 +29,6 @@ interface VehiculosService {
         @Body rentaRequest: RentaRequest
     )
 
-    @GET("vehiculos/{id}")
-    suspend fun obtenerVehiculoPorId(
-        @Header("x-llave-api") apiKey: String,
-        @Path("id") vehiculoId: Int
-    ): Vehiculo
 
     @GET("personas/{id}/rentas")
     suspend fun obtenerVehiculosRentados(
@@ -49,5 +47,25 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int
     ): List<RentaRequest>
+
+
+    @PUT("vehiculos/{id}")
+    suspend fun actualizarVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int,
+        @Body vehiculo: Vehiculo               // Datos nuevos del vehículo
+    ): Vehiculo
+
+    @DELETE("vehiculos/{id}")
+    suspend fun eliminarVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    ): Response<Unit>?
+
+    @POST("vehiculos")
+    suspend fun crearVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Body vehiculo: Vehiculo
+    ): Response<Vehiculo>
 
 }

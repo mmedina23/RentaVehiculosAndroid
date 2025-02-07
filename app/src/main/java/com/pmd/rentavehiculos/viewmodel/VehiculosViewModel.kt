@@ -25,7 +25,8 @@ class VehiculosViewModel : ViewModel() {
     val vehiculosRentados = mutableStateListOf<Vehiculo>()
     val vehiculosDisponibles = mutableStateListOf<Vehiculo>()
     val rentas = mutableStateListOf<RentaRequest>()
-
+    private val _vehiculosDisponibles2 = mutableStateListOf<Vehiculo>()  // 🔹 Aquí se declara correctamente
+    val vehiculosDisponibles2: List<Vehiculo> get() = _vehiculosDisponibles2
     /**
      * Obtiene la lista de vehículos disponibles desde la API.
      */
@@ -170,4 +171,80 @@ class VehiculosViewModel : ViewModel() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         return LocalDateTime.now().format(formatter)
     }
+
+
+    fun actualizarVehiculo(apiKey: String, vehiculo: Vehiculo, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.vehiculosService.actualizarVehiculo(apiKey, vehiculo.id, vehiculo)
+
+
+                obtenerVehiculosDisponibles(apiKey)
+
+                onResult(true, "Vehículo actualizado correctamente")
+
+            } catch (e: HttpException) {
+                onResult(false, "Error HTTP: ${e.code()}")
+            } catch (e: IOException) {
+                onResult(false, "Error de conexión con el servidor")
+            } catch (e: Exception) {
+                onResult(false, "Error desconocido al actualizar")
+            }
+        }
+    }
+
+
+    fun eliminarVehiculo(apiKey: String, vehiculoId: Int, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+
+                val response = RetrofitClient.vehiculosService.eliminarVehiculo(apiKey, vehiculoId)
+
+                if (response != null) {
+                    if (response.isSuccessful) {
+
+                        _vehiculosDisponibles2.removeIf { it.id == vehiculoId }
+                        obtenerVehiculosDisponibles(apiKey)
+                        onResult(true, "Vehículo eliminado correctamente")
+                    } else {
+                        onResult(false, "Error al eliminar vehículo")
+                    }
+                }
+
+            } catch (e: IOException) {
+                onResult(false, "Error de conexión con el servidor")
+              }
+        }
+    }
+
+    fun crearVehiculo(apiKey: String, vehiculo: Vehiculo, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+
+                val response = RetrofitClient.vehiculosService.crearVehiculo(apiKey, vehiculo)
+                Log.d("VehiculosViewModel", "🚀 Enviando vehículo: $vehiculo")
+
+                if (response.isSuccessful) {
+                    val vehiculoCreado = response.body()
+
+                    if (vehiculoCreado != null) {
+
+                        _vehiculosDisponibles2.add(vehiculoCreado)
+
+                        onResult(true, "Vehículo creado exitosamente")
+                    } else {
+                        onResult(false, "Error: Respuesta vacía del servidor")
+                    }
+                } else {
+                    onResult(false, "Error: ${response.code()}")
+                }
+
+            } catch (e: IOException) {
+                onResult(false, "Error de conexión")
+            }
+        }
+    }
+
+
+
 }
