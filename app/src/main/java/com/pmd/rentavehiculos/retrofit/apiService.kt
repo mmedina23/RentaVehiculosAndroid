@@ -3,7 +3,14 @@ package com.pmd.rentavehiculos.retrofit
 
 
 
+import com.pmd.rentavehiculos.modelos.LoginRequest
+import com.pmd.rentavehiculos.modelos.LoginResponse
+import com.pmd.rentavehiculos.modelos.LogoutResponse
+import com.pmd.rentavehiculos.modelos.Persona
+import com.pmd.rentavehiculos.modelos.Renta
+import com.pmd.rentavehiculos.modelos.Vehiculo
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
