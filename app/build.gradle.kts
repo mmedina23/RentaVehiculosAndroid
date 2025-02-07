@@ -75,4 +75,21 @@ dependencies {
     // OkHttp (para logs)
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
+
+
+
+    //LifecycleScope
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.1")
+
+
+
+    //dependencias para el retro fit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //dependencia pra el google.code.gson
+    implementation("com.google.code.gson:gson:2.8.6")
+
 }
