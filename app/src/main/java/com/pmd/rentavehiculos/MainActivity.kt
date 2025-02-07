@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
-import com.pmd.rentavehiculos.data.RetrofitService
+import com.pmd.rentavehiculos.data.remote.RetrofitServiceFactory
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import kotlinx.coroutines.launch
 
@@ -21,10 +21,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val service = RetrofitService.RetrofitServiceFactory.RetrofitService()
+
+        val service = RetrofitServiceFactory.create()
+
         lifecycleScope.launch {
-            val vehiculo = service.lisVehiculos("disponibles")
-            println(vehiculo)
+            try {
+                val vehiculos = service.lisVehiculos("disponibles")
+                println(vehiculos)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         setContent {

@@ -12,18 +12,21 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen()
+            val navController = rememberNavController() // Fix: Define a proper NavController
+            LoginScreen(navController)
         }
     }
 }
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -65,6 +68,8 @@ fun LoginScreen() {
             onClick = {
                 // Aquí puedes agregar la lógica para manejar el inicio de sesión
                 println("Email: $email, Password: $password")
+                // Example: Navigate to Menu Screen after login
+                navController.navigate("menu_screen")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,10 +78,11 @@ fun LoginScreen() {
             Text("Iniciar Sesión")
         }
     }
-
 }
-@Preview
+
+@Preview(showBackground = true)
 @Composable
-fun PreviewLoginScreen(){
-    LoginScreen()
+fun PreviewLoginScreen() {
+    val navController = rememberNavController() // Fix: Add a proper navController for preview
+    LoginScreen(navController)
 }
