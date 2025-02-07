@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.screen
+package com.pmd.rentavehiculos.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
