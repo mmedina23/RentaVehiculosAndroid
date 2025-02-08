@@ -1,0 +1,8 @@
+package com.pmd.rentavehiculos.modelo
+
+data class LoginResponse(
+    val token: String,
+    val perfil: String,
+    val persona: Persona? // Puedes incluir datos adicionales del usuario si el API los envía
+)
+
