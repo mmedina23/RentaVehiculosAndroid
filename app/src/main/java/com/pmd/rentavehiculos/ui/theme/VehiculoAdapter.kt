@@ -1,10 +1,11 @@
 package com.pmd.rentavehiculos.ui.theme
 
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.pmd.rentavehiculos.databinding.ItemVehiculoBinding
 import com.pmd.rentavehiculos.model.Vehiculo
+
 
 class VehiculoAdapter(private val vehiculos: List<Vehiculo>) :
     RecyclerView.Adapter<VehiculoAdapter.VehiculoViewHolder>() {

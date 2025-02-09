@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.screen
 
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.pmd.rentavehiculos.databinding.FragmentVehiculosBinding
+import com.pmd.rentavehiculos.ui.theme.VehiculoAdapter
 import com.pmd.rentavehiculos.viewmodel.VehiculoViewModel
+
 
 class VehiculoFragment : Fragment() {
     private var _binding: FragmentVehiculosBinding? = null

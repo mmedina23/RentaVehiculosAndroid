@@ -1,13 +1,12 @@
 package com.pmd.rentavehiculos.remote
 
-
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 object ApiClient {
-    private const val BASE_URL = "https://tu-api.com/api/" // Cambia esto por la URL real de tu backend
+    private const val BASE_URL = "http://10.0.2.2:8080/api/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
