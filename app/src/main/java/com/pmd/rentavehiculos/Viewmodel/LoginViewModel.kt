@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pmd.rentavehiculos.model.LoginRequest
 import com.pmd.rentavehiculos.model.Persona
+import com.pmd.rentavehiculos.remote.RetrofitClient
 import com.pmd.rentavehiculos.remote.RetrofitService
-
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -30,11 +30,11 @@ class LoginViewModel : ViewModel() {
                 perfil.value = response.perfil
 
 
-
+                //PRUEBAS POR SI ME FALLA LA API
                 Log.d("LoginViewModel", "Usuarioo: ${usuario.value}")
                 Log.d("LoginViewModel", "Perfil: ${perfil.value}")
 
-                onResult(true, perfil.value ?: "CLIENTE")
+                onResult(true, perfil.value ?: "CLIENTE")  // ESTO ME DEVUELVE EL RETURN CON LA VALIDACION DEL EMNU CLIENTE
 
             } catch (e: HttpException) {
                 onResult(false, "Error HTTP ${e.code()}")

@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.core
+package com.pmd.rentavehiculos.Navegacion
 
 import android.os.Build
 import androidx.annotation.RequiresApi

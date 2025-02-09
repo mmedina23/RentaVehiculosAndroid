@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            Navigation(navController) // 🔥 Asegúrate de que se llama `Navigation`
+            Navigation(navController) //
         }
     }
 }
