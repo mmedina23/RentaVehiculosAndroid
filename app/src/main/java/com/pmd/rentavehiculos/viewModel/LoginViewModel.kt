@@ -21,14 +21,13 @@ class LoginViewModel : ViewModel() {
                 val response = RetrofitClient.apiService.login(
                     LoginRequest(username, password)
                 )
-                // Verifica si la respuesta es válida
-                if (response.rol == "ADMIN" || response.rol == "CLIENTE") {
-                    onSuccess(response.rol) // Llama a onSuccess con el perfil del usuario
+                if (response.perfil == "ADMIN" || response.perfil == "CLIENTE") {
+                    onSuccess(response.perfil)
                 } else {
-                    onError("Rol desconocido") // Muestra un error si el rol no es válido
+                    onError("Rol desconocido")
                 }
             } catch (e: Exception) {
-                onError("Error en el login: ${e.localizedMessage}") // Manejo de errores
+                onError("Error en el login: ${e.localizedMessage}")
             }
         }
     }

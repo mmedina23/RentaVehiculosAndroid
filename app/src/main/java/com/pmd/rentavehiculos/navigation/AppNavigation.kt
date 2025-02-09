@@ -10,33 +10,28 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.pmd.rentavehiculos.screen.Admin
+import com.pmd.rentavehiculos.screen.Client
 import com.pmd.rentavehiculos.screen.LoginScreen
 
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    modifier: Modifier = Modifier // Parámetro opcional para el modificador
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
         startDestination = "login",
-        modifier = modifier // Aplicar el modificador recibido
+        modifier = modifier
     ) {
         composable("login") {
             LoginScreen(navController = navController)
         }
-        composable("patata") {
-            PatataScreen()
+        composable("admin") {
+            Admin(navController = navController)
         }
-    }
-}
-
-@Composable
-fun PatataScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Patata", style = MaterialTheme.typography.headlineLarge)
+        composable("cliente") {
+            Client(navController = navController)
+        }
     }
 }

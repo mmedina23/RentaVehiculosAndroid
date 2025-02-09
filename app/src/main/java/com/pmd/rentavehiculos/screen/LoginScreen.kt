@@ -61,12 +61,10 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    // Realiza el login
                     loginViewModel.login(
                         username,
                         password,
                         onSuccess = { perfil ->
-                            // Navega según el perfil
                             if (perfil == "ADMIN") {
                                 navController.navigate("admin")
                             } else {
@@ -74,7 +72,7 @@ fun LoginScreen(
                             }
                         },
                         onError = { error ->
-                            errorMessage = error // Muestra el error en pantalla
+                            errorMessage = error
                         }
                     )
                 },
