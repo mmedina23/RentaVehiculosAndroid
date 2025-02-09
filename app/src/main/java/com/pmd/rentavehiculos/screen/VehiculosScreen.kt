@@ -58,7 +58,8 @@ fun VehiculosScreen(
                     Text(
                         text = "Vehículos Disponibles",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 26.sp
+                        fontSize = 26.sp,
+                        color = Color.White
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF3A8DFF))
@@ -70,7 +71,7 @@ fun VehiculosScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Brush.verticalGradient(listOf(Color(0xFFE0F7FA), Color(0xFF00796B))))
+                .background(Brush.verticalGradient(listOf(Color(0xFFE0F7FA), Color(0xFF0086F1))))
         ) {
             LazyColumn(
                 modifier = Modifier.padding(16.dp)
@@ -141,7 +142,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
             .fillMaxWidth()
             .padding(12.dp)
             .shadow(12.dp, shape = RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Column(
@@ -153,7 +154,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     .fillMaxWidth()
                     .height(200.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF8BC34A)))),
+                    .background(Brush.horizontalGradient(listOf(Color(0xFF007DE8), Color(0xFF45A2EC)))),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -202,11 +203,9 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                         fontSize = 16.sp,
                         color = Color.Gray
                     )
-                    Text(
-                        text = "Cambios: ${vehiculo.cambios}",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
+
+
+
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -215,7 +214,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     text = "Precio/día: ${vehiculo.valor_dia} €",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 20.sp,
-                    color = Color(0xFFDB4437)
+                    color = Color(0xFFFFC200)
                 )
             }
 
