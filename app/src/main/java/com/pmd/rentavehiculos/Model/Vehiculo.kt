@@ -1,15 +1,13 @@
-package com.pmd.rentavehiculos.Model
-import com.google.gson.annotations.SerializedName
+package com.pmd.rentavehiculos.model
 
 data class Vehiculo(
-    @SerializedName("cambios")
-    val cambios: String,
-    val carroceria: String,
-    val color: String,
-    val disponible: Boolean,
     val id: Int,
     val marca: String,
+    val color: String,
+    val carroceria: String,
     val plazas: Int,
-    val tipoCombustible: String,
-    val valorDia: Int
+    val cambios: String,
+    val tipo_combustible: String,
+    val valor_dia: Double,
+    val disponible: Boolean
 )

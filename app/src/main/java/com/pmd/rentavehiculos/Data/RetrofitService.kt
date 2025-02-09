@@ -1,42 +1,24 @@
-package com.pmd.rentavehiculos.Data
-import com.pmd.rentavehiculos.Model.Vehiculo
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+package com.pmd.rentavehiculos.remote
+
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Query
 
-interface RetrofitService {
+object RetrofitService {
+    private const val BASE_URL = "http://192.168.1.42:8080/api/v1/" // Cambiar a la URL real
 
-    //servicio
-    @GET("vehiculos")
-    suspend fun listaVehiculosDisponibles(
-        @Header("x-llave-api") token: String,
-        @Query("estado") estado:String
-    ): List<Vehiculo>
-}
-
-//implementacion del servicio
-object RetrofitServiceFactory{
-    fun retrofitService(): RetrofitService{
-        return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/v1/")//parte de url que es fija
-            .addConverterFactory(GsonConverterFactory.create())//convierte el resultado de la peticion a objeto
-            .client(provideClient())
-            .build().create(RetrofitService::class.java)
+    val authService: AuthService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AuthService::class.java)
     }
 
-    private fun provideClient(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor() // esta pendiente de lo que entra y sale
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .retryOnConnectionFailure(true)
+    val vehiculosService: VehiculosService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-
-        return client
+            .create(VehiculosService::class.java)
     }
 }

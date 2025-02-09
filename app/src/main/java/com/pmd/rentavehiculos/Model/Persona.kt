@@ -1,8 +1,11 @@
-package com.pmd.rentavehiculos.Model
+package com.pmd.rentavehiculos.model
 
 data class Persona(
-    var nombre: String,
-    var apellido: String,
-    var edad: Int
-
+    val id: Int,
+    val nombre: String,
+    val apellidos: String,
+    val direccion: String,
+    val telefono: String,
+    val tipo_identificacion: String,
+    val identificacion: String
 )
