@@ -34,7 +34,7 @@ class LoginViewModel : ViewModel() {
                 Log.d("LoginViewModel", "Usuarioo: ${usuario.value}")
                 Log.d("LoginViewModel", "Perfil: ${perfil.value}")
 
-                onResult(true, perfil.value ?: "CLIENTE") 
+                onResult(true, perfil.value ?: "CLIENTE")
 
             } catch (e: HttpException) {
                 onResult(false, "Error HTTP ${e.code()}")

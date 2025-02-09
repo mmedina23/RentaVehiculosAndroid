@@ -1,28 +1,20 @@
 package com.pmd.rentavehiculos
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.pmd.rentavehiculos.Navegacion.AppNavigation
+import androidx.annotation.RequiresApi
+import androidx.navigation.compose.rememberNavController
+import com.pmd.rentavehiculos.core.Navigation
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
         setContent {
-            AppNavigation(innerPadding = PaddingValues(0.dp))
+            val navController = rememberNavController()
+            Navigation(navController) // 🔥 Asegúrate de que se llama `Navigation`
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    AppNavigation(innerPadding = PaddingValues(0.dp))
 }
