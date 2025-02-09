@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.Screen
+package com.pmd.rentavehiculos.screen
 
 import android.os.Build
 import androidx.annotation.RequiresApi

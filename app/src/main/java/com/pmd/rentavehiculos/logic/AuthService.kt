@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.remote
+package com.pmd.rentavehiculos.logic
 
 import com.pmd.rentavehiculos.model.AuthResponse
 import com.pmd.rentavehiculos.model.LoginRequest

@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.Screen
+package com.pmd.rentavehiculos.screen
 
 import android.util.Log
 import androidx.compose.foundation.background

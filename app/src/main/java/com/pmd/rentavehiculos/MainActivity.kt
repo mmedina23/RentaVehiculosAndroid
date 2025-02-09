@@ -6,7 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.navigation.compose.rememberNavController
-import com.pmd.rentavehiculos.core.Navigation
+import com.pmd.rentavehiculos.Navegacion.Navigation
+
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

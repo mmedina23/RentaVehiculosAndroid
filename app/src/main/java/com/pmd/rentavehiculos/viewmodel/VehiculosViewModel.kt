@@ -2,7 +2,6 @@ package com.pmd.rentavehiculos.viewmodel
 
 import android.icu.text.SimpleDateFormat
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -10,10 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.pmd.rentavehiculos.model.Vehiculo
 import com.pmd.rentavehiculos.model.Persona
 import com.pmd.rentavehiculos.model.RentaRequest
-import com.pmd.rentavehiculos.remote.RetrofitService
+import com.pmd.rentavehiculos.logic.RetrofitService
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar

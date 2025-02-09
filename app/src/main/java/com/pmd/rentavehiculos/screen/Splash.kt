@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.Screen
+package com.pmd.rentavehiculos.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
