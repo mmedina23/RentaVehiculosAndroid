@@ -1,48 +1,95 @@
 package com.pmd.rentavehiculos.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel // IMPORTANTE
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.pmd.rentavehiculos.viewModel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(), // Hilt inyecta el ViewModel aquí
-    onLoginSuccess: (String) -> Unit
+    navController: NavController,
+    loginViewModel: LoginViewModel = viewModel()
 ) {
-    val loginResult by viewModel.loginResult.observeAsState()
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        var username by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Registro",
+                style = MaterialTheme.typography.headlineLarge
+            )
 
-        TextField(value = username, onValueChange = { username = it }, label = { Text("Usuario") })
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation()
-        )
-        Button(onClick = { viewModel.login(username, password) }) {
-            Text("Iniciar Sesión")
-        }
-        loginResult?.let {
-            if (it.role == "admin") {
-                onLoginSuccess("admin")
-            } else {
-                onLoginSuccess("cliente")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                placeholder = { Text("Usuario") },
+                label = { Text("Usuario") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = { Text("Contraseña") },
+                label = { Text("Contraseña") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    // Realiza el login
+                    loginViewModel.login(
+                        username,
+                        password,
+                        onSuccess = { perfil ->
+                            // Navega según el perfil
+                            if (perfil == "ADMIN") {
+                                navController.navigate("admin")
+                            } else {
+                                navController.navigate("cliente")
+                            }
+                        },
+                        onError = { error ->
+                            errorMessage = error // Muestra el error en pantalla
+                        }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Validar")
+            }
+
+            errorMessage?.let { message ->
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
