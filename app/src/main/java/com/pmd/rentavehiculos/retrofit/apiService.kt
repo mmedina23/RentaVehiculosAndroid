@@ -16,6 +16,7 @@ import retrofit2.http.*
 interface ApiService {
 
     // Endpoint para iniciar sesión
+    @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
 

@@ -27,6 +27,8 @@ android {
             )
         }
     }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -36,6 +38,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    packaging { //mirar si luego esto da a errores futuros
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/INDEX.LIST"
+        }
     }
 }
 
@@ -92,4 +100,17 @@ dependencies {
     //dependencia pra el google.code.gson
     implementation("com.google.code.gson:gson:2.8.6")
 
+
+//pal navegadol
+    implementation("androidx.navigation:navigation-compose:2.8.6")
+
+
+    //corrutinas
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+
+
 }
+
