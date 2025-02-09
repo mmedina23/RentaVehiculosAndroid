@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.screen
+package com.pmd.rentavehiculos.Screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -21,7 +21,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun Splash(navController: NavController) {
     var isVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -68,5 +68,5 @@ fun SplashScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewSplashScreen() {
-    SplashScreen(navController = rememberNavController())
+    Splash(navController = rememberNavController())
 }
