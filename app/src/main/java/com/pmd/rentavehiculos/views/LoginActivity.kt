@@ -30,7 +30,6 @@ class LoginActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun LoginScreen() {
     var username by remember { mutableStateOf("") }
@@ -39,6 +38,14 @@ fun LoginScreen() {
     var loginError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val apiService = ApiClient.retrofit.create(ApiService::class.java)
+
+    // 🔥 Para manejar la navegación sin error
+    val activityLauncher = rememberUpdatedState(newValue = { token: String ->
+        val intent = Intent(context, VehiculosActivity::class.java)
+        intent.putExtra("TOKEN", token) // 📌 Pasamos el token como extra en el Intent
+        context.startActivity(intent)
+
+    })
 
     Column(
         modifier = Modifier
@@ -79,15 +86,10 @@ fun LoginScreen() {
             onClick = {
                 if (username.isNotEmpty() && password.isNotEmpty()) {
                     isLoading = true
-                    login(apiService, username, password) { success, role, errorMessage ->
+                    login(apiService, username, password) { success, token, errorMessage ->
                         isLoading = false
                         if (success) {
-                            val intent = if (role == "admin") {
-                                Intent(context, AdminActivity::class.java)
-                            } else {
-                                Intent(context, ClienteActivity::class.java)
-                            }
-                            context.startActivity(intent)
+                            activityLauncher.value(token!!) // 🔥 Lanza la actividad aquí
                         } else {
                             loginError = errorMessage ?: "Error al iniciar sesión"
                         }
@@ -113,25 +115,14 @@ fun login(
     password: String,
     onResult: (Boolean, String?, String?) -> Unit
 ) {
-    val request = LoginRequest(username, password)
-
-    // 🔥 DEBUG: Ver qué se envía
-    println("📤 Enviando solicitud de login: ${request.nombreUsuario} - ${request.contrasena}")
-    println("📤 URL: ${ApiClient.retrofit.baseUrl()}auth/login")
-
-    val call = apiService.login(request)
+    val call = apiService.login(LoginRequest(username, password))
 
     call.enqueue(object : Callback<LoginResponse> {
         override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-            // 🔥 DEBUG: Ver qué responde el servidor
-            println("📥 Respuesta del servidor: ${response.code()} - ${response.message()}")
-            println("📥 Body: ${response.body()?.toString()}")
-            println("📥 ErrorBody: ${response.errorBody()?.string()}")
-
             if (response.isSuccessful) {
                 val loginResponse = response.body()
                 if (loginResponse != null) {
-                    onResult(true, loginResponse.perfil, null)
+                    onResult(true, loginResponse.llave, null)
                 } else {
                     onResult(false, null, "Respuesta vacía del servidor")
                 }
@@ -141,7 +132,6 @@ fun login(
         }
 
         override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-            println("❌ Error de conexión: ${t.message}") // <-- DEBUG
             onResult(false, null, "Error de conexión: ${t.message}")
         }
     })

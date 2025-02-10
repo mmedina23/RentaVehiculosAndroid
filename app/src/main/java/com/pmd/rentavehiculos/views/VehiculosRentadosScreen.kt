@@ -1,9 +1,11 @@
 package com.pmd.rentavehiculos.views
 
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,39 +16,73 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.models.VehiculoRentado
-import com.pmd.rentavehiculos.viewmodels.VehiculosRentadosViewModel
+import com.pmd.rentavehiculos.network.ApiClient
+import com.pmd.rentavehiculos.network.ApiService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class VehiculosRentadosActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // ✅ Obtener el token que se pasa desde el login
+        val token = intent.getStringExtra("TOKEN") ?: ""
+
         setContent {
-            VehiculosRentadosScreen(
-                viewModel = TODO()
-            )
+            VehiculosRentadosScreen(token)
         }
     }
 }
-
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VehiculosRentadosScreen(viewModel: VehiculosRentadosViewModel ) {
+fun VehiculosRentadosScreen(token: String) {
     val context = LocalContext.current
+    var vehiculosRentados by remember { mutableStateOf<List<VehiculoRentado>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    val apiService = ApiClient.retrofit.create(ApiService::class.java)
 
-    LaunchedEffect(Unit) { viewModel.cargarVehiculosRentados(1) }
+    LaunchedEffect(Unit) {
+        val call = apiService.obtenerVehiculosRentados(token)
+        call.enqueue(object : Callback<List<VehiculoRentado>> {
+            override fun onResponse(call: Call<List<VehiculoRentado>>, response: Response<List<VehiculoRentado>>) {
+                if (response.isSuccessful) {
+                    vehiculosRentados = response.body() ?: emptyList()
+                } else {
+                    Toast.makeText(context, "Error al obtener vehículos", Toast.LENGTH_SHORT).show()
+                }
+                isLoading = false
+            }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Vehículos Rentados") }) }
+            override fun onFailure(call: Call<List<VehiculoRentado>>, t: Throwable) {
+                Toast.makeText(context, "Error de conexión", Toast.LENGTH_SHORT).show()
+                isLoading = false
+            }
+        })
+    }
+
+    Scaffold( // 🔴 Si Scaffold genera la advertencia
+        topBar = { TopAppBar(title = { Text("Vehículos Rentados") }) } // 🔴 Si TopAppBar la genera
     ) { padding ->
-        if (viewModel.isLoading) {
+        if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(modifier = Modifier.padding(padding)) {
-                items(viewModel.vehiculosRentados) { vehiculo ->
-                    VehiculoRentadoItem(vehiculo) {
-                        viewModel.devolverVehiculo(1, vehiculo.id) { mensaje ->
-                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
+            if (vehiculosRentados.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No has rentado ningún vehículo 😢")
+                }
+            } else {
+                LazyColumn(modifier = Modifier.padding(padding)) {
+                    items(vehiculosRentados) { vehiculo ->
+                        VehiculoRentadoItem(vehiculo, token) {
+                            vehiculosRentados = vehiculosRentados.filter { it.id != vehiculo.id }
                         }
                     }
                 }
@@ -55,9 +91,15 @@ fun VehiculosRentadosScreen(viewModel: VehiculosRentadosViewModel ) {
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun VehiculoRentadoItem(vehiculo: VehiculoRentado, onDevolver: () -> Unit) {
-    var showDialog by remember { mutableStateOf(false) }
+fun VehiculoRentadoItem(vehiculo: VehiculoRentado, token: String, onDevolverExitoso: () -> Unit) {
+    val context = LocalContext.current
+    val apiService = ApiClient.retrofit.create(ApiService::class.java)
+
+    // 📌 Cálculo de días rentados
+    val diasRenta = calcularDiasRenta(vehiculo.fechaRenta, vehiculo.fechaEntrega)
 
     Card(
         modifier = Modifier
@@ -66,44 +108,18 @@ fun VehiculoRentadoItem(vehiculo: VehiculoRentado, onDevolver: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    Text(text = "${vehiculo.marca} ${vehiculo.modelo}", style = MaterialTheme.typography.titleMedium)
-                    Text(text = "Renta desde: ${vehiculo.fechaRenta}", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Entrega prevista: ${vehiculo.fechaEntrega}", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Total pagado: \$${vehiculo.precioTotal}", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(onClick = { showDialog = true }) {
-                Text("Devolver Vehículo")
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Confirmar Devolución") },
-                    text = { Text("¿Estás seguro de que quieres devolver este vehículo?") },
-                    confirmButton = {
-                        Button(onClick = {
-                            onDevolver()
-                            showDialog = false
-                        }) {
-                            Text("Sí, devolver")
-                        }
-                    },
-                    dismissButton = {
-                        Button(onClick = { showDialog = false }) {
-                            Text("Cancelar")
-                        }
-                    }
-                )
-            }
+            Text(text = "${vehiculo.marca} ${vehiculo.modelo}", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Días rentados: $diasRenta", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Total: \$${vehiculo.precioTotal}", style = MaterialTheme.typography.bodyMedium)
         }
     }
+}
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun calcularDiasRenta(fechaRenta: String, fechaEntrega: String?): Long {
+    val formato = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Asegúrate que coincide con la API
+    val fechaInicio = LocalDate.parse(fechaRenta, formato)
+    val fechaFin = fechaEntrega?.let { LocalDate.parse(it, formato) } ?: LocalDate.now()
+
+    return ChronoUnit.DAYS.between(fechaInicio, fechaFin)
+}
