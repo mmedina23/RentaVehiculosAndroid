@@ -3,8 +3,10 @@ package com.pmd.rentavehiculos.components
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ActualizarVehiculoPorId(viewModel: VehiculoViewModel = viewModel()) {
     val context = LocalContext.current
+    val vehiculos by viewModel.vehiculos.collectAsState()
 
     // Variables de estado para almacenar los datos del formulario
     var id by remember { mutableStateOf("") }
@@ -186,6 +189,13 @@ fun ActualizarVehiculoPorId(viewModel: VehiculoViewModel = viewModel()) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Actualizar")
+            }
+
+            // Mostrar la lista de vehículos actualizada
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Vehículos Disponibles:", style = MaterialTheme.typography.titleMedium)
+            vehiculos.forEach { vehiculo ->
+                Text("ID: ${vehiculo.id}, Marca: ${vehiculo.marca}", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
