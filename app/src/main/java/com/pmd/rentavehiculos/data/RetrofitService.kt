@@ -1,44 +1,54 @@
 package com.pmd.rentavehiculos.data
 
-
-import com.pmd.rentavehiculos.data.model.Vehiculo
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Query
 
-interface RetrofitService {
+object RetrofitServiceFactory {
 
-    //servicio
-    @GET("vehiculos")
-    suspend fun listaVehiculosDisponibles(
-        @Header("x-llave-api") token: String,
-        @Query("estado") estado:String
-    ): List<Vehiculo>
-}
+    private const val BASE_URL = "http://10.0.2.2:8080/api/v1/"
 
-//implementacion del servicio
-object RetrofitServiceFactory{
-    fun retrofitService(): RetrofitService{
-        return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/v1/")//parte de url que es fija
-            .addConverterFactory(GsonConverterFactory.create())//convierte el resultado de la peticion a objeto
-            .client(provideClient())
-            .build().create(RetrofitService::class.java)
+    // Crear instancia del cliente una sola vez
+    private val client: OkHttpClient by lazy {
+        provideClient()
     }
 
+    fun vehiculoService(): VehiculoService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL) // parte de la URL que es fija
+            .addConverterFactory(GsonConverterFactory.create()) // convierte el resultado de la petición a objeto
+            .client(client)
+            .build()
+            .create(VehiculoService::class.java)
+    }
+
+    fun personaService(): PersonaService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(PersonaService::class.java)
+    }
+
+    fun authService(): AuthService{
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(AuthService::class.java)
+    }
+
+
     private fun provideClient(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor() // esta pendiente de lo que entra y sale
+        val interceptor = HttpLoggingInterceptor() // Está pendiente de lo que entra y sale
         interceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val client = OkHttpClient.Builder()
+        return OkHttpClient.Builder()
             .addInterceptor(interceptor)
             .retryOnConnectionFailure(true)
             .build()
-
-        return client
     }
 }
