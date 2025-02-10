@@ -6,16 +6,20 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.pmd.rentavehiculos.viewModel.LoginViewModel
+import com.pmd.rentavehiculos.viewModel.LoginViewModelFactory
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(LocalContext.current)
+    )
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

@@ -13,4 +13,12 @@ object RetrofitClient {
             .build()
             .create(ApiService::class.java)
     }
+
+    val vehiculosService: VehiculosService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(VehiculosService::class.java)
+    }
 }
