@@ -1,8 +1,12 @@
 package com.pmd.rentavehiculos.models
 
+
+
 import com.google.gson.annotations.SerializedName
 
 data class LoginResponse(
-    val token: String,
-    @SerializedName("role") val role: String // Asegúrate de que el campo sea correcto
+    @SerializedName("persona") val persona: Persona,
+    @SerializedName("perfil") val perfil: String,  // Cambia 'role' por 'perfil'
+    @SerializedName("llave") val llave: String,
+    @SerializedName("fecha_exp_llave") val fechaExpLlave: String
 )

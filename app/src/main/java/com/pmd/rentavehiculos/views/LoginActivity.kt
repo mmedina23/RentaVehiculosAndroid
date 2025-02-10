@@ -107,21 +107,31 @@ fun LoginScreen() {
         }
     }
 }
-
 fun login(
     apiService: ApiService,
     username: String,
     password: String,
     onResult: (Boolean, String?, String?) -> Unit
 ) {
-    val call = apiService.login(LoginRequest(username, password))
+    val request = LoginRequest(username, password)
+
+    // 🔥 DEBUG: Ver qué se envía
+    println("📤 Enviando solicitud de login: ${request.nombreUsuario} - ${request.contrasena}")
+    println("📤 URL: ${ApiClient.retrofit.baseUrl()}auth/login")
+
+    val call = apiService.login(request)
 
     call.enqueue(object : Callback<LoginResponse> {
         override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+            // 🔥 DEBUG: Ver qué responde el servidor
+            println("📥 Respuesta del servidor: ${response.code()} - ${response.message()}")
+            println("📥 Body: ${response.body()?.toString()}")
+            println("📥 ErrorBody: ${response.errorBody()?.string()}")
+
             if (response.isSuccessful) {
                 val loginResponse = response.body()
                 if (loginResponse != null) {
-                    onResult(true, loginResponse.role, null)
+                    onResult(true, loginResponse.perfil, null)
                 } else {
                     onResult(false, null, "Respuesta vacía del servidor")
                 }
@@ -131,6 +141,7 @@ fun login(
         }
 
         override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            println("❌ Error de conexión: ${t.message}") // <-- DEBUG
             onResult(false, null, "Error de conexión: ${t.message}")
         }
     })

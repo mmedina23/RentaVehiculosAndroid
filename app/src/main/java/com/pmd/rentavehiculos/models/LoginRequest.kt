@@ -1,6 +1,8 @@
 package com.pmd.rentavehiculos.models
 
+import com.google.gson.annotations.SerializedName
+
 data class LoginRequest(
-    val username: String,
-    val password: String
+    @SerializedName("nombre_usuario") val nombreUsuario: String,
+    @SerializedName("contrasena") val contrasena: String
 )

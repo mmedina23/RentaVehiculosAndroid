@@ -29,6 +29,11 @@
         <!-- MainActivity (opcional, si decides usarla después del login) -->
         <activity android:name=".MainActivity" android:exported="true"/>
 
+        <activity android:name=".views.ClienteActivity"/>
+
+        <activity android:name=".views.AdminActivity"/>
+
+
     </application>
 
 </manifest>
