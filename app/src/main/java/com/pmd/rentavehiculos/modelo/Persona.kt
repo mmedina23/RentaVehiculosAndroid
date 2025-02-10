@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.dataModel
+package com.pmd.rentavehiculos.modelo
 
 data class Persona(
     val id: Int,
