@@ -11,8 +11,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 class RentaRepository {
 
-    class RentaRepository {
-
         // Método para hacer login
         suspend fun login(loginRequest: LoginRequest): LoginResponse {
             val response: Response<LoginResponse> = RetrofitClient.authService.login(loginRequest)
@@ -92,5 +90,5 @@ class RentaRepository {
                 throw HttpException(response)
             }
         }
-    }
+
 }
