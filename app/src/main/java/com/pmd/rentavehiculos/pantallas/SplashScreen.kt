@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.Pantallas
+package com.pmd.rentavehiculos.pantallas
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
