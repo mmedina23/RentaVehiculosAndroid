@@ -36,6 +36,7 @@ fun LoginScreen() {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var loginError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val apiService = ApiClient.retrofit.create(ApiService::class.java)
 
@@ -67,13 +68,18 @@ fun LoginScreen() {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
+        if (loginError != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = loginError!!, color = MaterialTheme.colorScheme.error)
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = {
                 if (username.isNotEmpty() && password.isNotEmpty()) {
                     isLoading = true
-                    login(apiService, username, password) { success, role ->
+                    login(apiService, username, password) { success, role, errorMessage ->
                         isLoading = false
                         if (success) {
                             val intent = if (role == "admin") {
@@ -83,7 +89,7 @@ fun LoginScreen() {
                             }
                             context.startActivity(intent)
                         } else {
-                            Toast.makeText(context, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                            loginError = errorMessage ?: "Error al iniciar sesión"
                         }
                     }
                 } else {
@@ -102,7 +108,12 @@ fun LoginScreen() {
     }
 }
 
-fun login(apiService: ApiService, username: String, password: String, onResult: (Boolean, String) -> Unit) {
+fun login(
+    apiService: ApiService,
+    username: String,
+    password: String,
+    onResult: (Boolean, String?, String?) -> Unit
+) {
     val call = apiService.login(LoginRequest(username, password))
 
     call.enqueue(object : Callback<LoginResponse> {
@@ -110,17 +121,17 @@ fun login(apiService: ApiService, username: String, password: String, onResult: 
             if (response.isSuccessful) {
                 val loginResponse = response.body()
                 if (loginResponse != null) {
-                    onResult(true, loginResponse.role)
+                    onResult(true, loginResponse.role, null)
                 } else {
-                    onResult(false, "")
+                    onResult(false, null, "Respuesta vacía del servidor")
                 }
             } else {
-                onResult(false, "")
+                onResult(false, null, "Credenciales incorrectas")
             }
         }
 
         override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-            onResult(false, "")
+            onResult(false, null, "Error de conexión: ${t.message}")
         }
     })
 }

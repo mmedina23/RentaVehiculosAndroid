@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
 import com.pmd.rentavehiculos.models.VehiculoRentado
 import com.pmd.rentavehiculos.viewmodels.VehiculosRentadosViewModel
 
@@ -23,12 +20,16 @@ class VehiculosRentadosActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VehiculosRentadosScreen()
+            VehiculosRentadosScreen(
+                viewModel = TODO()
+            )
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VehiculosRentadosScreen(viewModel: VehiculosRentadosViewModel = viewModel()) {
+fun VehiculosRentadosScreen(viewModel: VehiculosRentadosViewModel ) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) { viewModel.cargarVehiculosRentados(1) }
@@ -54,7 +55,6 @@ fun VehiculosRentadosScreen(viewModel: VehiculosRentadosViewModel = viewModel())
     }
 }
 
-
 @Composable
 fun VehiculoRentadoItem(vehiculo: VehiculoRentado, onDevolver: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
@@ -66,12 +66,7 @@ fun VehiculoRentadoItem(vehiculo: VehiculoRentado, onDevolver: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row {
-                Image(
-                    painter = rememberImagePainter(vehiculo.imagenUrl),
-                    contentDescription = "Imagen del vehículo",
-                    modifier = Modifier.size(80.dp)
-                )
+
 
                 Spacer(modifier = Modifier.width(16.dp))
 
@@ -111,4 +106,4 @@ fun VehiculoRentadoItem(vehiculo: VehiculoRentado, onDevolver: () -> Unit) {
             }
         }
     }
-}
+
