@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pmd.rentavehiculos.models.RentaRequest
 import com.pmd.rentavehiculos.models.RentaResponse
+import com.pmd.rentavehiculos.models.Vehiculo
 
 class VehiculoViewModel : ViewModel() {
     private val apiService: ApiService = ApiClient.retrofit.create(ApiService::class.java)

@@ -1,13 +1,19 @@
 package com.pmd.rentavehiculos.views
 
-
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.pmd.rentavehiculos.R
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.models.LoginRequest
 import com.pmd.rentavehiculos.models.LoginResponse
 import com.pmd.rentavehiculos.network.ApiClient
@@ -16,58 +22,105 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LoginActivity : AppCompatActivity() {
-    private lateinit var apiService: ApiService
-
+class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContent {
+            LoginScreen()
+        }
+    }
+}
 
-        apiService = ApiClient.retrofit.create(ApiService::class.java)
+@Composable
+fun LoginScreen() {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val apiService = ApiClient.retrofit.create(ApiService::class.java)
 
-        val etUsername = findViewById<EditText>(R.id.etUsername)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val btnLogin = findViewById<Button>(R.id.btnLogin)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Iniciar Sesión", style = MaterialTheme.typography.headlineLarge)
 
-        btnLogin.setOnClickListener {
-            val username = etUsername.text.toString()
-            val password = etPassword.text.toString()
+        Spacer(modifier = Modifier.height(20.dp))
 
-            if (username.isNotEmpty() && password.isNotEmpty()) {
-                login(username, password)
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Usuario") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    isLoading = true
+                    login(apiService, username, password) { success, role ->
+                        isLoading = false
+                        if (success) {
+                            val intent = if (role == "admin") {
+                                Intent(context, AdminActivity::class.java)
+                            } else {
+                                Intent(context, ClienteActivity::class.java)
+                            }
+                            context.startActivity(intent)
+                        } else {
+                            Toast.makeText(context, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Ingrese usuario y contraseña", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator()
             } else {
-                Toast.makeText(this, "Ingrese usuario y contraseña", Toast.LENGTH_SHORT).show()
+                Text("Iniciar Sesión")
             }
         }
     }
+}
 
-    private fun login(username: String, password: String) {
-        val call = apiService.login(LoginRequest(username, password))
+fun login(apiService: ApiService, username: String, password: String, onResult: (Boolean, String) -> Unit) {
+    val call = apiService.login(LoginRequest(username, password))
 
-        call.enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                if (response.isSuccessful) {
-                    val loginResponse = response.body()
-                    if (loginResponse != null) {
-                        Toast.makeText(applicationContext, "Bienvenido ${loginResponse.role}", Toast.LENGTH_SHORT).show()
-
-                        // Redirigir según el rol
-                        val intent = if (loginResponse.role == "admin") {
-                            Intent(applicationContext, AdminActivity::class.java)
-                        } else {
-                            Intent(applicationContext, ClienteActivity::class.java)
-                        }
-                        startActivity(intent)
-                        finish()
-                    }
+    call.enqueue(object : Callback<LoginResponse> {
+        override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+            if (response.isSuccessful) {
+                val loginResponse = response.body()
+                if (loginResponse != null) {
+                    onResult(true, loginResponse.role)
                 } else {
-                    Toast.makeText(applicationContext, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                    onResult(false, "")
                 }
+            } else {
+                onResult(false, "")
             }
+        }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Toast.makeText(applicationContext, "Error de conexión", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
+        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            onResult(false, "")
+        }
+    })
 }

@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "https://tu-servidor-api.com/api/" // Reemplázalo con la URL real
+    private const val BASE_URL = "http://localhost:8080/api/v1/" // Reemplázalo con la URL real
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
