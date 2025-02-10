@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
             // Navega a la pantalla correspondiente según el perfil
             // Por ejemplo, si el perfil es "admin", navega a AdminActivity;
             // si es "cliente", navega a ClienteActivity.
-            when (authResponse.perfil) {
+            when (authResponse.perfil.lowercase()) {
                 "admin" -> {
                     // Navegar a la pantalla de admin
                     val intent = Intent(this, AdminActivity::class.java)

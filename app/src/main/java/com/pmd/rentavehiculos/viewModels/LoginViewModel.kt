@@ -23,7 +23,7 @@ class LoginViewModel : ViewModel() {
     fun login(usuario: String, contrasena: String) {
         viewModelScope.launch {
             try {
-                val loginRequest = LoginRequest(usuario = usuario, contrasena = contrasena)
+                val loginRequest = LoginRequest(nombreUsuario = usuario, contrasena = contrasena)
                 val authResponse = repository.login(loginRequest)
                 authResponseLiveData.value = authResponse
             } catch (ex: Exception) {
