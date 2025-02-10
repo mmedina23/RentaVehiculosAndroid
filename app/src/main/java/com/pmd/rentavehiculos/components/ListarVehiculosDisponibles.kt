@@ -22,14 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.viewModel.VehiculoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun VehiculosScreen(viewModel: VehiculoViewModel = viewModel()) {
+fun VehiculosDisponibles(viewModel: VehiculoViewModel = viewModel()) {
     val vehiculos = viewModel.vehiculos.collectAsState().value
 
     Scaffold(
@@ -47,7 +46,7 @@ fun VehiculosScreen(viewModel: VehiculoViewModel = viewModel()) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(vehiculos) { vehiculo ->
-                    PersonaScreen()
+                    VehiculoItem(vehiculo)
                 }
             }
         }

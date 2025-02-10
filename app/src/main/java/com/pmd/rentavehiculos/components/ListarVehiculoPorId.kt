@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,58 +21,42 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.pmd.rentavehiculos.data.model.Persona
-import com.pmd.rentavehiculos.viewModel.PersonaViewModel
+import com.pmd.rentavehiculos.data.model.Vehiculo
 
-
-
-
-
+import com.pmd.rentavehiculos.viewModel.VehiculoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ListarPersonas(viewModel: PersonaViewModel = viewModel()) {
-    val navController = rememberNavController()
-    val personas = viewModel.personas.collectAsState().value
+fun VehiculosPorId(viewModel: VehiculoViewModel = viewModel()) {
+    val vehiculo = viewModel.vehiculoPorId.collectAsState().value
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Personas") })
+            TopAppBar(title = { Text("Vehículos Por Id") })
         }
     ) {
-        if (personas.isEmpty()) {
+        if (vehiculo==null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(personas) { persona ->
-                    PersonaItem(persona)
-                }
-            }
+            VehiculoItemId(vehiculo)
         }
     }
 }
 
 @Composable
-fun PersonaItem(persona: Persona) {
+fun VehiculoItemId(vehiculo: Vehiculo) {
     Card(
         elevation = 4.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = " Id : ${persona.id} ", style = MaterialTheme.typography.headlineSmall )
-            Text(text = "Nombre: ${persona.nombre}")
-            Text(text = "Apellidos: ${persona.apellidos}")
-            Text(text = "direccion : ${persona.direccion}")
-            Text(text = "telefono: ${persona.telefono}")
-            Text(text = " tipoIdentificacion: ${persona.tipoIdentificacion} " )
-            Text(text = " identificacion: ${persona.identificacion} " )
+            Text(text = "${vehiculo.marca} - ${vehiculo.carroceria}", style = MaterialTheme.typography.headlineSmall )
+            Text(text = "Color: ${vehiculo.color}")
+            Text(text = "Combustible: ${vehiculo.tipoCombustible}")
+            Text(text = "Precio por día: €${vehiculo.valorDia}")
         }
     }
 }
