@@ -53,9 +53,15 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     //LifecycleScope
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0") // Reemplaza con la última versión
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.1")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

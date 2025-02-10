@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val URL = "http://192.168.1.133:8080/api/v1/"
+    private const val URL = "http://192.168.1.134:8080/api/v1/"
 
     fun makeRetrofitService() : ApiService {
         return Retrofit.Builder()

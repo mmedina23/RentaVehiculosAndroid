@@ -7,7 +7,13 @@ import kotlinx.serialization.Serializable
 object SplashScreen
 
 @Serializable
-object Personas
+data class Persona(val token: String)
 
 @Serializable
 object Login
+
+@Serializable
+data class Cliente(val token: String)
+
+@Serializable
+data class Admind(val token: String)

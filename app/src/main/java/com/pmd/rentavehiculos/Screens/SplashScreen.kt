@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pmd.rentavehiculos.Core.Login
-import com.pmd.rentavehiculos.Core.Personas
 import com.pmd.rentavehiculos.R
 import kotlinx.coroutines.delay
 

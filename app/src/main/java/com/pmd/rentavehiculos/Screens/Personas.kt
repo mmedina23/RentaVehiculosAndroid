@@ -7,24 +7,21 @@ import com.pmd.rentavehiculos.Api.RetrofitInstance
 import com.pmd.rentavehiculos.Entity.Persona
 
 @Composable
-fun PersonasFunction() {
-    // API Service instance
+fun PersonasFunction(token : String) {
     val service = RetrofitInstance.makeRetrofitService()
+
 
     // State to hold the list of personas, loading state, and error message
     var personas by remember { mutableStateOf<List<Persona>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // LaunchedEffect to fetch data when composable is first launched
     LaunchedEffect(Unit) {
         try {
-            // Fetch personas data from API
-            val result = service.obtenerpersonas("31012025230930787")
+            val result = service.obtenerpersonas(token)
             personas = result
             isLoading = false
         } catch (e: Exception) {
-            // Handle error if API call fails
             errorMessage = "Error: ${e.message}"
             isLoading = false
         }

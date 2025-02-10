@@ -13,7 +13,7 @@ data class Persona (
     val direccion : String,
     @SerializedName("telefono")
     val telefono : String,
-    @SerializedName("tipoIdentificacion")
+    @SerializedName("tipo_identificacion")
     val tipoIdentificacion : String,
     @SerializedName("identificacion")
     val identificacion : String
