@@ -41,6 +41,12 @@ android {
 
 dependencies {
 
+    // Jetpack Compose
+    implementation ("androidx.compose.ui:ui:1.5.4")
+    implementation ("androidx.compose.material3:material3:1.1.2")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation ("androidx.activity:activity-compose:1.8.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,6 +61,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.navigation.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

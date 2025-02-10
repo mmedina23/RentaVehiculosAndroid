@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.model
+package com.pmd.rentavehiculos.models
 
 data class Usuario(
     val persona: Persona,
