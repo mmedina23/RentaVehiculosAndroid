@@ -1,6 +1,6 @@
 package com.pmd.rentavehiculos.data.model
 
 data class LoginRequest(
-    val email: String,
-    val password: String
+    val nombre_usuario: String,
+    val contrasena: String
 )

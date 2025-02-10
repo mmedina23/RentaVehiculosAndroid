@@ -1,5 +1,10 @@
 package com.pmd.rentavehiculos.data.network
 
+import com.pmd.rentavehiculos.data.model.LoginRequest
+import com.pmd.rentavehiculos.data.model.LoginResponse
+import com.pmd.rentavehiculos.data.model.Persona
+import com.pmd.rentavehiculos.data.model.Renta
+import com.pmd.rentavehiculos.data.model.Vehiculo
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
