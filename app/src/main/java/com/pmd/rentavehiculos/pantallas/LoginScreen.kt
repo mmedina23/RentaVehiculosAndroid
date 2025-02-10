@@ -2,6 +2,7 @@ package com.pmd.rentavehiculos.pantallas
 
 import android.graphics.Color.rgb
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -32,8 +35,16 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
     ) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.logo4), // Asegúrate de que la imagen esté en res/drawable
+            contentDescription = null,
+            contentScale = ContentScale.Crop, // Ajusta la imagen al tamaño de la pantalla
+            modifier = Modifier.matchParentSize()
+        )
+
+        // Contenido de la pantalla (Formulario, botones, etc.)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -41,18 +52,10 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            /*Image(
-                painter = painterResource(id = R.drawable.logo1),
-                contentDescription = "Logo de la aplicación",
-                modifier = Modifier
-                    .size(280.dp)
-            )*/
-
             CustomTextField(
                 value = username,
                 onValueChange = { username = it },
                 label = "Usuario"
-
             )
 
             CustomTextField(
@@ -67,7 +70,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             Button(
                 onClick = {
                     if (username.isNotEmpty() && password.isNotEmpty()) {
-                        viewModel.login(username, password) { success , perfil ->
+                        viewModel.login(username, password) { success, perfil ->
                             if (success) {
                                 if (perfil == "ADMIN") {
                                     navController.navigate("menu_admin")
@@ -108,6 +111,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(

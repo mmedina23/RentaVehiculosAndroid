@@ -2,8 +2,6 @@ package com.pmd.rentavehiculos.remote
 
 import com.pmd.rentavehiculos.ClasesPrincipales.AuthResponse
 import com.pmd.rentavehiculos.ClasesPrincipales.LoginRequest
-import com.pmd.rentavehiculos.model.AuthResponse
-import com.pmd.rentavehiculos.model.LoginRequest
 
 import retrofit2.http.Body
 import retrofit2.http.Headers
