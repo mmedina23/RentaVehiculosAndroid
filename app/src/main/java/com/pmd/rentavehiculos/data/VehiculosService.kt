@@ -1,11 +1,10 @@
 package com.pmd.rentavehiculos.data
-
+import com.pmd.rentavehiculos.modelo.RentaVehiculo
 import com.pmd.rentavehiculos.modelo.Vehiculo
 import com.pmd.rentavehiculos.modelo.RentarVehiculoRequest
 import com.pmd.rentavehiculos.modelo.RentarVehiculoResponse
 import retrofit2.Response
 import retrofit2.http.*
-
 
 interface VehiculosService {
 
@@ -29,7 +28,7 @@ interface VehiculosService {
     suspend fun obtenerVehiculosRentados(
         @Header("x-llave-api") apiKey: String,
         @Path("id") personaId: Int
-    ): Response<List<RentarVehiculoResponse>>
+    ): Response<List<RentaVehiculo>>
 
     // Entregar (liberar) un vehículo
     @PATCH("vehiculos/{id}")
@@ -37,13 +36,6 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int
     ): Response<Unit>
-
-    // Obtener el historial de rentas de un vehículo
-    @GET("vehiculos/{id}/rentas")
-    suspend fun obtenerHistorialRentas(
-        @Header("x-llave-api") apiKey: String,
-        @Path("id") vehiculoId: Int
-    ): Response<List<RentarVehiculoResponse>>
 
     // Actualizar los datos de un vehículo
     @PUT("vehiculos/{id}")
@@ -66,4 +58,11 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Body vehiculo: Vehiculo
     ): Response<Vehiculo>
+
+    // Obtener el historial de rentas de un vehículo
+    @GET("vehiculos/{id}/rentas")
+    suspend fun obtenerHistorialRentas(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    ): Response<List<RentaVehiculo>>
 }

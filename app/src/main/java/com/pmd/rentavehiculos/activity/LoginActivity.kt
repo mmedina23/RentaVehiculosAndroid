@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.data.SessionManager
 import com.pmd.rentavehiculos.viewModels.LoginViewModel
 import com.pmd.rentavehiculos.screens.LoginScreen
+import com.pmd.rentavehiculos.activity.ClienteActivity
 
 class LoginActivity : ComponentActivity() {
 

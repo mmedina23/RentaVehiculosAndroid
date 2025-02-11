@@ -7,6 +7,7 @@ import com.pmd.rentavehiculos.modelo.Vehiculo
 import com.pmd.rentavehiculos.modelo.RentarVehiculoRequest
 import com.pmd.rentavehiculos.modelo.RentarVehiculoResponse
 import com.pmd.rentavehiculos.data.RetrofitClient
+import com.pmd.rentavehiculos.modelo.RentaVehiculo
 import retrofit2.HttpException
 import retrofit2.Response
 class RentaRepository {
@@ -53,6 +54,15 @@ class RentaRepository {
                 RetrofitClient.vehiculosService.entregarVehiculo(apiKey, vehiculoId)
             if (!response.isSuccessful) {
                 throw HttpException(response)
+            }
+        }
+
+        suspend fun obtenerVehiculosRentados(apiKey: String, personaId: Int): List<RentaVehiculo> {
+            val response = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
+            if (response.isSuccessful) {
+                return response.body() ?: emptyList()
+            } else {
+                throw retrofit2.HttpException(response)
             }
         }
 
