@@ -1,25 +1,27 @@
 package com.pmd.rentavehiculos.activity
-
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import com.pmd.rentavehiculos.R
+import com.pmd.rentavehiculos.screens.SplashScreen
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : ComponentActivity() {
 
     // Duración del splash en milisegundos (por ejemplo, 2000 = 2 segundos)
-    private val splashDuration: Long = 2000
+    private val splashDuration: Long = 2000L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-
-        // Después del tiempo definido, inicia LoginActivity
-        Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish() // Termina SplashActivity para que el usuario no vuelva a ella al presionar "Atrás"
-        }, splashDuration)
+        setContent {
+            SplashScreen(
+                splashDuration = splashDuration,
+                onSplashFinished = {
+                    // Después del tiempo definido, inicia LoginActivity
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish() // Termina SplashActivity para que el usuario no vuelva a ella al presionar "Atrás"
+                }
+            )
+        }
     }
 }
