@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos
+package com.pmd.rentavehiculos.Screen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.*
@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.pmd.rentavehiculos.R
 import kotlinx.coroutines.delay
 
 @SuppressLint("CoroutineCreationDuringComposition")

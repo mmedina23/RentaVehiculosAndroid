@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos
+package com.pmd.rentavehiculos.Screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

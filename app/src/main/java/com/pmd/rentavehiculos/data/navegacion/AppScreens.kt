@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.ui.theme.navegacion
+package com.pmd.rentavehiculos.data.navegacion
 
 
 sealed class AppScreens(val ruta: String) {

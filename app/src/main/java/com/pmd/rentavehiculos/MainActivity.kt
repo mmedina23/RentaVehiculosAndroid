@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,9 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import com.pmd.rentavehiculos.ui.theme.navegacion.AppNavigation
-import com.pmd.rentavehiculos.ui.theme.ClaseAndroidTheme
-import com.pmd.rentavehiculos.data.RetrofitServiceFactory
+import com.pmd.rentavehiculos.data.service.RetrofitServiceFactory
+import com.pmd.rentavehiculos.data.model.Persona
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import kotlinx.coroutines.launch
 
@@ -57,51 +54,43 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val nombres = arrayOf("Carlos", "Pepe", "Maria", "Juan")
         val personas = arrayOf(
-            Persona("Jose", "apellido", 20),
-            Persona("Carlos", "Mendoza", 18),
-            Persona("Pepe", "Pepito", 25),
-            Persona("Maximus", "Max", 19)
+            Persona("1", "Jose", "Apellido", 20, "Calle Falsa 123", 123456789, "DNI", "12345678A"),
+            Persona("2", "Carlos", "Mendoza", 18, "Avenida Siempre Viva 742", 987654321, "DNI", "87654321B"),
+            Persona("3", "Pepe", "Pepito", 25, "Plaza Mayor 1", 555555555, "DNI", "11223344C"),
+            Persona("4", "Maximus", "Max", 19, "Calle del Imperio 9", 444444444, "DNI", "99887766D")
         )
 
+
         val service = RetrofitServiceFactory.retrofitService()
-        lifecycleScope.launch{
-            val vehiculo = service.listaVehiculosDisponibles("30012025005447394","disponibles")
+        lifecycleScope.launch {
+            val vehiculo = service.listaVehiculosDisponibles("30012025005447394", "disponibles")
             println(vehiculo)
         }
 
         setContent {
             RentaVehiculosTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    //Funcion: card, botones, imagen
+                    // Llamada al composable Greeting
                     Greeting(
                         name = "Clase Android",
                         modifier = Modifier.padding(innerPadding)
                     )
 
-
-                    //  LazyColumn: muestra las columnas en pantalla y renderiza segun lo que vaya mostrando
-
-                    /*LazyColumn {
-                        items( nombres) {
+                    // Otras llamadas a composables (comentadas)
+                    /*
+                    LazyColumn {
+                        items(nombres) {
                             ListarItem(it, modifier = Modifier.padding(innerPadding))
                         }
-                    }*/
-
-                    /*
+                    }
                     LazyColumn {
                         items(personas) {
                             ListarPersona(it, modifier = Modifier.padding(innerPadding))
                         }
-                    }*/
-
-                    //llamado de la funcion del splah
-                    //AppNavigation(innerPadding)
-
-                    //Formulario
-                    // RegistroUsuarioForm("Prueba", modifier = Modifier.padding(innerPadding))
+                    }
+                    RegistroUsuarioForm("Prueba", modifier = Modifier.padding(innerPadding))
+                    */
                 }
             }
         }
@@ -111,7 +100,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(3.dp)
             .fillMaxWidth()
     ) {
@@ -143,7 +132,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             )
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { println("Hola Mariana") }//mensaje que se mostrara en consola
+                onClick = { println("Hola Mariana") }
             ) {
                 Text("Hola")
             }
@@ -163,18 +152,17 @@ fun ButtonToast(mensaje: String) {
                 Toast.LENGTH_LONG
             ).show()
         },
-        shape = CircleShape, //propiedad para colocarlo circular
+        shape = CircleShape,
     ) {
-        Icon(Icons.Filled.Add, "Floating action button.")//para colocar icono en el boton
+        Icon(Icons.Filled.Add, contentDescription = "Floating action button.")
     }
 }
 
-//listado de string = nombres
 @Composable
 fun ListarItem(nombre: String, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(12.dp)
     ) {
         Row {
@@ -185,7 +173,7 @@ fun ListarItem(nombre: String, modifier: Modifier = Modifier) {
                     .width(100.dp)
                     .height(100.dp)
             )
-            Text( //1
+            Text(
                 text = nombre,
                 modifier = Modifier.padding(24.dp)
             )
@@ -196,8 +184,8 @@ fun ListarItem(nombre: String, modifier: Modifier = Modifier) {
 @Composable
 fun ListarPersona(persona: Persona, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(12.dp)
     ) {
         Row {
@@ -213,7 +201,7 @@ fun ListarPersona(persona: Persona, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(24.dp)
             )
             Text(
-                text = persona.apellido,
+                text = persona.apellidos,
                 modifier = Modifier.padding(24.dp)
             )
             Text(
@@ -232,7 +220,7 @@ fun RegistroUsuarioForm(nombre: String, modifier: Modifier = Modifier) {
     val segundoApellido = remember { mutableStateOf(TextFieldValue()) }
 
     Column(
-        modifier = Modifier.padding(20.dp),
+        modifier = modifier.padding(20.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -241,9 +229,7 @@ fun RegistroUsuarioForm(nombre: String, modifier: Modifier = Modifier) {
             style = TextStyle(fontSize = 40.sp, fontFamily = FontFamily.Cursive)
         )
         Spacer(modifier = Modifier.height(15.dp))
-        Text(
-            text = "Registro de nuevo usuario"
-        )
+        Text(text = "Registro de nuevo usuario")
         Spacer(modifier = Modifier.height(45.dp))
         TextField(
             label = { Text(text = "Usuario") },
@@ -269,16 +255,14 @@ fun RegistroUsuarioForm(nombre: String, modifier: Modifier = Modifier) {
             onValueChange = { segundoApellido.value = it }
         )
         Spacer(modifier = Modifier.height(65.dp))
-        Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+        Box(modifier = Modifier.padding(horizontal = 40.dp)) {
             Button(
                 onClick = {
-
                     crearUsuario(
                         usuario.value.text,
                         primerNombre.value.text,
                         primerApellido.value.text,
                         segundoApellido.value.text
-
                     )
                 },
                 shape = RoundedCornerShape(50.dp),
@@ -298,7 +282,7 @@ private fun crearUsuario(
     primerApellido: String = "",
     segundoApellido: String = ""
 ) {
-    println("usuario registrado: $username - $primerNombre - $primerApellido - $segundoApellido");
+    println("usuario registrado: $username - $primerNombre - $primerApellido - $segundoApellido")
 }
 
 @Preview(showBackground = true)
@@ -308,3 +292,4 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+

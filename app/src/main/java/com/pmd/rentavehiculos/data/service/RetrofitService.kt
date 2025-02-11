@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.data
+package com.pmd.rentavehiculos.data.service
 
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import okhttp3.OkHttpClient
@@ -10,6 +10,7 @@ import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface RetrofitService {
+
     //servicio
     @GET("vehiculos")
     suspend fun listaVehiculosDisponibles(
@@ -40,3 +41,5 @@ object RetrofitServiceFactory{
         return client
     }
 }
+
+

@@ -1,97 +1,167 @@
 package com.pmd.rentavehiculos.ui.theme.login
 
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresExtension
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.pmd.rentavehiculos.R
+import com.pmd.rentavehiculos.viewmodel.LoginViewModel
+import androidx.compose.material3.TextFieldDefaults
 
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun LoginScreen(navController: NavController) {
-    var email by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Iniciar Sesión", style = MaterialTheme.typography.headlineMedium)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Campo de Email
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            Image(
+                painter = painterResource(id = R.drawable.splash_logo),
+                contentDescription = "Logo de la aplicacióogo1n",
+                modifier = Modifier
+                    .size(280.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            CustomTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = "Usuario",
+                leadingIcon = Icons.Default.Email
+            )
 
-            // Campo de Contraseña
-            OutlinedTextField(
+            CustomTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = "Mostrar contraseña"
-                        )
-                    }
-                }
+                label = "Contraseña",
+                leadingIcon = Icons.Default.Lock,
+                visualTransformation = PasswordVisualTransformation()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // Botón de Login
             Button(
                 onClick = {
-                    // Aquí deberemos validar los datos e iniciar sesión
-                    navController.navigate("home") // Navegación de prueba, luego definimos Home
+                    if (username.isNotEmpty() && password.isNotEmpty()) {
+                        viewModel.login(username, password) { success , perfil ->
+                            if (success) {
+                                if (perfil == "ADMIN") {
+                                    navController.navigate("menu_admin")
+                                } else {
+                                    navController.navigate("menu_cliente")
+                                }
+                            } else {
+                                errorMessage = "Error de autenticación"
+                                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    } else {
+                        errorMessage = "Por favor, completa todos los campos."
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                    }
                 },
-                modifier = Modifier.fillMaxWidth()
+                enabled = username.isNotEmpty() && password.isNotEmpty(),
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(42.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0077B7),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text(text = "Ingresar")
+                Text(text = "Iniciar Sesión", fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Botón de Registro (opcional)
-            TextButton(onClick = { navController.navigate("register") }) {
-                Text(text = "¿No tienes cuenta? Regístrate")
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreviewLoginScreen() {
-    LoginScreen(navController = rememberNavController())
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingIcon: ImageVector,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color(0xFF0077B7)) },
+        leadingIcon = {
+            Icon(
+                imageVector = leadingIcon,
+                contentDescription = null,
+                tint = Color(0xFF0D47A1)
+            )
+        },
+        visualTransformation = visualTransformation,
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color(0xFF005F99),
+            unfocusedBorderColor = Color(0xFF0D47A1).copy(alpha = 0.5f),
+            cursorColor = Color(0xFF005F99)
+        )
+    )
 }
+
+private fun TextFieldDefaults.outlinedTextFieldColors(
+    focusedBorderColor: Color,
+    unfocusedBorderColor: Color,
+    cursorColor: Color
+): TextFieldColors {
+    TODO("Not yet implemented")
+}
+

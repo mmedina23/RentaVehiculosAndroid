@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.pmd.rentavehiculos"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pmd.rentavehiculos"
@@ -49,8 +49,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.navigation:navigation-compose:2.8.6")
 
     testImplementation(libs.junit)
 
@@ -61,4 +61,12 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    // Conversor JSON (Gson)
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // OkHttp (para logs)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }
