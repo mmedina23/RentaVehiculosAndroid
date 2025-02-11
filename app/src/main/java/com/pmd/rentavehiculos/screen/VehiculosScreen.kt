@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.vista.VistaLogin
 import com.pmd.rentavehiculos.vista.VistaVehiculos
 import com.pmd.rentavehiculos.model.Vehiculo
@@ -128,9 +129,9 @@ fun VehiculosScreen(
                         }
                     }
                 },
-                        colors = ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF0077B7),
-                    contentColor = Color.White)) {
+                        contentColor = Color.White)) {
                     Text("Confirmar")
                 }
             },
@@ -147,6 +148,9 @@ fun VehiculosScreen(
 
 @Composable
 fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
+    println("Cargando imagen: ${vehiculo.imagen}") //PRUEBA PARA LAS IMAGENES
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -167,10 +171,10 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     .background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                AsyncImage(
+                    model = vehiculo.imagen,
                     contentDescription = "Imagen del Vehículo",
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
@@ -181,7 +185,8 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     text = vehiculo.marca,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
-                    color = Color(0xFF0055B7)
+                    color = Color(0xFF0055B7),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -257,7 +262,3 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
         }
     }
 }
-
-
-
-

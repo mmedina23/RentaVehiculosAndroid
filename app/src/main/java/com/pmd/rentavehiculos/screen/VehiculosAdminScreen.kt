@@ -43,7 +43,7 @@ import com.pmd.rentavehiculos.model.Vehiculo
 import com.pmd.rentavehiculos.vista.VistaLogin
 import com.pmd.rentavehiculos.vista.VistaVehiculos
 import androidx.compose.material3.TopAppBarDefaults
-
+import coil.compose.AsyncImage
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,14 +129,15 @@ fun VehiculoAdminCard(vehiculo: Vehiculo, onEdit: () -> Unit, onDelete: () -> Un
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.npc),
+            AsyncImage(
+                model = vehiculo.imagen, // URL de la imagen
                 contentDescription = "Imagen del Vehículo",
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
+
 
             Spacer(modifier = Modifier.width(12.dp))
 

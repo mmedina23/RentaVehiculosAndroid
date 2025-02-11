@@ -36,26 +36,27 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFF2F2F2))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.npc),
-                contentDescription = "Logo de la aplicación",
-                modifier = Modifier
-                    .size(280.dp)
+                contentDescription = "Logo",
+                modifier = Modifier.size(180.dp)
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = "Usuario",
+                label = "Correo electrónico",
                 leadingIcon = Icons.Default.Email
             )
 
@@ -67,48 +68,41 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
                 visualTransformation = PasswordVisualTransformation()
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = {
                     if (username.isNotEmpty() && password.isNotEmpty()) {
-                        viewModel.login(username, password) { success , perfil ->
+                        viewModel.login(username, password) { success, perfil ->
                             if (success) {
-                                if (perfil == "ADMIN") {
-                                    navController.navigate("menu_admin")
-                                } else {
-                                    navController.navigate("menu_cliente")
-                                }
+                                navController.navigate(if (perfil == "ADMIN") "menu_admin" else "menu_cliente")
                             } else {
-                                errorMessage = "Error de autenticación"
+                                errorMessage = "Credenciales incorrectas"
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                             }
                         }
                     } else {
-                        errorMessage = "Por favor, completa todos los campos."
+                        errorMessage = "Completa los campos."
                         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 },
                 enabled = username.isNotEmpty() && password.isNotEmpty(),
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(42.dp),
+                    .fillMaxWidth(0.7f)
+                    .height(48.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0077B7),
+                    containerColor = Color(0xFF0A74DA),
                     contentColor = Color.White
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Iniciar Sesión", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(text = "Iniciar Sesión", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
-            if (errorMessage.isNotEmpty()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(top = 6.dp)
-                )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            TextButton(onClick = { /* Implementar recuperación de contraseña */ }) {
+                Text("¿Olvidaste tu contraseña?", color = Color(0xFF0A74DA), fontSize = 14.sp)
             }
         }
     }
@@ -126,19 +120,18 @@ fun CustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color(0xFF0077B7)) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF0D47A1)) },
+        label = { Text(label, color = Color(0xFF43A047)) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF43A047)) },
         visualTransformation = visualTransformation,
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
-        shape = RoundedCornerShape(8.dp),
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color(0xFF005F99),
-            unfocusedBorderColor = Color(0xFF0D47A1).copy(alpha = 0.5f),
-            cursorColor = Color(0xFF005F99)
+            focusedBorderColor = Color(0xFF43A047),
+            unfocusedBorderColor = Color(0xFF43A047).copy(alpha = 0.5f),
+            cursorColor = Color(0xFF43A047)
         )
     )
 }
-
