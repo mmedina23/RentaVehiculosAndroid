@@ -34,8 +34,12 @@ fun DetalleVehiculoScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Text("Marca: ${vehiculo.marca}")
         Text("Color: ${vehiculo.color}")
-        Text("Valor por día: ${vehiculo.valor_dia}")
-        // Agrega más detalles según sea necesario
+        Text(text = "Carrocería: ${vehiculo.carroceria}")
+        Text(text = "Plazas: ${vehiculo.plazas}")
+        Text(text = "Cambios: ${vehiculo.cambios}")
+        Text(text = "Tipo de combustible: ${vehiculo.tipo_combustible}")
+        Text(text = "Valor por día: ${vehiculo.valor_dia}")
+        //El id no le interesa al usuario
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = diasRenta,
@@ -53,7 +57,6 @@ fun DetalleVehiculoScreen(
                 if (dias != null && dias > 0) {
                     isProcessing = true
                     // Llamamos a la función para rentar el vehículo.
-                    // Se asume que en el ViewModel se implementa la función rentarVehiculo(...).
                     vehiculosViewModel.rentarVehiculo(apiKey, vehiculo.id, personaId, dias) {
                         isProcessing = false
                         onRentSuccess()

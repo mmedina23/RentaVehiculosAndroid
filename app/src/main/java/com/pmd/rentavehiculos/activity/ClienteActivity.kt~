@@ -19,6 +19,7 @@ import com.pmd.rentavehiculos.screens.DetalleVehiculoScreen
 import com.pmd.rentavehiculos.screens.VehiculosDisponiblesScreen
 import com.pmd.rentavehiculos.screens.VehiculosRentadosScreen
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
+import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 class ClienteActivity : ComponentActivity() {
 
@@ -63,17 +64,13 @@ class ClienteActivity : ComponentActivity() {
                                 }
                             )
                         }
-                // Pantalla de vehículos disponibles
+                        // Pantalla de vehículos disponibles
                         composable("vehiculos_disponibles") {
                             VehiculosDisponiblesScreen(
                                 apiKey = apiKey,
                                 onVehiculoClick = { vehiculo ->
                                     // Navega al detalle pasando el id del vehículo
                                     navController.navigate("detalle_vehiculo/${vehiculo.id}")
-                                },
-                                onBackClick = {
-                                    // Esta llamada elimina la pantalla actual de la pila de navegación y regresa a la anterior
-                                    navController.popBackStack()
                                 }
                             )
                         }
