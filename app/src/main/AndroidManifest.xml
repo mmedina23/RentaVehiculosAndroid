@@ -13,7 +13,7 @@
         android:theme="@style/Theme.RentaVehiculos"
         android:usesCleartextTraffic="true">
 
-        <!-- Splash Screen como pantalla de inicio -->
+        <!-- 🟢 Splash Screen como pantalla de inicio -->
         <activity
             android:name=".views.SplashActivity"
             android:exported="true">
@@ -23,17 +23,32 @@
             </intent-filter>
         </activity>
 
-        <!-- Login Activity -->
-        <activity android:name=".views.LoginActivity" android:exported="true"/>
+        <!-- 🟢 Login Activity -->
+        <activity
+            android:name=".views.LoginActivity"
+            android:exported="true"/>
 
-        <!-- MainActivity (opcional, si decides usarla después del login) -->
-        <activity android:name=".MainActivity" android:exported="true"/>
+        <!-- 🟢 Cliente Activity -->
+        <activity
+            android:name=".views.ClienteActivity"
+            android:exported="true"/>
 
-        <activity android:name=".views.ClienteActivity"/>
+        <!-- 🟢 Admin Activity -->
+        <activity
+            android:name=".views.AdminActivity"
+            android:exported="true"/>
 
-        <activity android:name=".views.AdminActivity"/>
+        <!-- 🟢 Vehículos Disponibles -->
+        <activity
+            android:name=".views.VehiculosActivity"
+            android:exported="true"/>
 
-        <activity android:name=".views.VehiculosActivity" android:exported="true"/>
+        <!-- 🟢 Vehículos Rentados -->
+        <activity
+            android:name=".views.VehiculosRentadosActivity"
+            android:exported="true"/>
+
+
 
 
     </application>

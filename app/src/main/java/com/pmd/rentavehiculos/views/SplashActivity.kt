@@ -1,9 +1,10 @@
 package com.pmd.rentavehiculos.views
 
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -16,29 +17,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.pmd.rentavehiculos.R
+import com.pmd.rentavehiculos.navegacion.Navigation
 import kotlinx.coroutines.delay
 
 class SplashActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SplashScreen {
-                startActivity(Intent(this, LoginActivity::class.java))
-                finish()
-            }
+            val navController = rememberNavController() // ✅ Controlador de navegación
+            Navigation(navController) // ✅ Llama a la navegación global
         }
     }
 }
 
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen(navController: androidx.navigation.NavHostController) {
     var isVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         isVisible = true
         delay(3000) // ⏳ Espera 3 segundos
-        onTimeout()
+        navController.navigate("login") {
+            popUpTo("splash") { inclusive = true } // ✅ Elimina el Splash de la pila de navegación
+        }
     }
 
     Box(
@@ -52,7 +56,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo), // Asegúrate de tener esta imagen en res/drawable
+                    painter = painterResource(id = R.drawable.logo), // 📌 Asegúrate de tener el logo en res/drawable
                     contentDescription = "Logo de la App",
                     modifier = Modifier.size(150.dp)
                 )

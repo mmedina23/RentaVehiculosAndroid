@@ -1,11 +1,14 @@
 package com.pmd.rentavehiculos.models
 
+
+import com.google.gson.annotations.SerializedName
+
 data class Persona(
-    val id: Int,
-    val nombre: String,
-    val apellidos: String,
-    val direccion: String,
-    val telefono: String,
-    val tipo_identificacion: String,
-    val identificacion: String
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("apellidos") val apellidos: String,
+    @SerializedName("direccion") val direccion: String,
+    @SerializedName("telefono") val telefono: String,
+    @SerializedName("tipo_identificacion") val tipoIdentificacion: String,
+    @SerializedName("identificacion") val identificacion: String
 )

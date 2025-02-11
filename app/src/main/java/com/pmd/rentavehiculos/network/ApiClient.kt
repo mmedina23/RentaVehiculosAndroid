@@ -1,26 +1,20 @@
 package com.pmd.rentavehiculos.network
 
-
-
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://192.168.1.11:8080/api/v1/" // Reemplázalo con la URL real
 
-    private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+    private const val BASE_URL = "http://192.168.1.11:8080/api/v1/" // ✅ Asegúrate de que termina en "/"
+
+    val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)  // ✅ Usa la URL corregida
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
-
-    private val client = OkHttpClient.Builder()
-        .addInterceptor(logging)
-        .build()
-
-    val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 }
+
+
+
+

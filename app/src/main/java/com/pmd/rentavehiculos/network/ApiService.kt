@@ -1,57 +1,47 @@
 package com.pmd.rentavehiculos.network
 
-import com.pmd.rentavehiculos.models.DevolverVehiculoRequest
-import com.pmd.rentavehiculos.models.DevolverVehiculoResponse
-import com.pmd.rentavehiculos.models.LoginRequest
-import com.pmd.rentavehiculos.models.LoginResponse
-import com.pmd.rentavehiculos.models.RentaRequest
-import com.pmd.rentavehiculos.models.RentaResponse
-import com.pmd.rentavehiculos.models.RentarVehiculoRequest
-import com.pmd.rentavehiculos.models.RentarVehiculoResponse
-import com.pmd.rentavehiculos.models.Vehiculo
-import com.pmd.rentavehiculos.models.VehiculoRentado
+import com.pmd.rentavehiculos.models.*
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
-
+import retrofit2.http.*
 
 interface ApiService {
 
+    // 🔹 Autenticación (Login)
     @POST("auth/login")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
-    @POST("vehiculos/devolver")
-    fun devolverVehiculo(@Body request: DevolverVehiculoRequest): Call<DevolverVehiculoResponse>
-    @GET("vehiculos/disponibles")
-    fun getVehiculosDisponibles(): Call<List<Vehiculo>>
-    @POST("vehiculos/rentar")
-    fun rentarVehiculo(@Body request: RentaRequest): Call<RentaResponse>
-    @GET("vehiculos/rentados")
-    fun getVehiculosRentados(@Query("usuarioId") usuarioId: Int): Call<List<VehiculoRentado>>
-    @GET("api/v1/vehiculos/disponibles")
-    fun obtenerVehiculos(): Call<List<Vehiculo>>
+
+    // 🔹 Obtener lista de vehículos disponibles
     @GET("vehiculos")
     fun obtenerVehiculos(
-        @Header("x-llave-api") llaveApi: String
+        @Header("x-llave-api") token: String
     ): Call<List<Vehiculo>>
-    @GET("/api/v1/vehiculos-rentados") // Ajusta la ruta según la API
+
+    // 🔹 Obtener lista de vehículos rentados
+    @GET("vehiculos/rentados")
     fun obtenerVehiculosRentados(
         @Header("x-llave-api") token: String
     ): Call<List<VehiculoRentado>>
-    //@POST("vehiculos/rentar")
 
-    @POST("/api/v1/vehiculos/{id}/rentar")
+    // 🔹 Rentar un vehículo
+    @POST("vehiculos/{id}/rentas")
     fun rentarVehiculo(
-        @Header("x-llave-api") token: String,  // 🔹 Se envía correctamente el token en el header
+        @Header("x-llave-api") token: String,
         @Path("id") vehiculoId: Int,
-        @Body request: RentarVehiculoRequest  // 🔹 Enviamos el JSON correctamente
-
+        @Body request: Map<String, Any> // 🔹 Se usa un Map para enviar un JSON flexible
     ): Call<RentarVehiculoResponse>
 
-    abstract fun rentarVehiculo(token: String, request: RentarVehiculoRequest): Any
+    // 🔹 Devolver un vehículo rentado
+    @PATCH("vehiculos/{id}/devolver")
+    fun devolverVehiculo(
+        @Header("x-llave-api") token: String,
+        @Path("id") vehiculoId: Int
+    ): Call<Void> // ✅ Retrofit devuelve un `Void` cuando no hay respuesta en el body
+
+
+
+
+
+
 
 
 }

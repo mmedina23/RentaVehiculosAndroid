@@ -1,20 +1,19 @@
 package com.pmd.rentavehiculos.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.pmd.rentavehiculos.network.ApiClient
-import com.pmd.rentavehiculos.network.ApiService
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.pmd.rentavehiculos.models.RentaRequest
-import com.pmd.rentavehiculos.models.RentaResponse
+import com.pmd.rentavehiculos.models.RentarVehiculoRequest
+import com.pmd.rentavehiculos.models.RentarVehiculoResponse
 import com.pmd.rentavehiculos.models.Vehiculo
+import com.pmd.rentavehiculos.network.ApiClient
+import com.pmd.rentavehiculos.network.ApiService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class VehiculoViewModel : ViewModel() {
     private val apiService: ApiService = ApiClient.retrofit.create(ApiService::class.java)
@@ -25,43 +24,76 @@ class VehiculoViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
         private set
 
-    fun cargarVehiculos() {
+    // ✅ Cargar vehículos disponibles
+    fun cargarVehiculos(token: String) {
         isLoading = true
-        apiService.getVehiculosDisponibles().enqueue(object : Callback<List<Vehiculo>> {
-            override fun onResponse(call: Call<List<Vehiculo>>, response: Response<List<Vehiculo>>) {
+        val call = apiService.obtenerVehiculos(token) // ✅ Función correcta
+        call.enqueue(object : Callback<List<Vehiculo>> {
+            override fun onResponse(
+                call: Call<List<Vehiculo>>,
+                response: Response<List<Vehiculo>>
+            ) {
                 if (response.isSuccessful) {
-                    response.body()?.let {
-                        vehiculos.clear()
-                        vehiculos.addAll(it)
-                    }
+                    vehiculos.clear()
+                    response.body()
+                        ?.let { vehiculos.addAll(it) } // ✅ Se usa `addAll()` en lugar de `postValue()`
+                    Log.d("VehiculoViewModel", "🚗 Vehículos cargados: ${vehiculos.size}")
+                } else {
+                    Log.e(
+                        "VehiculoViewModel",
+                        "❌ Error al obtener vehículos: ${response.errorBody()?.string()}"
+                    )
                 }
                 isLoading = false
             }
 
             override fun onFailure(call: Call<List<Vehiculo>>, t: Throwable) {
+                Log.e("VehiculoViewModel", "❌ Error de conexión: ${t.message}")
                 isLoading = false
             }
         })
     }
-    fun rentarVehiculo(usuarioId: Int, vehiculoId: Int, dias: Int, onResult: (String) -> Unit) {
-        val apiService = ApiClient.retrofit.create(ApiService::class.java)
-        val request = RentaRequest(usuarioId, vehiculoId, dias)
 
-        apiService.rentarVehiculo(request).enqueue(object : Callback<RentaResponse> {
-            override fun onResponse(call: Call<RentaResponse>, response: Response<RentaResponse>) {
+    // ✅ Renta un vehículo
+
+    fun rentarVehiculo(
+        token: String,
+        vehiculoId: Int,
+        identificacionPersona: String, // ✅ Se necesita la identificación de la persona
+        dias: Int,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val apiService = ApiClient.retrofit.create(ApiService::class.java)
+
+        // ✅ Convertimos `RentarVehiculoRequest` a un Map<String, Any>
+        val requestBody = mapOf(
+            "persona" to mapOf("identificacion" to identificacionPersona),
+            "dias_renta" to dias
+        )
+
+        println("📢 Enviando renta: Vehículo ID: $vehiculoId, Días: $dias, Token: $token")
+        println("📢 JSON enviado: $requestBody")
+
+        val call = apiService.rentarVehiculo(token, vehiculoId, requestBody)
+        call.enqueue(object : Callback<RentarVehiculoResponse> {
+            override fun onResponse(
+                call: Call<RentarVehiculoResponse>,
+                response: Response<RentarVehiculoResponse>
+            ) {
                 if (response.isSuccessful) {
-                    response.body()?.let {
-                        onResult("Vehículo rentado por \$$it.totalPago")
-                    }
+                    println("✅ Vehículo rentado con éxito")
+                    onResult(true, "Vehículo rentado con éxito")
                 } else {
-                    onResult("Error al rentar vehículo")
+                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
+                    println("❌ Error al rentar: $errorMsg")
+                    onResult(false, errorMsg)
                 }
             }
 
-            override fun onFailure(call: Call<RentaResponse>, t: Throwable) {
-                onResult("Error de conexión")
+            override fun onFailure(call: Call<RentarVehiculoResponse>, t: Throwable) {
+                println("❌ Error de conexión: ${t.message}")
+                onResult(false, "Error de conexión: ${t.message}")
             }
         })
     }
-
 }

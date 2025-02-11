@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.animation.core)
     implementation(libs.androidx.animation.core)
     implementation(libs.androidx.animation.core)
+    implementation(libs.androidx.navigation.compose)
 
     // Pruebas
     testImplementation("junit:junit:4.13.2")

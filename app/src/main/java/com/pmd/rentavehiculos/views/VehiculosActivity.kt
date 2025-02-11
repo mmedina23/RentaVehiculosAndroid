@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.pmd.rentavehiculos.models.RentarVehiculoRequest
 import com.pmd.rentavehiculos.models.RentarVehiculoResponse
 import com.pmd.rentavehiculos.models.Vehiculo
 import com.pmd.rentavehiculos.network.ApiClient
@@ -30,13 +29,14 @@ class VehiculosActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val token = intent.getStringExtra("TOKEN") ?: ""  // 📌 Recibir el token del Intent
+        val token = intent.getStringExtra("TOKEN") ?: ""
 
         setContent {
-            VehiculosScreen(token)  // 📌 Pasamos el token correctamente
+            VehiculosScreen(token)
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosScreen(token: String) {
@@ -46,14 +46,14 @@ fun VehiculosScreen(token: String) {
     val apiService = ApiClient.retrofit.create(ApiService::class.java)
 
     LaunchedEffect(Unit) {
-        println("📢 Cargando lista de vehículos con token: $token") // Log de depuración
+        println("📢 Cargando vehículos con token: $token")
 
         val call = apiService.obtenerVehiculos(token)
         call.enqueue(object : Callback<List<Vehiculo>> {
             override fun onResponse(call: Call<List<Vehiculo>>, response: Response<List<Vehiculo>>) {
                 if (response.isSuccessful) {
                     vehiculos = response.body() ?: emptyList()
-                    println("✅ Vehículos obtenidos: $vehiculos") // Log de éxito
+                    println("✅ Vehículos obtenidos: $vehiculos")
                 } else {
                     println("❌ Error al obtener vehículos: ${response.errorBody()?.string()}")
                     Toast.makeText(context, "Error al obtener vehículos", Toast.LENGTH_SHORT).show()
@@ -63,7 +63,7 @@ fun VehiculosScreen(token: String) {
 
             override fun onFailure(call: Call<List<Vehiculo>>, t: Throwable) {
                 println("❌ Error de conexión: ${t.message}")
-                Toast.makeText(context, "Error de conexión: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error de conexión", Toast.LENGTH_SHORT).show()
                 isLoading = false
             }
         })
@@ -77,25 +77,17 @@ fun VehiculosScreen(token: String) {
                 CircularProgressIndicator()
             }
         } else {
-            if (vehiculos.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay vehículos disponibles 😢")
-                }
-            } else {
-                LazyColumn(modifier = Modifier.padding(padding)) {
-                    items(vehiculos) { vehiculo ->
-                        VehiculoItem(vehiculo, token) {
-                            vehiculos = vehiculos.filter { it.id != vehiculo.id }
-                        }
-                    }
+            LazyColumn(modifier = Modifier.padding(padding)) {
+                items(vehiculos) { vehiculo ->
+                    VehiculoItem(vehiculo, token)
                 }
             }
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun VehiculoItem(vehiculo: Vehiculo, token: String, onRentarExitoso: () -> Unit) {
+fun VehiculoItem(vehiculo: Vehiculo, token: String) {
     var showDialog by remember { mutableStateOf(false) }
     var dias by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -108,11 +100,10 @@ fun VehiculoItem(vehiculo: Vehiculo, token: String, onRentarExitoso: () -> Unit)
             .clickable { showDialog = true },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Column {
-                Text(text = "${vehiculo.marca} ${vehiculo.modelo}", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Precio: \$${vehiculo.valorDia}/día", style = MaterialTheme.typography.bodyMedium)
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "${vehiculo.marca} - ${vehiculo.carroceria}", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Color: ${vehiculo.color}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Precio: \$${vehiculo.valorDia}/día", style = MaterialTheme.typography.bodyMedium)
         }
     }
 
@@ -140,8 +131,10 @@ fun VehiculoItem(vehiculo: Vehiculo, token: String, onRentarExitoso: () -> Unit)
                 Button(onClick = {
                     val diasInt = dias.toIntOrNull()
                     if (diasInt != null && diasInt > 0) {
-                        rentarVehiculo(apiService, token, vehiculo.id, diasInt, context, onRentarExitoso)
-                        showDialog = false
+                        val identificacionPersona = "2354789" // 🔥 Cambia esto por la identificación real del usuario
+                        rentarVehiculo(apiService, token, vehiculo.id, identificacionPersona, diasInt, context) {
+                            showDialog = false
+                        }
                     } else {
                         Toast.makeText(context, "Ingrese una cantidad válida de días", Toast.LENGTH_SHORT).show()
                     }
@@ -158,35 +151,42 @@ fun VehiculoItem(vehiculo: Vehiculo, token: String, onRentarExitoso: () -> Unit)
     }
 }
 
-// ✅ Función separada para rentar el vehículo correctamente
+
 fun rentarVehiculo(
     apiService: ApiService,
     token: String,
     vehiculoId: Int,
-    dias: Int,
+    identificacionPersona: String, // Se pasa solo la identificación de la persona
+    dias: Int, // ✅ Ahora es un Int
     context: Context,
     onRentarExitoso: () -> Unit
 ) {
-    val request = RentarVehiculoRequest(vehiculoId, dias)
+    val request = mapOf(
+        "persona" to mapOf("identificacion" to identificacionPersona),
+        "dias_renta" to dias
+    )
 
     println("📢 Enviando petición de renta: Vehículo ID: $vehiculoId, Días: $dias, Token: $token")
+    println("📢 Cuerpo de la petición: $request")
 
-    val call = apiService.rentarVehiculo(token, request)
+    val call = apiService.rentarVehiculo(token, vehiculoId, request)
     call.enqueue(object : Callback<RentarVehiculoResponse> {
         override fun onResponse(call: Call<RentarVehiculoResponse>, response: Response<RentarVehiculoResponse>) {
-            println("📢 Respuesta del servidor: ${response.code()} - ${response.message()}")
+            println("📢 Respuesta del servidor: Código ${response.code()} - ${response.message()}")
 
             if (response.isSuccessful) {
-                Toast.makeText(context, "Vehículo rentado con éxito", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "✅ Vehículo rentado con éxito", Toast.LENGTH_SHORT).show()
                 onRentarExitoso()
             } else {
-                Toast.makeText(context, "Error al rentar: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
+                println("❌ Error al rentar: $errorMsg")
+                Toast.makeText(context, "❌ Error al rentar: $errorMsg", Toast.LENGTH_SHORT).show()
             }
         }
 
         override fun onFailure(call: Call<RentarVehiculoResponse>, t: Throwable) {
             println("❌ Error de conexión: ${t.message}")
-            Toast.makeText(context, "Error de conexión: ${t.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "❌ Error de conexión: ${t.message}", Toast.LENGTH_SHORT).show()
         }
     })
 }
