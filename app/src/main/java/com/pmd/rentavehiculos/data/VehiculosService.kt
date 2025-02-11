@@ -65,4 +65,10 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int
     ): Response<List<RentaVehiculo>>
+
+    @GET("vehiculos/{id}")
+    suspend fun obtenerDetalleVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    ): Response<Vehiculo>
 }

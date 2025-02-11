@@ -1,11 +1,16 @@
 package com.pmd.rentavehiculos.activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.compose.NavHost
@@ -19,6 +24,10 @@ import com.pmd.rentavehiculos.screens.DetalleVehiculoScreen
 import com.pmd.rentavehiculos.screens.VehiculosDisponiblesScreen
 import com.pmd.rentavehiculos.screens.VehiculosRentadosScreen
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
+import com.pmd.rentavehiculos.viewModels.VehiculosViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+
 
 class ClienteActivity : ComponentActivity() {
 
@@ -29,7 +38,6 @@ class ClienteActivity : ComponentActivity() {
         sessionManager = SessionManager(this)
 
         val personaId: Int = sessionManager.personaId ?: 0
-
         // Si token es nullable, asigna un valor por defecto (aunque lo ideal es que sea no nulo)
         val apiKey: String = sessionManager.token ?: ""
 
@@ -52,10 +60,9 @@ class ClienteActivity : ComponentActivity() {
                                     navController.navigate("vehiculos_rentados")
                                 },
                                 onLogoutClick = {
-                                    //limpieza de datos de sesión usando SharedPreferences
+                                    // Limpieza de datos de sesión usando SharedPreferences
                                     val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                                     sharedPreferences.edit().clear().apply()
-
                                     // Navegar a la pantalla de login y limpiar la pila de navegación
                                     navController.navigate("login") {
                                         popUpTo("client_menu") { inclusive = true }
@@ -63,49 +70,54 @@ class ClienteActivity : ComponentActivity() {
                                 }
                             )
                         }
-                // Pantalla de vehículos disponibles
+                        // Pantalla de vehículos disponibles
                         composable("vehiculos_disponibles") {
                             VehiculosDisponiblesScreen(
                                 apiKey = apiKey,
                                 onVehiculoClick = { vehiculo ->
-                                    // Navega al detalle pasando el id del vehículo
+                                    Log.d("NAVIGATION", "Navegando a detalle del vehículo id: ${vehiculo.id}")
                                     navController.navigate("detalle_vehiculo/${vehiculo.id}")
                                 },
                                 onBackClick = {
-                                    // Esta llamada elimina la pantalla actual de la pila de navegación y regresa a la anterior
                                     navController.popBackStack()
                                 }
                             )
                         }
-                        // Pantalla de detalle de vehículo
+                        // Pantalla de detalle de vehículo (usando datos reales)
                         composable(
                             route = "detalle_vehiculo/{vehiculoId}",
                             arguments = listOf(
-                                navArgument("vehiculoId") {
-                                    this.type = NavType.IntType
-                                }
+                                navArgument("vehiculoId") { type = NavType.IntType }
                             )
                         ) { backStackEntry ->
-                            val id = backStackEntry.arguments?.getInt("vehiculoId") ?: 0
-                            // Se crea un objeto Vehiculo simulado; en producción se consulta el ViewModel
-                            val vehiculoSimulado = Vehiculo(
-                                id = id,
-                                marca = "Marca $id",
-                                color = "Color",
-                                carroceria = "TURISMO",
-                                plazas = 4,
-                                cambios = "AUTOMATICO",
-                                tipo_combustible = "Gasolina",
-                                valor_dia = 100.0,
-                                disponible = true
-                            )
-                            DetalleVehiculoScreen(
-                                vehiculo = vehiculoSimulado,
-                                apiKey = apiKey,
-                                personaId = personaId,
-                                onRentSuccess = { navController.popBackStack() },
-                                onBack = { navController.popBackStack() }
-                            )
+                            val vehiculoId = backStackEntry.arguments?.getInt("vehiculoId") ?: 0
+                            Log.d("DETALLE", "Detalle solicitado para vehículo id: $vehiculoId")
+
+                            // Obtén el ViewModel
+                            val vehiculosViewModel: VehiculosViewModel = viewModel()
+
+                            // Llama a la función para obtener el detalle del vehículo
+                            LaunchedEffect(key1 = vehiculoId) {
+                                vehiculosViewModel.obtenerDetalleVehiculo(apiKey, vehiculoId)
+                            }
+
+                            // Observa el LiveData del detalle del vehículo
+                            val vehiculo: Vehiculo? by vehiculosViewModel.vehiculoDetalleLiveData.observeAsState(initial = null)
+
+                            val vehiculoLocal = vehiculo
+                            if (vehiculoLocal == null) {
+                                Log.d("DETALLE", "Vehículo aún nulo, mostrando indicador de carga")
+                                CircularProgressIndicator()
+                            } else {
+                                Log.d("DETALLE", "Detalle del vehículo obtenido: ${vehiculoLocal.id}")
+                                DetalleVehiculoScreen(
+                                    vehiculo = vehiculoLocal,
+                                    apiKey = apiKey,
+                                    personaId = personaId,
+                                    onRentSuccess = { navController.popBackStack() },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
                         }
                         // Pantalla de vehículos rentados
                         composable("vehiculos_rentados") {

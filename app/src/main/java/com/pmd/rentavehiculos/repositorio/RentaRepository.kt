@@ -1,6 +1,7 @@
 package com.pmd.rentavehiculos.repositorio
 
 
+import android.util.Log
 import com.pmd.rentavehiculos.modelo.LoginResponse
 import com.pmd.rentavehiculos.modelo.LoginRequest
 import com.pmd.rentavehiculos.modelo.Vehiculo
@@ -8,6 +9,9 @@ import com.pmd.rentavehiculos.modelo.RentarVehiculoRequest
 import com.pmd.rentavehiculos.modelo.RentarVehiculoResponse
 import com.pmd.rentavehiculos.data.RetrofitClient
 import com.pmd.rentavehiculos.modelo.RentaVehiculo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import retrofit2.Response
 class RentaRepository {
@@ -97,6 +101,18 @@ class RentaRepository {
             if (response.isSuccessful) {
                 return response.body() ?: throw Exception("La respuesta de creación es nula")
             } else {
+                throw HttpException(response)
+            }
+        }
+
+        // Obtener el detalle de un vehículo
+        suspend fun obtenerDetalleVehiculo(apiKey: String, vehiculoId: Int): Vehiculo {
+            val response: Response<Vehiculo> =
+                RetrofitClient.vehiculosService.obtenerDetalleVehiculo(apiKey, vehiculoId)
+            if (response.isSuccessful) {
+                return response.body() ?: throw Exception("La respuesta de detalle del vehículo es nula")
+            } else {
+                val errorBody = response.errorBody()?.string()
                 throw HttpException(response)
             }
         }
