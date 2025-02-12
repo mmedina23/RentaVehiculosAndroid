@@ -54,23 +54,24 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
         Button(
             onClick = {
                 if (username.isNotEmpty() && password.isNotEmpty()) {
-                    loginViewModel.login(username, password) { success, perfil ->
+                    loginViewModel.login(username, password) { success, perfil, token, personaId ->
                         if (success) {
                             if (perfil == "ADMIN") {
-                                navController.navigate("menu_admin") {
+                                navController.navigate("menu_admin/$token/$personaId") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {
-                                navController.navigate("menu_cliente") {
+                                navController.navigate("menu_cliente/$token/$personaId") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             }
                         } else {
-                            loginError = "Credenciales incorrectas"
+                            loginError = "❌ Credenciales incorrectas"
                         }
                     }
                 } else {
-                    Toast.makeText(context, "Ingrese usuario y contraseña", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Ingrese usuario y contraseña", Toast.LENGTH_SHORT)
+                        .show()
                 }
             },
             modifier = Modifier.fillMaxWidth()

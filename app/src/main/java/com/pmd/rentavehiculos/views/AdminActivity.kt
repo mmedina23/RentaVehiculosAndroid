@@ -26,41 +26,34 @@ class AdminActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val token = intent.getStringExtra("TOKEN") ?: ""
+        val personaId = intent.getIntExtra("PERSONA_ID", 0) // ✅ Obtener personaId correctamente
 
         setContent {
-            AdminScreen(token)
+            AdminScreen(token, personaId) // ✅ Ahora se pasa personaId
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdminScreen(token: String) {
-    var tabIndex by remember { mutableStateOf(0) } // 📌 Controla la pestaña seleccionada
+
+fun AdminScreen(token: String, personaId: Int) { // ✅ Se pasa personaId correctamente
+    var tabIndex by remember { mutableStateOf(0) }
     val context = LocalContext.current
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Administrador") }) }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            // 🔹 TAB ROW - Permite cambiar entre "Disponibles" y "Rentados"
             TabRow(selectedTabIndex = tabIndex) {
-                Tab(
-                    selected = tabIndex == 0,
-                    onClick = { tabIndex = 0 },
-                    text = { Text("Disponibles") }
-                )
-                Tab(
-                    selected = tabIndex == 1,
-                    onClick = { tabIndex = 1 },
-                    text = { Text("Rentados") }
-                )
+                Tab(selected = tabIndex == 0, onClick = { tabIndex = 0 }, text = { Text("Disponibles") })
+                Tab(selected = tabIndex == 1, onClick = { tabIndex = 1 }, text = { Text("Rentados") })
             }
 
-            // 🔹 Cargar la pantalla según la pestaña seleccionada
             when (tabIndex) {
                 0 -> VehiculosDisponiblesScreen(token)
-                1 -> VehiculosRentadosScreen(token)
+                1 -> VehiculosRentadosScreen(token, personaId) // ✅ Se pasa personaId
             }
         }
     }
@@ -108,14 +101,14 @@ fun VehiculosDisponiblesScreen(token: String) {
 
 // 🔹 PANTALLA DE VEHÍCULOS RENTADOS
 @Composable
-fun VehiculosRentadosScreen(token: String) {
+fun VehiculosRentadosScreen(token: String, personaId: Int) { // ✅ Se recibe personaId
     val context = LocalContext.current
     var vehiculosRentados by remember { mutableStateOf<List<VehiculoRentado>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     val apiService = ApiClient.retrofit.create(ApiService::class.java)
 
     LaunchedEffect(Unit) {
-        val call = apiService.obtenerVehiculosRentados(token)
+        val call = apiService.obtenerVehiculosRentados(token, personaId) // ✅ Ahora se pasa personaId
         call.enqueue(object : Callback<List<VehiculoRentado>> {
             override fun onResponse(call: Call<List<VehiculoRentado>>, response: Response<List<VehiculoRentado>>) {
                 if (response.isSuccessful) {
@@ -145,7 +138,6 @@ fun VehiculosRentadosScreen(token: String) {
         }
     }
 }
-
 
 
 

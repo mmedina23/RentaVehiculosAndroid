@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuAdminScreen(navController: NavHostController) {
+fun MenuAdminScreen(navController: NavHostController, token: String) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Menú Administrador") }) }
     ) { padding ->

@@ -16,19 +16,13 @@ interface ApiService {
         @Header("x-llave-api") token: String
     ): Call<List<Vehiculo>>
 
-    // 🔹 Obtener lista de vehículos rentados
-    @GET("vehiculos/rentados")
+
+    @GET("vehiculos/rentados/{personaId}")
     fun obtenerVehiculosRentados(
-        @Header("x-llave-api") token: String
+        @Header("x-llave-api") token: String,
+        @Path("personaId") personaId: Int  // ✅ Se agrega el parámetro
     ): Call<List<VehiculoRentado>>
 
-    // 🔹 Rentar un vehículo
-    @POST("vehiculos/{id}/rentas")
-    fun rentarVehiculo(
-        @Header("x-llave-api") token: String,
-        @Path("id") vehiculoId: Int,
-        @Body request: Map<String, Any> // 🔹 Se usa un Map para enviar un JSON flexible
-    ): Call<RentarVehiculoResponse>
 
     // 🔹 Devolver un vehículo rentado
     @PATCH("vehiculos/{id}/devolver")
@@ -37,11 +31,16 @@ interface ApiService {
         @Path("id") vehiculoId: Int
     ): Call<Void> // ✅ Retrofit devuelve un `Void` cuando no hay respuesta en el body
 
-
-
-
-
-
-
-
+    // 🔹 Rentar un vehículo
+    @POST("vehiculos/{vehiculoId}/rentar")  // ✅ Ahora la URL coincide con el Path
+    fun rentarVehiculo(
+        @Header("x-llave-api") token: String,
+        @Path("vehiculoId") vehiculoId: Int,  // ✅ Ahora es igual a la URL
+        @Body request: RentarVehiculoRequest
+    ): Call<RentarVehiculoResponse>
 }
+
+
+
+
+

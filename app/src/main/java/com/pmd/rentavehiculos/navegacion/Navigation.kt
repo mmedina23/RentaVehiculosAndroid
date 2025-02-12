@@ -19,21 +19,37 @@ fun Navigation(navController: NavHostController) {
 
     NavHost(navController, startDestination = "splash") {
 
-        // ✅ Modificación: Ahora SplashScreen recibe el `navController`
+        // ✅ Modificación: Ahora SplashScreen recibe `navController` correctamente
         composable("splash") {
-            SplashScreen(navController) // ✅ Pasamos `navController`
+            SplashScreen(navController) // ✅ Pasamos `navController` directamente
         }
 
+        // ✅ Pantalla de Login
         composable("login") {
             LoginScreen(navController, loginViewModel)
         }
 
-        composable("menu_admin") {
-            MenuAdminScreen(navController)
+        // ✅ Menú ADMIN recibe token
+        composable("menu_admin/{token}") { backStackEntry ->
+            val token = backStackEntry.arguments?.getString("token") ?: ""
+            MenuAdminScreen(navController, token)
         }
 
-        composable("menu_cliente") {
-            ClienteMenuScreen(navController)
+        // ✅ Menú CLIENTE recibe token
+        composable("menu_cliente/{token}/{personaId}") { backStackEntry ->
+            val token = backStackEntry.arguments?.getString("token") ?: ""
+            val personaId = backStackEntry.arguments?.getString("personaId")?.toIntOrNull() ?: 0
+            ClienteMenuScreen(navController, token, personaId) // ✅ Pasamos `personaId`
         }
+
+
+        // ✅ Vehículos Disponibles (Recibe token correctamente)
+        composable("vehiculos/{token}/{personaId}") { backStackEntry ->
+            val token = backStackEntry.arguments?.getString("token") ?: ""
+            val personaId = backStackEntry.arguments?.getString("personaId")?.toIntOrNull() ?: 0
+            VehiculosScreen(token, personaId) // ✅ Ahora pasamos personaId correctamente
+        }
+
+        }
+
     }
-}

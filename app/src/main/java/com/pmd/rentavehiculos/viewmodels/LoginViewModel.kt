@@ -11,9 +11,11 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
-    var perfil = mutableStateOf("")
+    var token = mutableStateOf<String?>(null)
+    var perfil = mutableStateOf<String?>(null)
+    var personaId = mutableStateOf<Int?>(null) // ✅ Guardamos personaId
 
-    fun login(username: String, password: String, onResult: (Boolean, String) -> Unit) {
+    fun login(username: String, password: String, onResult: (Boolean, String?, String?, Int?) -> Unit) {
         val apiService = ApiClient.retrofit.create(ApiService::class.java)
         val call = apiService.login(LoginRequest(username, password))
 
@@ -23,17 +25,19 @@ class LoginViewModel : ViewModel() {
                     val loginResponse = response.body()
                     if (loginResponse != null) {
                         perfil.value = loginResponse.perfil
-                        onResult(true, loginResponse.perfil)
+                        token.value = loginResponse.llave
+                        personaId.value = loginResponse.personaId // ✅ Obtenemos `personaId`
+                        onResult(true, loginResponse.perfil, loginResponse.llave, loginResponse.personaId)
                     } else {
-                        onResult(false, "")
+                        onResult(false, null, null, null)
                     }
                 } else {
-                    onResult(false, "")
+                    onResult(false, null, null, null)
                 }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                onResult(false, "")
+                onResult(false, null, null, null)
             }
         })
     }

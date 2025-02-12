@@ -4,7 +4,7 @@ package com.pmd.rentavehiculos.models
 import com.google.gson.annotations.SerializedName
 
 data class Persona(
-    @SerializedName("id") val id: Int,
+    @SerializedName("id") val id: Int, // 🔹 Debe existir
     @SerializedName("nombre") val nombre: String,
     @SerializedName("apellidos") val apellidos: String,
     @SerializedName("direccion") val direccion: String,

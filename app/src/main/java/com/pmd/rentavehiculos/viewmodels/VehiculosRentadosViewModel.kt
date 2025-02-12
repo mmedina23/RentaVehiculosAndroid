@@ -1,12 +1,12 @@
 package com.pmd.rentavehiculos.viewmodels
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.pmd.rentavehiculos.models.DevolverVehiculoResponse
 import com.pmd.rentavehiculos.models.VehiculoRentado
 import com.pmd.rentavehiculos.network.ApiClient
 import com.pmd.rentavehiculos.network.ApiService
@@ -23,11 +23,12 @@ class VehiculosRentadosViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
         private set
 
-    // ✅ Cargar vehículos rentados
+    // ✅ Cargar vehículos rentados con personaId
 
-    fun cargarVehiculosRentados(token: String) {
+    fun cargarVehiculosRentados(token: String, personaId: Int) { // ✅ Se agrega `personaId`
         isLoading = true
-        val call = apiService.obtenerVehiculosRentados(token) // ✅ Corrección de función
+        val call =
+            apiService.obtenerVehiculosRentados(token, personaId) // ✅ Ahora se pasa `personaId`
         call.enqueue(object : Callback<List<VehiculoRentado>> {
             override fun onResponse(
                 call: Call<List<VehiculoRentado>>,
@@ -35,10 +36,10 @@ class VehiculosRentadosViewModel : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     vehiculosRentados.clear()
-                    response.body()?.let { vehiculosRentados.addAll(it) } // ✅ Se usa addAll()
+                    response.body()?.let { vehiculosRentados.addAll(it) }
                     Log.d(
                         "VehiculosRentadosVM",
-                        "🚗 Vehículos rentados cargados: ${vehiculosRentados.size}"
+                        "✅ Vehículos rentados cargados: ${vehiculosRentados.size}"
                     )
                 } else {
                     Log.e(
@@ -55,30 +56,4 @@ class VehiculosRentadosViewModel : ViewModel() {
             }
         })
     }
-
-    // ✅ Devolver vehículo correctamente
-
-    fun devolverVehiculo(token: String, vehiculoId: Int, onResult: (Boolean, String?) -> Unit) {
-        val apiService = ApiClient.retrofit.create(ApiService::class.java)
-
-        val call = apiService.devolverVehiculo(token, vehiculoId)
-        call.enqueue(object : Callback<Void> { // ✅ Aquí debe ser `Callback<Void>`
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    println("✅ Vehículo devuelto con éxito")
-                    onResult(true, "Vehículo devuelto con éxito")
-                } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
-                    println("❌ Error al devolver vehículo: $errorMsg")
-                    onResult(false, errorMsg)
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                println("❌ Error de conexión: ${t.message}")
-                onResult(false, "Error de conexión: ${t.message}")
-            }
-        })
-    }
 }
-
