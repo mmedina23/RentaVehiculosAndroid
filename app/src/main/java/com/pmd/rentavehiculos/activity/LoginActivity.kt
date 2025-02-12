@@ -45,10 +45,12 @@ class LoginActivity : ComponentActivity() {
                 "admin" -> {
                     val intent = Intent(this, AdminActivity::class.java)
                     startActivity(intent)
+                    finish() // Cierra LoginActivity para que no se quede en la pila
                 }
                 "cliente" -> {
                     val intent = Intent(this, ClienteActivity::class.java)
                     startActivity(intent)
+                    finish() // Cierra LoginActivity para que no se quede en la pila
                 }
                 else -> {
                     Toast.makeText(this, "Perfil desconocido", Toast.LENGTH_SHORT).show()

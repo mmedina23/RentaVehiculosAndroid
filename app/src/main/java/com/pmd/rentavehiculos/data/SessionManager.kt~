@@ -36,14 +36,6 @@ class SessionManager(context: Context) {
             prefs.edit().putString("PERSONA", json).apply()
         }
 
-    //propiedad para almacenar el perfil
-    var perfil: String?
-        get() = prefs.getString("PERFIL", null)
-        set(value) {
-            prefs.edit().putString("PERFIL", value).apply()
-        }
-
-
     fun clearSession() {
         prefs.edit().clear().apply()
     }

@@ -114,6 +114,7 @@ class ClienteActivity : ComponentActivity() {
                                     vehiculo = vehiculoLocal,
                                     apiKey = apiKey,
                                     personaId = personaId,
+                                    sessionManager = sessionManager, // Pasar la instancia de SessionManager
                                     onRentSuccess = { navController.popBackStack() },
                                     onBack = { navController.popBackStack() }
                                 )

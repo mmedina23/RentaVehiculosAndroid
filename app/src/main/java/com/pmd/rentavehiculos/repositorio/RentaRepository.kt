@@ -38,19 +38,6 @@ class RentaRepository {
         }
 
         // Reservar un vehículo
-//        suspend fun reservarVehiculo(
-//            apiKey: String,
-//            vehiculoId: Int,
-//            rentaRequest: RentarVehiculoRequest
-//        ): RentarVehiculoResponse {
-//            val response: Response<RentarVehiculoResponse> =
-//                RetrofitClient.vehiculosService.reservarVehiculo(apiKey, vehiculoId, rentaRequest)
-//            if (response.isSuccessful) {
-//                return response.body() ?: throw Exception("La respuesta de reserva es nula")
-//            } else {
-//                throw HttpException(response)
-//            }
-//        }
         suspend fun reservarVehiculo(
             apiKey: String,
             vehiculoId: Int,
@@ -74,7 +61,7 @@ class RentaRepository {
                 throw HttpException(response)
             }
         }
-
+        // Obtener la lista de vehículos rentados por una persona
         suspend fun obtenerVehiculosRentados(apiKey: String, personaId: Int): List<RentaVehiculo> {
             val response = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
             if (response.isSuccessful) {
@@ -127,6 +114,16 @@ class RentaRepository {
                 return response.body() ?: throw Exception("La respuesta de detalle del vehículo es nula")
             } else {
                 val errorBody = response.errorBody()?.string()
+                throw HttpException(response)
+            }
+        }
+
+        // Obtener el historial de rentas global para el admin
+        suspend fun obtenerTodasLasRentas(apiKey: String): List<RentaVehiculo> {
+            val response = RetrofitClient.vehiculosService.obtenerTodasLasRentas(apiKey)
+            if (response.isSuccessful) {
+                return response.body() ?: emptyList()
+            } else {
                 throw HttpException(response)
             }
         }

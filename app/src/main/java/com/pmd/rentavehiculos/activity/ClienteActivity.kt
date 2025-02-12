@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -60,13 +61,13 @@ class ClienteActivity : ComponentActivity() {
                                     navController.navigate("vehiculos_rentados")
                                 },
                                 onLogoutClick = {
-                                    // Limpieza de datos de sesión usando SharedPreferences
                                     val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                                     sharedPreferences.edit().clear().apply()
-                                    // Navegar a la pantalla de login y limpiar la pila de navegación
-                                    navController.navigate("login") {
-                                        popUpTo("client_menu") { inclusive = true }
+                                    val intent = Intent(this@ClienteActivity, LoginActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     }
+                                    startActivity(intent)
+                                    finish()
                                 }
                             )
                         }
