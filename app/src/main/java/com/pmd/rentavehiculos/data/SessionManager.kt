@@ -2,6 +2,8 @@ package com.pmd.rentavehiculos.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.pmd.rentavehiculos.modelo.Persona
 
 class SessionManager(context: Context) {
 
@@ -14,20 +16,26 @@ class SessionManager(context: Context) {
             prefs.edit().putString("TOKEN", value).apply()
         }
 
-    // Almacenar el ID en SharedPreferences
     var personaId: Int?
         get() {
-            // Si no existe, devuelve null o un valor por defecto
-            // Nota: SharedPreferences no permite guardar null para enteros, así que puedes usar 0 como valor no válido.
             val id = prefs.getInt("PERSONA_ID", 0)
             return if (id == 0) null else id
         }
         set(value) {
-            // Si value es null, se puede borrar la entrada o guardarlo como 0
             prefs.edit().putInt("PERSONA_ID", value ?: 0).apply()
         }
 
-    // Método para limpiar la sesión (por ejemplo, en logout)
+    // Persona guardada en SharedPreferences
+    var persona: Persona?
+        get() {
+            val json = prefs.getString("PERSONA", null)
+            return if (json != null) Gson().fromJson(json, Persona::class.java) else null
+        }
+        set(value) {
+            val json = Gson().toJson(value)
+            prefs.edit().putString("PERSONA", json).apply()
+        }
+
     fun clearSession() {
         prefs.edit().clear().apply()
     }

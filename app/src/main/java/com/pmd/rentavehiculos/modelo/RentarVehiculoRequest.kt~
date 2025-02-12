@@ -6,13 +6,13 @@ data class RentarVehiculoRequest(
     @SerializedName("persona")
     val persona: PersonaRequest,
     @SerializedName("dias_renta")
-    val dias_renta: Int,
+    val diasRenta: Int,
     @SerializedName("valor_total_renta")
-    val valor_total_renta: Int,
+    val valorTotalRenta: Int,
     @SerializedName("fecha_renta")
-    val fecha_renta: String,
+    val fechaRenta: String,
     @SerializedName("fecha_estimada_entrega")
-    val fecha_estimada_entrega: String
+    val fechaEstimadaEntrega: String
 )
 
 data class PersonaRequest(

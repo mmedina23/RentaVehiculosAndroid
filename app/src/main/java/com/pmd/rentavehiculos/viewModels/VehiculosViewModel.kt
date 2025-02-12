@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pmd.rentavehiculos.data.RetrofitClient
+import com.pmd.rentavehiculos.modelo.Persona
 import com.pmd.rentavehiculos.modelo.RentaVehiculo
+import com.pmd.rentavehiculos.modelo.RentarVehiculoRequest
 import com.pmd.rentavehiculos.modelo.Vehiculo
 import com.pmd.rentavehiculos.repositorio.RentaRepository
 import kotlinx.coroutines.launch
@@ -39,32 +41,64 @@ class VehiculosViewModel : ViewModel() {
     }
 
     // Función para rentar un vehículo
-    fun rentarVehiculo(apiKey: String, vehiculoId: Int, personaId: Int, dias: Int, onSuccess: () -> Unit) {
+    fun rentarVehiculo(
+        apiKey: String,
+        usuario: Persona,  // Se requiere para extraer el id y poder hacer la validación previa
+        vehiculoId: Int,
+        request: RentarVehiculoRequest,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
-                val request = com.pmd.rentavehiculos.modelo.RentarVehiculoRequest(
-                    vehiculoId = vehiculoId,
-                    dias = dias
-                )
+                // Llamar al repositorio para obtener la lista ya desempaquetada
+                val rentasActualizadas = repository.obtenerVehiculosRentados(apiKey, usuario.id)
+
+                // Ahora rentasActualizadas es de tipo List<RentaVehiculo> y se puede filtrar
+                val vehiculosRentados = rentasActualizadas.filter { it.fechaEntrega.isNullOrEmpty() }
+
+                if (vehiculosRentados.size >= 3) {
+                    onError("No puedes rentar más de 3 vehículos a la vez.")
+                    return@launch
+                }
+
+                // Realiza la reserva enviando la solicitud con la estructura mínima
                 repository.reservarVehiculo(apiKey, vehiculoId, request)
                 onSuccess()
             } catch (ex: Exception) {
-                errorLiveData.value = "Error al rentar el vehículo: ${ex.message}"
+                val mensajeError = "Error al rentar el vehículo: ${ex.message}"
+                errorLiveData.value = mensajeError
+                Log.e("VIEWMODEL", mensajeError, ex)
+                onError(mensajeError)
             }
         }
     }
 
     // Función para obtener vehículos rentados
-    fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
-        viewModelScope.launch {
-            try {
-                val rentas = repository.obtenerVehiculosRentados(apiKey, personaId)
-                vehiculosRentadosLiveData.value = rentas
-            } catch (ex: Exception) {
-                errorLiveData.value = "Error al obtener vehículos rentados: ${ex.message}"
-            }
-        }
-    }
+//    fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
+//        viewModelScope.launch {
+//            try {
+//                val rentas = repository.obtenerVehiculosRentados(apiKey, personaId)
+//                vehiculosRentadosLiveData.value = rentas
+//            } catch (ex: Exception) {
+//                errorLiveData.value = "Error al obtener vehículos rentados: ${ex.message}"
+//            }
+//        }
+//    }
+//    /**
+//     * Obtiene los vehículos rentados por un usuario.
+//     */
+//    fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
+//        viewModelScope.launch {
+//            try {
+//                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
+//                rentas.clear()
+//                rentas.addAll(rentasObtenidas)
+//            } catch (e: Exception) {
+//                rentas.clear()
+//            }
+//        }
+//    }
 
     // Función para entregar un vehículo
     fun entregarVehiculo(apiKey: String, vehiculoId: Int) {

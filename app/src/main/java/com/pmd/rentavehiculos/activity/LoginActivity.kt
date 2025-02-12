@@ -6,19 +6,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.data.SessionManager
 import com.pmd.rentavehiculos.viewModels.LoginViewModel
 import com.pmd.rentavehiculos.screens.LoginScreen
 import com.pmd.rentavehiculos.activity.ClienteActivity
-
 class LoginActivity : ComponentActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels()
@@ -42,8 +33,11 @@ class LoginActivity : ComponentActivity() {
         loginViewModel.authResponseLiveData.observe(this) { authResponse ->
             // Guarda el token recibido
             sessionManager.token = authResponse.token
+            // Guarda el ID de la persona
+            sessionManager.personaId = authResponse.persona.id
+            // Guarda el objeto completo de Persona en la sesión
+            sessionManager.persona = authResponse.persona
 
-            // Notifica al usuario que el login fue exitoso y muestra el perfil
             Toast.makeText(this, "Login exitoso. Perfil: ${authResponse.perfil}", Toast.LENGTH_SHORT).show()
 
             // Navega a la pantalla correspondiente según el perfil

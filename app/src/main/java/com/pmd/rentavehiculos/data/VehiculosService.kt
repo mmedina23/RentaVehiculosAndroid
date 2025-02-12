@@ -16,12 +16,18 @@ interface VehiculosService {
     ): Response<List<Vehiculo>>
 
     // Reservar (rentar) un vehículo
+//    @POST("vehiculos/{id}/rentas")
+//    suspend fun reservarVehiculo(
+//        @Header("x-llave-api") apiKey: String,
+//        @Path("id") vehiculoId: Int,
+//        @Body rentaRequest: RentarVehiculoRequest
+//    ): Response<RentarVehiculoResponse>
     @POST("vehiculos/{id}/rentas")
     suspend fun reservarVehiculo(
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int,
         @Body rentaRequest: RentarVehiculoRequest
-    ): Response<RentarVehiculoResponse>
+    ): Response<Unit>
 
     // Obtener la lista de vehículos rentados por una persona
     @GET("personas/{id}/rentas")
@@ -71,4 +77,6 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int
     ): Response<Vehiculo>
+
+
 }

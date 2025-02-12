@@ -6,6 +6,6 @@ data class Persona(
     val apellidos: String,
     val direccion: String,
     val telefono: String,
-    val tipoidentificacion: String,
+    val tipo_identificacion: String,
     val identificacion: String
 )

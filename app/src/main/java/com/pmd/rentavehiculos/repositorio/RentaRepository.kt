@@ -38,16 +38,30 @@ class RentaRepository {
         }
 
         // Reservar un vehículo
+//        suspend fun reservarVehiculo(
+//            apiKey: String,
+//            vehiculoId: Int,
+//            rentaRequest: RentarVehiculoRequest
+//        ): RentarVehiculoResponse {
+//            val response: Response<RentarVehiculoResponse> =
+//                RetrofitClient.vehiculosService.reservarVehiculo(apiKey, vehiculoId, rentaRequest)
+//            if (response.isSuccessful) {
+//                return response.body() ?: throw Exception("La respuesta de reserva es nula")
+//            } else {
+//                throw HttpException(response)
+//            }
+//        }
         suspend fun reservarVehiculo(
             apiKey: String,
             vehiculoId: Int,
             rentaRequest: RentarVehiculoRequest
-        ): RentarVehiculoResponse {
-            val response: Response<RentarVehiculoResponse> =
+        ): Unit {
+            val response: Response<Unit> =
                 RetrofitClient.vehiculosService.reservarVehiculo(apiKey, vehiculoId, rentaRequest)
             if (response.isSuccessful) {
-                return response.body() ?: throw Exception("La respuesta de reserva es nula")
+                return
             } else {
+                val errorBody = response.errorBody()?.string()
                 throw HttpException(response)
             }
         }

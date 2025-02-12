@@ -61,6 +61,7 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview") // Preview y herramientas
     implementation ("androidx.activity:activity-compose:1.6.1")
     implementation ("androidx.compose.runtime:runtime-livedata")
+    implementation ("com.google.code.gson:gson:2.10.1")
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     testImplementation(libs.junit)
