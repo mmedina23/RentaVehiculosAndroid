@@ -52,8 +52,9 @@ fun VehiculosRentadosScreen(
                 LazyColumn {
                     items(rentas) { renta ->
                         RentadoItem(renta = renta, onEntregar = {
-                            onEntregarVehiculo(renta.vehiculo.id)
-                            // Opcional: refrescar la lista luego de entregar.
+                            // Llamada a la función del view model para entregar el vehículo
+                            rentadosViewModel.entregarVehiculo(apiKey, renta.vehiculo.id)
+                            // Refrescar la lista luego de entregar
                             rentadosViewModel.obtenerVehiculosRentados(apiKey, personaId)
                         })
                     }
