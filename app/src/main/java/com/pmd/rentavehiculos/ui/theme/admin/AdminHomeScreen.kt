@@ -1,38 +1,40 @@
 package com.pmd.rentavehiculos.ui.theme.admin
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.content.Context
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 
 @Composable
 fun AdminHomeScreen(
     navController: NavController,
-    viewModel: AdminViewModel = viewModel(),
-    llaveApi: String
+    context: Context,
+    id: String?
 ) {
-    viewModel.llaveApi = llaveApi
+    val viewModel: AdminViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return AdminViewModel(context) as T
+            }
+        }
+    )
+
     LaunchedEffect(Unit) {
         viewModel.loadVehiculosDisponibles()
         viewModel.loadVehiculosRentados()
     }
+
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
     val vehiculosRentados by viewModel.vehiculosRentados.observeAsState(emptyList())
 
@@ -55,7 +57,6 @@ fun AdminHomeScreen(
     }
 }
 
-// Card para un vehículo disponible
 @Composable
 fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
     Column(
@@ -71,11 +72,9 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
         Text("Cambios: ${vehiculo.cambios}", style = MaterialTheme.typography.bodyMedium)
         Text("Tipo Combustible: ${vehiculo.tipo_combustible}", style = MaterialTheme.typography.bodyMedium)
         Text("Valor por Día: $${vehiculo.valorDia}", style = MaterialTheme.typography.bodyMedium)
-        Text("Carroceria: ${vehiculo.disponible}", style = MaterialTheme.typography.bodyMedium)
     }
 }
 
-// Card para un vehículo rentado
 @Composable
 fun VehiculoRentadoCard(renta: Renta) {
     Column(
@@ -89,10 +88,7 @@ fun VehiculoRentadoCard(renta: Renta) {
         Text("Días Rentado: ${renta.dias_renta}", style = MaterialTheme.typography.bodyMedium)
         Text("Fecha de Renta: ${renta.fecha_renta}", style = MaterialTheme.typography.bodyMedium)
         Text("Fecha Estimada de Entrega: ${renta.fecha_estimada_entrega}", style = MaterialTheme.typography.bodyMedium)
-        Text(
-            "Fecha de Entrega: ${renta.fecha_entregado ?: "No entregado"}",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Text("Fecha de Entrega: ${renta.fecha_entregado ?: "No entregado"}", style = MaterialTheme.typography.bodyMedium)
         Text("Valor Total: $${renta.valor_total_venta}", style = MaterialTheme.typography.bodyMedium)
     }
 }

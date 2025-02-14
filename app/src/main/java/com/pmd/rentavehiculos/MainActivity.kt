@@ -17,16 +17,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RentaVehiculosTheme {
-                // Configuración del NavController
                 val navController = rememberNavController()
 
-                // Scaffold para manejar la estructura
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding: PaddingValues ->
-                    // Ajustar el padding del contenido
                     AppNavigation(
                         navController = navController,
+                        context = this,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

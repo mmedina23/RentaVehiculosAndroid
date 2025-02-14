@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.ui.auth
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -13,13 +14,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.pmd.rentavehiculos.data.repository.SessionManager
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    context: Context // <-- Añadimos contexto
 ) {
+    val sessionManager = remember { SessionManager(context) } // <-- Instancia de SessionManager
+
     val nombreUsuario = remember { mutableStateOf("") }
     val contrasena = remember { mutableStateOf("") }
 
@@ -59,16 +64,19 @@ fun LoginScreen(
 
         // Navegar a la pantalla principal después del login
         loginResult?.let { result ->
-            val llaveApi = result.llave
+            sessionManager.token = result.llave
+            sessionManager.personaId = result.persona?.id
+            sessionManager.perfil = result.perfil
 
             LaunchedEffect(Unit) {
                 if (result.perfil == "ADMIN") {
-                    navController.navigate("admin_home/$llaveApi") // Asegúrate de que esta ruta coincida
+                    navController.navigate("admin_home/${sessionManager.personaId ?: "default"}")
                 } else if (result.perfil == "CLIENTE") {
-                    navController.navigate("cliente_home") // Agrega esta ruta si es necesaria
+                    navController.navigate("cliente_home")
                 }
             }
         }
     }
 }
+
 
