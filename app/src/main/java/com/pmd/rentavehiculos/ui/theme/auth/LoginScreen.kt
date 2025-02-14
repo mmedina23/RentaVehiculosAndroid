@@ -70,7 +70,7 @@ fun LoginScreen(
 
             LaunchedEffect(Unit) {
                 if (result.perfil == "ADMIN") {
-                    navController.navigate("admin_home/${sessionManager.personaId ?: "default"}")
+                    navController.navigate("admin_home")
                 } else if (result.perfil == "CLIENTE") {
                     navController.navigate("cliente_home")
                 }
