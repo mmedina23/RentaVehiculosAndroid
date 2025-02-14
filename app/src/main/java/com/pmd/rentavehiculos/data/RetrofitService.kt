@@ -3,6 +3,7 @@ package com.pmd.rentavehiculos.data
 import android.media.session.MediaSession.Token
 import com.pmd.rentavehiculos.data.model.LoginRequest
 import com.pmd.rentavehiculos.data.model.LoginResponse
+import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,6 +23,10 @@ interface RetrofitService {
     suspend fun login(
         @Body request: LoginRequest
     ): LoginResponse
+    @GET("vehiculos/rentas") // Ajusta este endpoint si es necesario
+    suspend fun getRentasPorVehiculo(
+        @Header("x-llava-api") token: String
+    ): List<Renta>
 }
 
 object RetrofitServiceFactory{

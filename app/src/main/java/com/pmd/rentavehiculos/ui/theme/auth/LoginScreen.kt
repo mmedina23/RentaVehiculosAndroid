@@ -17,7 +17,7 @@ import com.pmd.rentavehiculos.ui.theme.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavController, // Recibe el NavController
+    navController: NavController,
     authViewModel: AuthViewModel = viewModel()
 ) {
     val nombreUsuario = remember { mutableStateOf("") }
@@ -58,10 +58,17 @@ fun LoginScreen(
         }
 
         // Navegar a la pantalla principal después del login
-        loginResult?.let {
+        loginResult?.let { result ->
+            val llaveApi = result.llave
+
             LaunchedEffect(Unit) {
-                navController.navigate("home") // Redirige a la pantalla principal
+                if (result.perfil == "ADMIN") {
+                    navController.navigate("admin_home/$llaveApi") // Asegúrate de que esta ruta coincida
+                } else if (result.perfil == "CLIENTE") {
+                    navController.navigate("cliente_home") // Agrega esta ruta si es necesaria
+                }
             }
         }
     }
 }
+
