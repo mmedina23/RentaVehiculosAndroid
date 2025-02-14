@@ -1,4 +1,10 @@
 package com.pmd.rentavehiculos.modelos
 
-class Renta {
-}
+data class Renta(
+    val vehiculo: Vehiculo,
+    val dias_renta: Int,
+    val valor_total_renta: Double,
+    val fecha_renta: String,
+    val fecha_estimada_entrega: String
+)
+

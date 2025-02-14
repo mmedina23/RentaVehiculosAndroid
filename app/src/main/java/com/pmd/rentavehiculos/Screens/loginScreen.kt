@@ -1,6 +1,7 @@
 package com.pmd.rentavehiculos.Screens
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,17 +29,24 @@ import androidx.navigation.NavController
 import com.pmd.rentavehiculos.R
 import com.pmd.rentavehiculos.modelos.LoginRequest
 import com.pmd.rentavehiculos.retrofit.RetrofitClient
+import com.pmd.rentavehiculos.viewmodels.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    // Recibimos el LoginViewModel
+    loginViewModel: LoginViewModel
+) {
+    val context = LocalContext.current
+
+    // Estados locales para username, password y error
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -52,8 +60,10 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Spacer(modifier = Modifier.height(16.dp))
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.vehiculo),
                 contentDescription = "App Logo",
                 modifier = Modifier.size(250.dp)
             )
@@ -85,7 +95,14 @@ fun LoginScreen(navController: NavController) {
                         errorMessage = "Por favor, completa todos los campos."
                         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     } else {
-                        loginUser(username, password, navController, context)
+                        // Llamamos a la función loginUser pasando el ViewModel
+                        loginUser(
+                            username,
+                            password,
+                            navController,
+                            context,
+                            loginViewModel
+                        )
                     }
                 },
                 modifier = Modifier
@@ -105,7 +122,6 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
@@ -118,47 +134,32 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
-@Composable
-fun SimpleCustomTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    leadingIcon: ImageVector,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardType: KeyboardType = KeyboardType.Text
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null) },
-        visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-
 fun loginUser(
     username: String,
     password: String,
     navController: NavController,
-    context: Context
+    context: Context,
+    loginViewModel: LoginViewModel
 ) {
     val retrofitService = RetrofitClient.apiService
     val loginRequest = LoginRequest(nombre_usuario = username, contrasena = password)
 
-    // Llamada a Retrofit usando una corrutina
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val response = retrofitService.login(loginRequest)
+            val response = retrofitService.loginUser(loginRequest)
             withContext(Dispatchers.Main) {
-                if (response.perfil == "ADMIN") {
-                    navController.navigate("admin")
-                } else if (response.perfil == "CLIENTE") {
-                    navController.navigate("cliente")
-                } else {
-                    Toast.makeText(context, "Rol desconocido", Toast.LENGTH_SHORT).show()
+               //guardo apiKey EN EL VIEWMODEL
+                loginViewModel.apiKey.value = response.llave
+                loginViewModel.usuario.value = response.persona
+                loginViewModel.perfil.value = response.perfil
+
+                Log.d("API_DEBUG", "API Key recibida: ${response.llave}")
+
+                // segun perfil ir a blabla o blabla
+                when (response.perfil.uppercase()) {
+                    "ADMIN" -> navController.navigate("admin")
+                    "CLIENTE" -> navController.navigate("cliente")
+                    else -> Toast.makeText(context, "Rol desconocido", Toast.LENGTH_SHORT).show()
                 }
             }
         } catch (e: Exception) {
@@ -170,5 +171,28 @@ fun loginUser(
 }
 
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SimpleCustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingIcon: ImageVector,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardType: KeyboardType = KeyboardType.Text
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onValueChange(it) },
+        label = { Text(label, color = Color.Black) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.Black) },
+        visualTransformation = visualTransformation,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Black,
+            unfocusedBorderColor = Color.Gray,
+            unfocusedTextColor = Color.Black
+        )
+    )
+}
