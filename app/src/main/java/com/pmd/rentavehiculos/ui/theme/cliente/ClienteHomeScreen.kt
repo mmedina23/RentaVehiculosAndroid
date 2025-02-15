@@ -176,7 +176,7 @@ fun HistorialRentasScreen(viewModel: ClienteViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RentasActualesScreen(viewModel: ClienteViewModel) {
+fun RentasActualesScreen(viewModel: ClienteViewModel, navController: NavController) {
     val vehiculosRentados by viewModel.vehiculosRentados.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -196,6 +196,12 @@ fun RentasActualesScreen(viewModel: ClienteViewModel) {
                                 viewModel.entregarVehiculo(renta) { success, message ->
                                     if (success) {
                                         viewModel.cargarVehiculosDisponibles()
+                                        viewModel.cargarVehiculosRentados()
+
+                                        // 🔹 Navegar a `cliente_home` para reflejar los cambios en la UI
+                                        navController.navigate("cliente_home") {
+                                            popUpTo("rentas_actuales") { inclusive = true }
+                                        }
                                     }
                                 }
                             }
@@ -206,6 +212,7 @@ fun RentasActualesScreen(viewModel: ClienteViewModel) {
         }
     }
 }
+
 
 @Composable
 fun VehiculoRentadoClienteCard(renta: Renta, onEntregarClick: () -> Unit) {

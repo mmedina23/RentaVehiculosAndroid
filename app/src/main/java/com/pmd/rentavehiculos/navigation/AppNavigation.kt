@@ -89,7 +89,7 @@ fun AppNavigation(
                 val viewModelFactory = ClienteViewModelFactory(rentaService, vehiculoService, sessionManager)
                 val viewModel = ViewModelProvider(backStackEntry, viewModelFactory)[ClienteViewModel::class.java]
 
-                RentasActualesScreen(viewModel = viewModel)
+                RentasActualesScreen(viewModel = viewModel, navController = navController)
             }
 
             // Pantalla del Historial de Rentas

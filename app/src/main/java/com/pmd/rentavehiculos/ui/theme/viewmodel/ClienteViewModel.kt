@@ -155,19 +155,17 @@ class ClienteViewModel(
         }
     }
 
-    /**
-     * Entrega un vehículo rentado y lo mueve al historial.
-     */
+
     fun entregarVehiculo(renta: Renta, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = rentaService.entregarVehiculo(sessionManager.token!!, renta.vehiculo.id)
                 if (response.isSuccessful) {
-                    _vehiculosRentados.value = _vehiculosRentados.value.filter { it.id != renta.id }
-                    cargarVehiculosDisponibles()
-                    cargarHistorialRentas()
+                    cargarVehiculosDisponibles()  // 🔹 Recargar lista de vehículos disponibles
+                    cargarVehiculosRentados()     // 🔹 Recargar lista de rentas actuales
                     onResult(true, "Vehículo entregado correctamente")
                 } else {
+                    Log.e("ClienteViewModel", "Error al entregar vehículo: ${response.message()}")
                     onResult(false, "Error al entregar vehículo")
                 }
             } catch (e: IOException) {
@@ -177,4 +175,6 @@ class ClienteViewModel(
             }
         }
     }
+
 }
+
