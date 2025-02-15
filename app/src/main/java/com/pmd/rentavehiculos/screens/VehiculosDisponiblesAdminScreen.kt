@@ -82,7 +82,7 @@ fun VehiculosDisponiblesAdminScreen(
                 }
             }
             else -> {
-                LazyColumn {
+                LazyColumn (modifier = Modifier.weight(1f)) {
                     items(vehiculos) { vehiculo ->
                         // Usa el componente VehiculoItemAdmin
                         VehiculoItemAdmin(vehiculo = vehiculo) {

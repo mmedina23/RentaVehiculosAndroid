@@ -49,7 +49,7 @@ fun VehiculosRentadosScreen(
                 CircularProgressIndicator()
             }
             else -> {
-                LazyColumn (modifier = Modifier.weight(1f)) {//modifier = Modifier.weight(1f) PARA QUE OCUPE TODO EL ESPACIO Y PODER HACER SCROLL
+                LazyColumn (modifier = Modifier.weight(1f)) {
                     items(rentas) { renta ->
                         RentadoItem(renta = renta, onEntregar = {
                             // Llamada a la función del view model para entregar el vehículo

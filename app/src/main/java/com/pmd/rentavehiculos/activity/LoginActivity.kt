@@ -25,6 +25,9 @@ class LoginActivity : ComponentActivity() {
             LoginScreen(
                 onLogin = { usuario, contrasena ->
                     loginViewModel.login(usuario, contrasena)
+                },
+                onExit = {
+                    finish() // Cierra la actividad, lo que en este caso cierra la aplicación
                 }
             )
         }

@@ -81,7 +81,7 @@ fun RentaVehiculosListScreen(
                 }
             }
             else -> {
-                LazyColumn {
+                LazyColumn (modifier = Modifier.weight(1f)) {
                     items<Vehiculo>(vehiculosRentados) { vehiculo ->                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()

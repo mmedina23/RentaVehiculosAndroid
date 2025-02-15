@@ -69,7 +69,7 @@ fun VehiculosDisponiblesScreen(
                 CircularProgressIndicator()
             }
             else -> {
-                LazyColumn {
+                LazyColumn (modifier = Modifier.weight(1f)){
                     items(vehiculos) { vehiculo ->
                         VehiculoItem(vehiculo = vehiculo) {
                             onVehiculoClick(vehiculo)

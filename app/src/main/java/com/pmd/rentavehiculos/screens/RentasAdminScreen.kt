@@ -73,7 +73,7 @@ fun RentasAdminScreen(
                 }
             }
             else -> {
-                LazyColumn {
+                LazyColumn(modifier = Modifier.weight(1f)) {
                     items(rentas) { renta ->
                         Card(
                             modifier = Modifier

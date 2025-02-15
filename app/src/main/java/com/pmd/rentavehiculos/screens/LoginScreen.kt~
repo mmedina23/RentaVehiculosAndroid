@@ -15,8 +15,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun LoginScreen(
-    onLogin: (String, String) -> Unit,
-    onExit: () -> Unit
+    onLogin: (String, String) -> Unit
 ) {
     var usuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
