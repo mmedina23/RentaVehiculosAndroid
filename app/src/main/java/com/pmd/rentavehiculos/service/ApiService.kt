@@ -11,4 +11,4 @@ interface ApiService {
     @POST("auth/login")
     suspend fun login(@Body request: LoginSolicitud): AuthResponse
 }
-//SEGUN STACKOVERFLOW ESTO ES ASI. CHEQUEAR EN YOUTUBE. DE MOMENTO FUNCIONANDO
+
