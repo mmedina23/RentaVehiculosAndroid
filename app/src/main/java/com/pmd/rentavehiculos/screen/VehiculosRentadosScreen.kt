@@ -14,9 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.model.RentaSolicitud
 import com.pmd.rentavehiculos.vista.VistaLogin
 import com.pmd.rentavehiculos.vista.VistaVehiculos
+import com.pmd.rentavehiculos.model.Vehiculo
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -89,6 +91,7 @@ fun VehiculosRentadosScreen(
 fun RentaCard(renta: RentaSolicitud, onEntregarVehiculo: (Int) -> Unit) {
     val yaEntregado = !renta.fecha_entregado.isNullOrEmpty()
 
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,6 +107,11 @@ fun RentaCard(renta: RentaSolicitud, onEntregarVehiculo: (Int) -> Unit) {
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (yaEntregado) Color.Gray else Color.Black
+            )
+            AsyncImage(
+                model = renta.vehiculo.imagen,
+                contentDescription = "Imagen del Vehículo",
+                modifier = Modifier.fillMaxSize()
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Días alquilados: ${renta.dias_renta}")
