@@ -46,7 +46,7 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.npc),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
                 modifier = Modifier.size(180.dp)
             )
