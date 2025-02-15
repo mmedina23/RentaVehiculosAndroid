@@ -8,7 +8,7 @@ data class RentarVehiculoRequest(
     @SerializedName("dias_renta")
     val dias_renta: Int,
     @SerializedName("valor_total_renta")
-    val valor_total_renta: Int,
+    val valor_total_renta: Double,
     @SerializedName("fecha_renta")
     val fecha_renta: String,
     @SerializedName("fecha_estimada_entrega")

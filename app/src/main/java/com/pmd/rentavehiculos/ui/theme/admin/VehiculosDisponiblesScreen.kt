@@ -73,7 +73,7 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
             Text("Color: ${vehiculo.color}")
             Text("Plazas: ${vehiculo.plazas}")
             Text("Tipo Combustible: ${vehiculo.tipo_combustible}")
-            Text("Valor por Día: $${vehiculo.valorDia}")
+            Text("Valor por Día: $${vehiculo.valor_dia}")
         }
     }
 }

@@ -23,8 +23,7 @@ fun ClienteHomeScreen(
     viewModel: ClienteViewModel,
     navController: NavController,
     context: Context
-)
-{
+) {
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.collectAsState()
     val vehiculosRentados by viewModel.vehiculosRentados.collectAsState()
     val scope = rememberCoroutineScope()
@@ -33,13 +32,21 @@ fun ClienteHomeScreen(
         topBar = {
             TopAppBar(title = { Text("Renta de Vehículos") })
         }
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
             Text("Vehículos Disponibles", style = MaterialTheme.typography.headlineMedium)
             LazyColumn {
                 items(vehiculosDisponibles) { vehiculo ->
                     VehiculoDisponibleCard(vehiculo) {
-                        scope.launch { viewModel.rentarVehiculo(vehiculo) }
+                        scope.launch {
+                            viewModel.rentarVehiculo(vehiculo) { success, message ->
+                                if (success) {
+                                    println("✅ Renta exitosa: $message")
+                                } else {
+                                    println("❌ Error al rentar: $message")
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -48,13 +55,22 @@ fun ClienteHomeScreen(
             LazyColumn {
                 items(vehiculosRentados) { renta ->
                     VehiculoRentadoCard(renta) {
-                        scope.launch { viewModel.entregarVehiculo(renta) }
+                        scope.launch {
+                            viewModel.entregarVehiculo(renta) { success, message ->
+                                if (success) {
+                                    println("✅ Vehículo entregado: $message")
+                                } else {
+                                    println("❌ Error al entregar: $message")
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun VehiculoDisponibleCard(vehiculo: Vehiculo, onRentarClick: () -> Unit) {
@@ -70,7 +86,7 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo, onRentarClick: () -> Unit) {
             )
             Text("Marca: ${vehiculo.marca}")
             Text("Modelo: ${vehiculo.carroceria}")
-            Text("Valor por Día: $${vehiculo.valorDia}")
+            Text("Valor por Día: $${vehiculo.valor_dia}")
             Button(onClick = onRentarClick) {
                 Text("Rentar")
             }

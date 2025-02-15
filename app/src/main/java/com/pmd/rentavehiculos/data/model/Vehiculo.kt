@@ -8,7 +8,7 @@ data class Vehiculo(
     val plazas: Int,
     val cambios: String,
     val tipo_combustible: String,
-    val valorDia: Int,
+    val valor_dia: Double,
     val disponible : Boolean,
     val imagen : String
 )
