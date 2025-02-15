@@ -40,7 +40,7 @@ class LoginViewModel : ViewModel() {
                 Log.d("LoginViewModel", "Intentando iniciar sesión con usuario: $username")
 
                 // Enviamos la solicitud de inicio de sesión a la API
-                val response = RetrofitClient.apiService.login(LoginRequest(username, password))
+                val response = RetrofitClient.loginService.login(LoginRequest(username, password))
 
                 // Guardamos la información obtenida en los estados observables
                 apiKey.value = response.llave  // API Key para futuras solicitudes autenticadas.
