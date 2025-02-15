@@ -130,13 +130,4 @@ class RentaRepository {
             }
         }
 
-        suspend fun obtenerHistorialRentas(apiKey: String, vehiculoId: Int): List<RentaVehiculo> {
-            val response = RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
-            if (response.isSuccessful) {
-                return response.body() ?: emptyList()
-            } else {
-                throw HttpException(response)
-            }
-        }
-
 }

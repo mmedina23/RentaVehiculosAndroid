@@ -32,11 +32,12 @@ fun VehiculosDisponiblesAdminScreen(
     onBackClick: () -> Unit,
     onVehiculoClick: (Vehiculo) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        adminViewModel.obtenerVehiculosDisponibles(apiKey)
-    }
+    val vehiculosViewModel: VehiculosViewModel = viewModel()
 
-    val vehiculos by adminViewModel.vehiculosDisponiblesLiveData.observeAsState(emptyList())
+    LaunchedEffect(Unit) {
+        vehiculosViewModel.obtenerVehiculosDisponibles(apiKey)
+    }
+    val vehiculos by vehiculosViewModel.vehiculosDisponiblesLiveData.observeAsState(emptyList());
     val errorMessage by adminViewModel.errorLiveData.observeAsState()
 
     Column(

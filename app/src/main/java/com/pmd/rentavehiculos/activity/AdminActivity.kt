@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import com.pmd.rentavehiculos.screens.AdminMenuScreen
+import com.pmd.rentavehiculos.screens.RentaVehiculosListScreen
 import com.pmd.rentavehiculos.screens.RentasAdminScreen
 import com.pmd.rentavehiculos.screens.VehiculosDisponiblesAdminScreen
 
@@ -49,17 +50,6 @@ class AdminActivity : ComponentActivity() {
         val personaId: Int = sessionManager.personaId ?: 0
         val apiKey: String = sessionManager.token ?: ""
         Log.d("AdminActivity", "Se inició AdminActivity")
-//        // Verifica que el perfil sea admin
-//        if (sessionManager.perfil?.lowercase() != "admin") {
-//            // Si no es admin, limpia la sesión y redirige al login
-//            sessionManager.clearSession()
-//            val intent = Intent(this, LoginActivity::class.java).apply {
-//                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            }
-//            startActivity(intent)
-//            finish()
-//            return
-//        }
 
         setContent {
             RentaVehiculosTheme {
@@ -137,13 +127,30 @@ class AdminActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        // Pantalla de rentas (vehículos rentados) para admin
+                        // Pantalla de lista de vehículos rentados
                         composable("rentas") {
-                            RentasAdminScreen(
+                            RentaVehiculosListScreen(
                                 apiKey = apiKey,
+                                onVehicleClick = { vehiculoId ->
+                                    navController.navigate("rentas/$vehiculoId")
+                                },
                                 onBackClick = { navController.popBackStack() }
                             )
                         }
+
+                        // Pantalla de historial de rentas de un vehículo específico
+                        composable(
+                            route = "rentas/{vehiculoId}",
+                            arguments = listOf(navArgument("vehiculoId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val vehiculoId = backStackEntry.arguments?.getInt("vehiculoId") ?: 0
+                            RentasAdminScreen(
+                                apiKey = apiKey,
+                                vehiculoId = vehiculoId,
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+
                     }
                 }
             }

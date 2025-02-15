@@ -78,4 +78,11 @@ interface VehiculosService {
     suspend fun obtenerTodasLasRentas(
         @Header("x-llave-api") apiKey: String
     ): Response<List<RentaVehiculo>>
+
+    // Obtener la lista de vehículoss (para admin)
+    @GET("vehiculos")
+    suspend fun obtenerVehiculosAdmin(
+        @Header("x-llave-api") apiKey: String,
+        @Query("estado") estado: String? = null
+    ): Response<List<Vehiculo>>
 }

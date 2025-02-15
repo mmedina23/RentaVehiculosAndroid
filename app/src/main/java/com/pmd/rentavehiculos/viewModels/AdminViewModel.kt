@@ -16,31 +16,31 @@ class AdminViewModel : ViewModel() {
     val vehiculosDisponiblesLiveData = MutableLiveData<List<Vehiculo>>()
     val rentasLiveData = MutableLiveData<List<RentaVehiculo>>()
     val errorLiveData = MutableLiveData<String>()
+    val vehiculosRentadosAdminLiveData = MutableLiveData<List<Vehiculo>>()
 
-    fun obtenerVehiculosDisponibles(apiKey: String) {
+    fun obtenerVehiculosRentadosAdmin(apiKey: String) {
         viewModelScope.launch {
             try {
-                Log.d("AdminViewModel", "Obteniendo vehículos disponibles...")
-                val vehiculos = repository.obtenerVehiculosDisponibles(apiKey)
-                vehiculosDisponiblesLiveData.value = vehiculos
-                Log.d("AdminViewModel", "Vehículos disponibles obtenidos: ${vehiculos.size}")
+                val vehiculos = repository.obtenerVehiculosRentadosAdmin(apiKey)
+                vehiculosRentadosAdminLiveData.value = vehiculos
             } catch (ex: Exception) {
-                errorLiveData.value = "Error: ${ex.message}"
-                Log.e("AdminViewModel", "Error al obtener vehículos disponibles", ex)
+                errorLiveData.value = "Error al obtener vehículos rentados: ${ex.message}"
             }
         }
     }
 
-    fun obtenerTodasLasRentas(apiKey: String) {
+    fun obtenerHistorialRentas(apiKey: String, vehiculoId: Int) {
         viewModelScope.launch {
             try {
-                val rentas = repository.obtenerTodasLasRentas(apiKey)
-                rentasLiveData.value = rentas
+                // Asegúrate de haber implementado esta función en el repositorio
+                val historial = repository.obtenerHistorialRentas(apiKey, vehiculoId)
+                rentasLiveData.value = historial
             } catch (ex: Exception) {
-                errorLiveData.value = "Error al obtener rentas: ${ex.message}"
+                errorLiveData.value = "Error al obtener historial de rentas: ${ex.message}"
             }
         }
     }
+
 
     // Aquí podrías agregar otras funciones, como crear, actualizar o eliminar vehículos.
 }
