@@ -33,11 +33,11 @@ fun MenuScreen(navController: NavController) {
                 .height(410.dp)         )
 
         Text(
-            text = "Bienvenido",
+            text = "Menú",
             fontSize = 38.sp,
             fontWeight = FontWeight.ExtraBold,
             fontFamily = FontFamily.Serif,
-            color = Color(0xFF0077B7),
+            color = Color(0xFF43A047),
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -45,7 +45,7 @@ fun MenuScreen(navController: NavController) {
             onClick = { navController.navigate("vehiculos") },
             modifier = Modifier.fillMaxWidth(0.8f),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0077B7),
+                containerColor = Color(0xFF43A047),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(10.dp)
@@ -58,7 +58,7 @@ fun MenuScreen(navController: NavController) {
             onClick = { navController.navigate("vehiculos_rentados") },
             modifier = Modifier.fillMaxWidth(0.8f),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0077B7), // Azul RGB 0,119,183
+                containerColor = Color(0xFF43A047),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(10.dp)
