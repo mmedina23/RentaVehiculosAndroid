@@ -69,10 +69,10 @@ fun LoginScreen(
             sessionManager.perfil = result.perfil
 
             LaunchedEffect(Unit) {
-                if (result.perfil == "ADMIN") {
-                    navController.navigate("admin_home")
-                } else if (result.perfil == "CLIENTE") {
-                    navController.navigate("cliente_home")
+                val destination = if (result.perfil == "ADMIN") "admin_home" else "cliente_home"
+                navController.navigate(destination) {
+                    popUpTo("login") { inclusive = true } // Elimina la pantalla de login del back stack
+                    launchSingleTop = true // Evita duplicar instancias de la misma pantalla
                 }
             }
         }

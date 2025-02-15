@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.data.model.Renta
-import com.pmd.rentavehiculos.data.model.RentarVehiculoRequest
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
 @Composable
@@ -58,9 +58,22 @@ fun ListaVehiculosRentados(navController: NavController, context: Context) {
 fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta) {
     val persona = renta.persona
 
-    Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             // Datos del vehículo
+            AsyncImage(
+                model = vehiculo.imagen,  // URL de la imagen
+                contentDescription = "Imagen del vehículo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp) // Ajusta el tamaño según necesidad
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text("🚗 Vehículo: ${vehiculo.marca}")
             Text("🔑 ID del Vehículo: ${vehiculo.id}")
             Text("🎨 Color: ${vehiculo.color}")
