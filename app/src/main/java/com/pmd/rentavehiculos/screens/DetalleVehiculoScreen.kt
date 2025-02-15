@@ -45,15 +45,17 @@ fun DetalleVehiculoScreen(
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Detalle del Vehículo", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text("Marca: ${vehiculo.marca}")
         Text("Color: ${vehiculo.color}")
+        Spacer(modifier = Modifier.height(20.dp))
         Text("Carrocería: ${vehiculo.carroceria}")
         Text("Plazas: ${vehiculo.plazas}")
         Text("Cambios: ${vehiculo.cambios}")
         Text("Tipo de combustible: ${vehiculo.tipo_combustible}")
+        Spacer(modifier = Modifier.height(20.dp))
         Text("Valor por día: ${vehiculo.valor_dia}")
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Si es admin, muestra botones para eliminar o modificar.
         if (isAdmin) {

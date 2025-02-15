@@ -91,7 +91,10 @@ fun RentaVehiculosListScreen(
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("ID: ${vehiculo.id}")
                                 Text("Marca: ${vehiculo.marca}")
-                                // Puedes agregar más datos si lo consideras
+                                Text("Carrocería: ${vehiculo.carroceria}")
+                                Text("Plazas: ${vehiculo.plazas}")
+                                Text("Cambios: ${vehiculo.cambios}")
+                                Text("Valor por día: ${vehiculo.valor_dia}")
                             }
                         }
                     }

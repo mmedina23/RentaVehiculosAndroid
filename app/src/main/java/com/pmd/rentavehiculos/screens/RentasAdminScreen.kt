@@ -68,9 +68,10 @@ fun RentasAdminScreen(
                 )
             }
             rentas.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+                Text(
+                    text = "No hay vehículos rentados",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
             else -> {
                 LazyColumn(modifier = Modifier.weight(1f)) {
@@ -81,11 +82,18 @@ fun RentasAdminScreen(
                                 .padding(8.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
+                                Spacer(modifier = Modifier.height(20.dp))
                                 Text("Rentado por: ${renta.persona.nombre} ${renta.persona.apellidos}")
+                                Text("Identificación: ${renta.persona.tipo_identificacion} ${renta.persona.identificacion}")
+                                Text("Dirección: ${renta.persona.direccion}")
+                                Text ("Telefón: ${renta.persona.telefono}")
+                                Spacer(modifier = Modifier.height(20.dp))
                                 Text("Días: ${renta.dias}")
                                 Text("Fecha de Renta: ${renta.fechaRenta}")
                                 Text("Fecha Prevista Entrega: ${renta.fechaPrevistaEntrega}")
                                 Text("Fecha Entrega: ${renta.fechaEntrega ?: "Pendiente"}")
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Text("Valor por día: ${renta.vehiculo.valor_dia}")
                                 Text("Valor Total: ${renta.valorTotal}")
                             }
                         }

@@ -54,7 +54,7 @@ class VehiculosViewModel : ViewModel() {
                 // Llamar al repositorio para obtener la lista ya desempaquetada
                 val rentasActualizadas = repository.obtenerVehiculosRentados(apiKey, usuario.id)
 
-                // Ahora rentasActualizadas es de tipo List<RentaVehiculo> y se puede filtrar
+                //rentasActualizadas es de tipo List<RentaVehiculo> y se puede filtrar
                 val vehiculosRentados = rentasActualizadas.filter { it.fechaEntrega.isNullOrEmpty() }
 
                 if (vehiculosRentados.size >= 3) {
@@ -73,32 +73,6 @@ class VehiculosViewModel : ViewModel() {
             }
         }
     }
-
-    // Función para obtener vehículos rentados
-//    fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
-//        viewModelScope.launch {
-//            try {
-//                val rentas = repository.obtenerVehiculosRentados(apiKey, personaId)
-//                vehiculosRentadosLiveData.value = rentas
-//            } catch (ex: Exception) {
-//                errorLiveData.value = "Error al obtener vehículos rentados: ${ex.message}"
-//            }
-//        }
-//    }
-//    /**
-//     * Obtiene los vehículos rentados por un usuario.
-//     */
-//    fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
-//        viewModelScope.launch {
-//            try {
-//                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
-//                rentas.clear()
-//                rentas.addAll(rentasObtenidas)
-//            } catch (e: Exception) {
-//                rentas.clear()
-//            }
-//        }
-//    }
 
     // Función para entregar un vehículo
     fun entregarVehiculo(apiKey: String, vehiculoId: Int) {

@@ -110,6 +110,10 @@ fun VehiculoItemAdmin(vehiculo: Vehiculo, onClick: () -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "ID: ${vehiculo.id}")
             Text(text = "Marca: ${vehiculo.marca}")
+            Text(text = "Carrocería: ${vehiculo.carroceria}")
+            Text(text = "Plazas: ${vehiculo.plazas}")
+            Text(text = "Cambios: ${vehiculo.cambios}")
+            Text(text = "Valor por día: ${vehiculo.valor_dia}")
         }
     }
 }

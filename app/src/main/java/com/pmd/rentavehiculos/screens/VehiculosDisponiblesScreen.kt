@@ -94,9 +94,9 @@ fun VehiculoItem(vehiculo: Vehiculo, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Marca: ${vehiculo.marca}")
-            Text(text = "Color: ${vehiculo.color}")
+            Text(text = "Carrocería: ${vehiculo.carroceria}")
+            Text(text = "Plazas: ${vehiculo.plazas}")
             Text(text = "Valor por día: ${vehiculo.valor_dia}")
-            //El id no le interesa al usuario
         }
     }
 }

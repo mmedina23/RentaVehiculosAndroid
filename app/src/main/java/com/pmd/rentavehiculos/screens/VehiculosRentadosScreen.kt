@@ -72,10 +72,20 @@ fun RentadoItem(renta: RentaVehiculo, onEntregar: () -> Unit) {
             .padding(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Spacer(modifier = Modifier.height(20.dp))
             Text("Vehículo: ${renta.vehiculo.marca}")
+            Text("Color: ${renta.vehiculo.color}")
+            Text("Carrocería: ${renta.vehiculo.carroceria}")
+            Text("Plazas: ${renta.vehiculo.plazas}")
+            Text("Cambios: ${renta.vehiculo.cambios}")
+            Text("Tipo de Combustible: ${renta.vehiculo.tipo_combustible}")
+            Text("Valor por Día: ${renta.vehiculo.valor_dia}")
+            Spacer(modifier = Modifier.height(20.dp))
             Text("Días de Renta: ${renta.dias}")
+            Spacer(modifier = Modifier.height(20.dp))
             Text("Fecha de Renta: ${renta.fechaRenta}")
             Text("Fecha Estimada Entrega: ${renta.fechaPrevistaEntrega}")
+            Spacer(modifier = Modifier.height(20.dp))
             Text("Valor Total: ${renta.valorTotal}")
             if (renta.fechaEntrega == null) {
                 Button(
