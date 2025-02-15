@@ -14,7 +14,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -44,7 +43,19 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
+
+    // 🔥 SOLUCIÓN: Excluir archivos duplicados de Netty
+    packagingOptions {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/io.netty.versions.properties" // 🔥 Se excluyen archivos de Netty
+            excludes += "META-INF/AL2.0"
+            excludes += "META-INF/LGPL2.1"
+        }
+    }
 }
+
 
 dependencies {
     // Jetpack Compose
@@ -53,6 +64,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.4.3")
 
     // Core AndroidX
     implementation("androidx.core:core-ktx:1.12.0")
@@ -60,18 +72,24 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
 
     // Retrofit para llamadas API
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation("com.google.code.gson:gson:2.8.6")
-    implementation(libs.androidx.animation.core)
-    implementation(libs.androidx.animation.core)
-    implementation(libs.androidx.animation.core)
-    implementation(libs.androidx.animation.core)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0") // 🔥 Versión más reciente
+
+    // Gson (solo una versión)
+    implementation("com.google.code.gson:gson:2.10.1") // 🔥 Versión más reciente
+
+    // Jetpack Compose Animations
     implementation(libs.androidx.animation.core)
     implementation(libs.androidx.navigation.compose)
+
+    // Firebase y DataStore
+    implementation(libs.firebase.appdistribution.gradle)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Pruebas
     testImplementation("junit:junit:4.13.2")
