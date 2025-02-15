@@ -26,11 +26,11 @@ fun MenuScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.npc),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo principal",
             modifier = Modifier
                 .width(300.dp)
-                .height(410.dp)         )
+                .height(410.dp))
 
         Text(
             text = "Menú",
