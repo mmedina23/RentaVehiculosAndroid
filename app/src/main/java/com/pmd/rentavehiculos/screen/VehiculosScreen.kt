@@ -89,7 +89,12 @@ fun VehiculosScreen(
     if (showDialog && selectedVehiculo != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Reservar ${selectedVehiculo?.marca}") },
+            title = { Text(
+                text = "Reservar ${selectedVehiculo?.marca}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = Color(0xFF1E88E5) // Azul principal
+            )  },
             text = {
                 Column {
                     Text("Introduce los días de renta:", fontSize = 16.sp, color = Color.Black)
@@ -126,11 +131,12 @@ fun VehiculosScreen(
                             showDialog = false
                         }
                     }
+
                 }) {
-                    Text("Confirmar", fontWeight = FontWeight.Bold)
+                    Text("Confirmar", fontWeight = FontWeight.Bold ,color = Color(0xFF001F3F))
                 }
             },
-            dismissButton = { Button(onClick = { showDialog = false }) { Text("Cancelar") } }
+            dismissButton = { Button(onClick = { showDialog = false }) { Text("Cancelar", fontWeight = FontWeight.Bold, color = Color(0xFF001F3F))  } }
         )
     }
 }

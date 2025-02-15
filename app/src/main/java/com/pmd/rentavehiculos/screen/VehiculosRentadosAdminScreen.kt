@@ -11,7 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,29 +48,33 @@ fun VehiculosRentadosAdminScreen(
         topBar = {
             SmallTopAppBar(
                 title = {
-                    Text("Historial de Rentas", fontWeight = FontWeight.Bold)
+                    Text("Historial de Rentas", fontWeight = FontWeight.Bold, color = Color.White)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF0D47A1))
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF003366))
             )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF001F3F), Color(0xFF003366))
+                    )
+                )
                 .padding(paddingValues)
                 .padding(16.dp)
-                .background(Color(0xFFF5F5F5)) // Fondo más claro y moderno
         ) {
             Text(
                 "Historial del vehículo ID: $vehiculoId",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D47A1)
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -76,7 +83,7 @@ fun VehiculosRentadosAdminScreen(
                 Text(
                     "No hay historial de rentas para este vehículo.",
                     modifier = Modifier.padding(16.dp),
-                    color = Color.Gray,
+                    color = Color.White,
                     fontSize = 16.sp
                 )
             } else {
@@ -105,7 +112,7 @@ fun RentaCardAdmin(renta: RentaRequest) {
                 text = "🚗 ${renta.vehiculo.marca} - ${renta.vehiculo.color}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D47A1)
+                color = Color(0xFF003366)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -135,8 +142,56 @@ fun RentaCardAdmin(renta: RentaRequest) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewVehiculosRentadosAdminScreen() {
-    VehiculosRentadosAdminScreen(
-        navController = NavController(LocalContext.current),
-        vehiculoId = 123
-    )
+    VehiculosRentadosAdminScreenPreview(emptyList(), 123)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VehiculosRentadosAdminScreenPreview(rentas: List<RentaRequest>, vehiculoId: Int) {
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = {
+                    Text("Historial de Rentas", fontWeight = FontWeight.Bold, color = Color.White)
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF003366))
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF001F3F), Color(0xFF003366))
+                    )
+                )
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            Text(
+                "Historial del vehículo ID: $vehiculoId",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (rentas.isEmpty()) {
+                Text(
+                    "No hay historial de rentas para este vehículo.",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
+            } else {
+                LazyColumn {
+                    items(rentas) { renta ->
+                        RentaCardAdmin(renta)
+                    }
+                }
+            }
+        }
+    }
 }
