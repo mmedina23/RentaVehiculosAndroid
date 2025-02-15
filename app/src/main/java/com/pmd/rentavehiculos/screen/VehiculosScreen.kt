@@ -52,6 +52,7 @@ fun VehiculosScreen(
     }
 
     Scaffold(
+        Modifier.background(color = Color.White),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -62,7 +63,7 @@ fun VehiculosScreen(
                         color = Color.White
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0077B7))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF43A047))
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -71,7 +72,7 @@ fun VehiculosScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(16.dp).background(color = Color.White)
         ) {
             LazyColumn {
                 items(vehiculos) { vehiculo ->
@@ -87,10 +88,9 @@ fun VehiculosScreen(
     if (showDialog && selectedVehiculo != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Reservar ${selectedVehiculo?.marca}") },
+            title = { Text("Alquilar ${selectedVehiculo?.marca}") },
             text = {
                 Column {
-                    Text("Introduce los días de renta:")
 
                     OutlinedTextField(
                         value = diasRenta,
@@ -130,13 +130,13 @@ fun VehiculosScreen(
                     }
                 },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF0077B7),
+                        containerColor = Color(0xFF43A047),
                         contentColor = Color.White)) {
                     Text("Confirmar")
                 }
             },
             dismissButton = { Button(onClick = { showDialog = false },colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0077B7),
+                containerColor = Color(0xFF43A047),
                 contentColor = Color.White)) { Text("Cancelar") } },
             containerColor = Color.White
 
@@ -185,7 +185,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     text = vehiculo.marca,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
-                    color = Color(0xFF0055B7),
+                    color = Color(0xFF43A047),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
@@ -231,7 +231,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     text = "Precio/día: ${vehiculo.valor_dia} €",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 18.sp,
-                    color = Color.Red
+                    color = Color.Blue
                 )
             }
 
@@ -243,17 +243,17 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)), // Naranja llamativo
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047)),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = "Reservar",
+                    contentDescription = "Alquilar",
                     tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Reservar",
+                    "Alquilar",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
