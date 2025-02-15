@@ -13,7 +13,7 @@ import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (String, String) -> Unit // Acción al iniciar sesión correctamente
+    onLoginSuccess: (String, String, String) -> Unit
 ) {
     val viewModel: LoginViewModel = viewModel()
     var nombreUsuario by remember { mutableStateOf("") }
@@ -42,6 +42,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
+                println("🔄 Intentando iniciar sesión con usuario: $nombreUsuario")
                 viewModel.iniciarSesion(nombreUsuario, contrasena)
             },
             modifier = Modifier.fillMaxWidth()
@@ -49,16 +50,22 @@ fun LoginScreen(
             Text("Iniciar sesión")
         }
 
-        // Manejar el estado del login
         when (loginState) {
-            is LoginState.Loading -> Text("Cargando...")
-            is LoginState.Success -> {
-                val successState = loginState as LoginState.Success
-                Text(successState.mensaje)
-                // Llamamos a la función de redirección al éxito
-                onLoginSuccess(successState.perfil, successState.llave)
+            is LoginState.Loading -> {
+                CircularProgressIndicator()
             }
-            is LoginState.Error -> Text("Error: ${(loginState as LoginState.Error).error}")
+            is LoginState.Success -> {
+                // Código cuando el login es exitoso
+            }
+            is LoginState.Error -> {
+                // Código cuando hay un error
+            }
+            else -> {
+                // Manejo de cualquier otro estado (logout, nulo, etc.)
+            }
         }
     }
 }
+
+
+

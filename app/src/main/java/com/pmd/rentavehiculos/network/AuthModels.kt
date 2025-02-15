@@ -6,6 +6,10 @@ data class LoginRequest(
     val contrasena: String
 )
 
+data class LogoutRequest(
+    val id_usuario: Int,
+    val llave_api: String
+)
 
 // Modelo de la respuesta del login
 data class LoginResponse(

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.pmd.rentavehiculos"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pmd.rentavehiculos"
