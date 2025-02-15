@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.pmd.rentavehiculos.data.model.Renta
+import com.pmd.rentavehiculos.data.model.RentarVehiculoRequest
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
-
 @Composable
-fun ListaVehiculosRentados(navController: NavController, context : Context) {
+fun ListaVehiculosRentados(navController: NavController, context: Context) {
     val viewModel: AdminViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -24,23 +25,24 @@ fun ListaVehiculosRentados(navController: NavController, context : Context) {
         }
     )
 
-    // Obtenemos el estado de los vehículos rentados
-    val vehiculosRentados by viewModel.vehiculosRentados.observeAsState(emptyList())
+    // Obtenemos el estado de las rentas (que contienen los vehículos)
+    val rentas by viewModel.rentas.observeAsState(emptyList())
 
-    // Cargar los vehículos rentados
+    // Cargar las rentas
     LaunchedEffect(Unit) {
-        viewModel.loadVehiculosRentados() // Cargar los vehículos rentados
+        viewModel.loadVehiculosRentados() // Cargar las rentas (y, por ende, los vehículos rentados)
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("🚗 Vehículos Rentados", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mostrar Vehículos Rentados
-        if (vehiculosRentados.isNotEmpty()) {
+        // Mostrar rentas (y los vehículos asociados a esas rentas)
+        if (rentas.isNotEmpty()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(vehiculosRentados) { vehiculo ->
-                    VehiculoRentadoCard(vehiculo) // Mostrar cada vehículo rentado
+                items(rentas) { renta ->
+                    val vehiculo = renta.vehiculo // Obtener el vehículo asociado a la renta
+                    VehiculoRentadoCard(vehiculo = vehiculo, renta = renta) // Mostrar detalles del vehículo rentado
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -50,16 +52,42 @@ fun ListaVehiculosRentados(navController: NavController, context : Context) {
     }
 }
 
+
+
 @Composable
-fun VehiculoRentadoCard(vehiculo: Vehiculo) {
+fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta) {
+    val persona = renta.persona
+
     Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text("Marca: ${vehiculo.marca}", style = MaterialTheme.typography.bodyLarge)
-            Text("Modelo: ${vehiculo.carroceria}")
-            Text("Color: ${vehiculo.color}")
-            Text("Plazas: ${vehiculo.plazas}")
-            Text("Tipo Combustible: ${vehiculo.tipo_combustible}")
-            Text("Valor por Día: $${vehiculo.valorDia}")
+            // Datos del vehículo
+            Text("🚗 Vehículo: ${vehiculo.marca}")
+            Text("🔑 ID del Vehículo: ${vehiculo.id}")
+            Text("🎨 Color: ${vehiculo.color}")
+            Text("🚗 Carrocería: ${vehiculo.carroceria}")
+            Text("🚙 Plazas: ${vehiculo.plazas}")
+            Text("⛽ Combustible: ${vehiculo.tipo_combustible}")
+
+            // Datos de la persona que alquiló el vehículo
+            Text("👤 Persona que lo rentó:")
+            Text("  ID Persona: ${persona.id}")
+            Text("  Nombre: ${persona.nombre} ${persona.apellidos}")
+            Text("  Dirección: ${persona.direccion}")
+            Text("  Teléfono: ${persona.telefono}")
+            Text("  Identificación: ${persona.identificacion}")
+
+            // Datos de la renta
+            Text("🗓️ Días Rentados: ${renta.dias}")
+            Text("📅 Fecha de Alquiler: ${renta.fechaRenta}")
+            Text("📆 Fecha Estimada de Entrega: ${renta.fechaPrevistaEntrega}")
+            Text("📅 Fecha de Entrega: ${renta.fechaEntrega ?: "No entregado"}")
+
+            // Valor de la renta
+            Text("💰 Valor Total de la Renta: $${renta.valorTotal}")
         }
     }
 }
+
+
+
+

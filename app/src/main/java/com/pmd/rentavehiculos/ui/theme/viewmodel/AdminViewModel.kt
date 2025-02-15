@@ -19,6 +19,9 @@ class AdminViewModel(context: Context) : ViewModel() {
     private val _vehiculosRentados = MutableLiveData<List<Vehiculo>>() // Aquí almacenamos los vehículos rentados
     val vehiculosRentados : LiveData<List<Vehiculo>> get() = _vehiculosRentados
 
+    private val _rentas = MutableLiveData<List<Renta>>() // Variable mutable
+    val rentas: LiveData<List<Renta>> get() = _rentas // Variable solo de lectura
+
     private fun obtenerToken(): String? = sessionManager.token
 
     // Cargar los vehículos disponibles
@@ -43,29 +46,30 @@ class AdminViewModel(context: Context) : ViewModel() {
         }
     }
 
-    // Cargar todos los vehículos rentados
+    // Cargar todos los vehículos rentados con sus rentas asociadas
+    // Cargar los vehículos rentados con sus rentas asociadas
     fun loadVehiculosRentados() = viewModelScope.launch {
         obtenerToken()?.let { token ->
             val response = vehiculoService.obtenerVehiculos(token, "disponibles") // Obtener vehículos disponibles
             if (response.isSuccessful) {
                 val vehiculos = response.body() ?: emptyList()
-                // Filtrar los vehículos rentados
-                val vehiculosRentados = mutableListOf<Vehiculo>()
+                val rentas = mutableListOf<Renta>()
                 for (vehiculo in vehiculos) {
                     val rentaResponse = rentaService.obtenerHistorialRentas(token, vehiculo.id)
                     if (rentaResponse.isSuccessful) {
-                        val rentas = rentaResponse.body() ?: emptyList()
-                        if (rentas.isNotEmpty()) { // Si tiene rentas, significa que está rentado
-                            vehiculosRentados.add(vehiculo)
+                        val rentasHistorial = rentaResponse.body() ?: emptyList()
+                        if (rentasHistorial.isNotEmpty()) {
+                            rentas.addAll(rentasHistorial) // Guardamos las rentas
                         }
                     } else {
                         println("Error al cargar historial de rentas para el vehículo ${vehiculo.id}: ${rentaResponse.errorBody()?.string()}")
                     }
                 }
-                _vehiculosRentados.postValue(vehiculosRentados) // Aquí almacenamos los vehículos rentados
+                _rentas.postValue(rentas) // Almacenamos las rentas en _rentas
             } else {
                 println("Error al obtener vehículos disponibles: ${response.errorBody()?.string()}")
             }
         }
     }
+
 }

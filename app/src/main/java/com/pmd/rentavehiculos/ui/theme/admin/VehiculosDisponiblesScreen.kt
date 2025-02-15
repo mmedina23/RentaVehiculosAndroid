@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
 @Composable
@@ -59,6 +60,14 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
+            AsyncImage(
+                model = vehiculo.imagen,  // URL de la imagen
+                contentDescription = "Imagen del vehículo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp) // Ajusta el tamaño según necesidad
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text("Marca: ${vehiculo.marca}", style = MaterialTheme.typography.bodyLarge)
             Text("Modelo: ${vehiculo.carroceria}")
             Text("Color: ${vehiculo.color}")
