@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.Screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,16 +19,16 @@ import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 @Composable
 fun VehiculosRentadosAdminScreen(
     navController: NavController,
-    vehiculoId: Int,
     vehiculosViewModel: VehiculosViewModel = viewModel(),
     loginViewModel: LoginViewModel = viewModel()
 ) {
     val apiKey = loginViewModel.apiKey.value
-    val rentas by vehiculosViewModel.rentas.collectAsState() // ✅ Usa collectAsState()
 
-    LaunchedEffect(apiKey, vehiculoId) {
+    val rentas by vehiculosViewModel.rentas.collectAsState()
+
+    LaunchedEffect(apiKey) {
         if (!apiKey.isNullOrEmpty()) {
-            vehiculosViewModel.obtenerVehiculosRentadosAdmin(apiKey, vehiculoId)
+            vehiculosViewModel.obtenerHistorialRentasAdmin(apiKey)
         }
     }
 
@@ -43,16 +44,16 @@ fun VehiculosRentadosAdminScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Historial del vehículo ID: $vehiculoId",
+                text = "Rentas de Clientes",
                 style = MaterialTheme.typography.titleLarge
             )
 
-            if (rentas.isEmpty()) { // ✅ Ahora rentas puede usar isEmpty()
-                Text("No hay historial de rentas para este vehículo.")
+            if (rentas.isEmpty()) {
+                Text("No hay rentas registradas.")
             } else {
                 LazyColumn {
                     items(rentas) { renta ->
-                        RentaCardAdmin(renta)
+                        RentaCardAdmin(renta, apiKey, vehiculosViewModel)
                     }
                 }
             }
@@ -60,8 +61,9 @@ fun VehiculosRentadosAdminScreen(
     }
 }
 
+
 @Composable
-fun RentaCardAdmin(renta: RentaRequest) {
+fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: VehiculosViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -70,11 +72,34 @@ fun RentaCardAdmin(renta: RentaRequest) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}")
+            Text(text = "Vehículo: ${renta.vehiculo.marca}")
             Text(text = "Días rentados: ${renta.dias_renta}")
-            Text(text = "Valor total: $${renta.valor_total_renta}")
             Text(text = "Fecha de renta: ${renta.fecha_renta}")
             Text(text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}")
-            Text(text = if (!renta.fecha_estimada_entrega.isNullOrEmpty()) "Entregado: ${renta.fecha_estimada_entrega}" else "No entregado aún")
+
+            // ✅ Mostrar la fecha de entrega si ya fue devuelto
+            if (!renta..isNullOrEmpty()) {
+                Text(text = "Entregado: ${renta.fecha_estimada_entrega}")
+            } else {
+                Text(text = "No entregado aún")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ✅ Administrador puede liberar el vehículo rentado
+            Button(
+                onClick = {
+                    if (!apiKey.isNullOrEmpty()) {
+                        vehiculosViewModel.liberarVehiculo(apiKey, renta.vehiculo.id) { success, message ->
+                            Log.d("VehiculosRentadosAdminScreen", "Liberación: $message")
+                        }
+                    }
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Liberar Vehículo")
+            }
         }
     }
 }
+

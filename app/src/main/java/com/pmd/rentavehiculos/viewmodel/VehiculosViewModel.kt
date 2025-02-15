@@ -226,11 +226,10 @@ class VehiculosViewModel : ViewModel() {
     /**
      * liberar los vehiculos .
      */
-
     fun liberarVehiculo(apiKey: String, vehiculoId: Int, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (apiKey.isBlank()) {
-                onResult(false, "❌ Error: API Key inválida")
+                onResult(false, "Error: API Key inválida")
                 return@launch
             }
 
@@ -238,30 +237,45 @@ class VehiculosViewModel : ViewModel() {
                 val response = RetrofitClient.vehiculosService.entregarVehiculo(apiKey, vehiculoId)
 
                 if (response.isSuccessful) {
-                    Log.d("VehiculosViewModel", "✅ Vehículo liberado correctamente")
-
-                    // Recargar lista de vehículos disponibles
-                    obtenerVehiculosDisponibles(apiKey)
-
                     onResult(true, "✅ Vehículo liberado correctamente")
+                    obtenerVehiculosDisponibles(apiKey)  // Actualiza la lista de vehículos
                 } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("VehiculosViewModel", "❌ Error al liberar vehículo: $errorBody")
-                    onResult(false, "❌ Error al liberar vehículo: $errorBody")
+                    onResult(false, "❌ Error al liberar vehículo")
                 }
 
             } catch (e: HttpException) {
-                Log.e("VehiculosViewModel", "❌ Error HTTP ${e.code()} - ${e.response()?.errorBody()?.string()}")
-                onResult(false, "❌ Error HTTP ${e.code()}")
+                onResult(false, "❌ Error HTTP ${e.code()} - ${e.response()?.errorBody()?.string()}")
             } catch (e: IOException) {
-                Log.e("VehiculosViewModel", "❌ Error de conexión con el servidor")
                 onResult(false, "❌ Error de conexión con el servidor")
             } catch (e: Exception) {
-                Log.e("VehiculosViewModel", "❌ Error desconocido: ${e.message}")
-                onResult(false, "❌ Error desconocido")
+                onResult(false, "❌ Error desconocido: ${e.message}")
             }
         }
     }
+    fun obtenerHistorialRentasAdmin(apiKey: String) {
+        viewModelScope.launch {
+            if (apiKey.isBlank()) {
+                Log.e("VehiculosViewModel", "❌ API Key vacía")
+                return@launch
+            }
 
+            isLoading.value = true
+            try {
+                Log.d("VehiculosViewModel", "🔄 Cargando historial de rentas de todos los clientes...")
+
+                // Llamada a la API para obtener todas las rentas
+                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerTodasLasRentas("Bearer $apiKey")
+
+                rentas.value = rentasObtenidas
+                Log.d("VehiculosViewModel", "✅ Historial de rentas obtenido (${rentasObtenidas.size})")
+
+            } catch (e: Exception) {
+                Log.e("VehiculosViewModel", "❌ Error al obtener historial de rentas: ${e.message}")
+                rentas.value = emptyList()
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
 
 }

@@ -65,8 +65,9 @@ fun VehiculosRentadosScreen(
 /**
  * Tarjeta que muestra los datos de una renta sin opción de liberar.
  */
+
 @Composable
-fun RentaCard(renta: RentaRequest) {
+fun RentaCard(renta: RentaRequest, apiKey: String?, vehiculosViewModel: VehiculosViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,15 +75,36 @@ fun RentaCard(renta: RentaRequest) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}")
+            Text(text = "Vehículo: ${renta.vehiculo.marca}")
             Text(text = "Días rentados: ${renta.dias_renta}")
             Text(text = "Valor total: $${renta.valor_total_renta}")
             Text(text = "Fecha de renta: ${renta.fecha_renta}")
             Text(text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}")
-            Text(
-                text = if (!renta.fecha_estimada_entrega.isNullOrEmpty()) "Entregado: ${renta.fecha_estimada_entrega}"
-                else "No entregado aún"
-            )
+
+            // 🔥 Mostrar la fecha de entrega si ya fue devuelto
+            if (!renta.fecha_estimada_entrega.isNullOrEmpty()) {
+                Text(text = "Entregado: ${renta.fecha_estimada_entrega}")
+            } else {
+                Text(text = "No entregado aún")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ✅ Cliente puede liberar el vehículo si aún no lo ha entregado
+            if (renta.fecha_estimada_entrega.isNullOrEmpty()) {
+                Button(
+                    onClick = {
+                        if (!apiKey.isNullOrEmpty()) {
+                            vehiculosViewModel.liberarVehiculo(apiKey, renta.vehiculo.id) { success, message ->
+                                Log.d("VehiculosRentadosScreen", "Liberación: $message")
+                            }
+                        }
+                    },
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text("Liberar Vehículo")
+                }
+            }
         }
     }
 }
