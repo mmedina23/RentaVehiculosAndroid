@@ -32,6 +32,9 @@ class ClienteViewModel(
     private val _vehiculosRentados = MutableStateFlow<List<Renta>>(emptyList())
     val vehiculosRentados: StateFlow<List<Renta>> = _vehiculosRentados
 
+    private val _historialRentas = MutableStateFlow<List<Renta>>(emptyList())
+    val historialRentas: StateFlow<List<Renta>> = _historialRentas
+
     init {
         cargarVehiculosDisponibles()
         cargarVehiculosRentados()
@@ -76,11 +79,28 @@ class ClienteViewModel(
     }
 
     /**
-     * Reserva un vehículo para el usuario logueado.
+     * Obtiene el historial de rentas del usuario.
      */
-    fun rentarVehiculo(vehiculo: Vehiculo, onResult: (Boolean, String) -> Unit) {
+    fun cargarHistorialRentas() {
+        viewModelScope.launch {
+            sessionManager.personaId?.let { personaId ->
+                try {
+                    val response = rentaService.obtenerHistorialRentas(sessionManager.token!!, personaId)
+                    if (response.isSuccessful) {
+                        _historialRentas.value = response.body() ?: emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ClienteViewModel", "Error al obtener historial de rentas", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Reserva un vehículo para el usuario logueado con una cantidad de días específica.
+     */
+    fun rentarVehiculo(vehiculo: Vehiculo, diasRenta: Int, onResult: (Boolean, String) -> Unit) {
         if (_vehiculosRentados.value.size >= 3) {
-            Log.e("ClienteViewModel", "No puedes rentar más de 3 vehículos.")
             onResult(false, "No puedes rentar más de 3 vehículos a la vez.")
             return
         }
@@ -89,39 +109,24 @@ class ClienteViewModel(
             try {
                 val personaId = sessionManager.personaId?.toString() ?: ""
                 if (personaId.isEmpty()) {
-                    Log.e("ClienteViewModel", "ID de persona no válido")
                     onResult(false, "Error: No se encontró el usuario logueado.")
                     return@launch
                 }
 
                 val personaRequest = PersonaRequest(personaId)
-                val diasRenta = 5
-
-                // 📌 Validación del valor por día
                 val valorPorDia = vehiculo.valor_dia ?: 0.0
+
                 if (valorPorDia <= 0.0) {
-                    Log.e("ClienteViewModel", "⚠️ El valor del vehículo es inválido: $valorPorDia")
                     onResult(false, "Error: El vehículo tiene un valor por día inválido.")
                     return@launch
                 }
 
                 val valorTotalRenta = valorPorDia * diasRenta
-
-                // 📌 Asegurar que los valores de fechas sean correctos
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
                 val calendar = Calendar.getInstance()
                 val fechaRenta = dateFormat.format(calendar.time)
                 calendar.add(Calendar.DAY_OF_YEAR, diasRenta)
                 val fechaEntrega = dateFormat.format(calendar.time)
-
-                // 📌 Validación de valores antes de enviar
-                Log.d("ClienteViewModel", "✅ Datos antes de enviar:")
-                Log.d("ClienteViewModel", "Persona ID: $personaId")
-                Log.d("ClienteViewModel", "Días de renta: $diasRenta")
-                Log.d("ClienteViewModel", "Valor por día: $valorPorDia")
-                Log.d("ClienteViewModel", "Valor total renta: $valorTotalRenta")
-                Log.d("ClienteViewModel", "Fecha renta: $fechaRenta")
-                Log.d("ClienteViewModel", "Fecha entrega: $fechaEntrega")
 
                 val rentaRequest = RentarVehiculoRequest(
                     persona = personaRequest,
@@ -131,22 +136,13 @@ class ClienteViewModel(
                     fecha_estimada_entrega = fechaEntrega
                 )
 
-                // 📌 Log para verificar el JSON enviado
-                val jsonRequest = Gson().toJson(rentaRequest)
-                Log.d("ClienteViewModel", "🚀 Enviando solicitud de renta: $jsonRequest")
-
                 val response = rentaService.reservarVehiculo(sessionManager.token!!, vehiculo.id, rentaRequest)
 
                 if (response.isSuccessful) {
-                    Log.d("ClienteViewModel", "✅ Renta exitosa")
-                    cargarVehiculosDisponibles()
+                    _vehiculosDisponibles.value = _vehiculosDisponibles.value.filter { it.id != vehiculo.id }
                     cargarVehiculosRentados()
                     onResult(true, "Reserva exitosa")
                 } else {
-                    Log.e("ClienteViewModel", "❌ Error al rentar vehículo: ${response.code()} - ${response.message()}")
-                    response.errorBody()?.let {
-                        Log.e("ClienteViewModel", "Detalles del error: ${it.string()}")
-                    }
                     onResult(false, "Error al rentar vehículo: ${response.code()}")
                 }
             } catch (e: HttpException) {
@@ -159,20 +155,19 @@ class ClienteViewModel(
         }
     }
 
-
     /**
-     * Entrega un vehículo rentado.
+     * Entrega un vehículo rentado y lo mueve al historial.
      */
     fun entregarVehiculo(renta: Renta, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = rentaService.entregarVehiculo(sessionManager.token!!, renta.vehiculo.id)
                 if (response.isSuccessful) {
+                    _vehiculosRentados.value = _vehiculosRentados.value.filter { it.id != renta.id }
                     cargarVehiculosDisponibles()
-                    cargarVehiculosRentados()
+                    cargarHistorialRentas()
                     onResult(true, "Vehículo entregado correctamente")
                 } else {
-                    Log.e("ClienteViewModel", "Error al entregar vehículo: ${response.message()}")
                     onResult(false, "Error al entregar vehículo")
                 }
             } catch (e: IOException) {

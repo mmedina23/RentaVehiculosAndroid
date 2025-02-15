@@ -20,6 +20,8 @@ import com.pmd.rentavehiculos.ui.auth.LoginScreen
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosDisponibles
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosRentados
 import com.pmd.rentavehiculos.ui.theme.cliente.ClienteHomeScreen
+import com.pmd.rentavehiculos.ui.theme.cliente.HistorialRentasScreen
+import com.pmd.rentavehiculos.ui.theme.cliente.RentasActualesScreen
 import com.pmd.rentavehiculos.ui.theme.home.HomeScreen
 import com.pmd.rentavehiculos.ui.theme.viewmodel.ClienteViewModel
 import com.pmd.rentavehiculos.ui.theme.viewmodel.ClienteViewModelFactory
@@ -60,24 +62,53 @@ fun AppNavigation(
             ListaVehiculosRentados(navController = navController, context = context)
         }
 
-        composable("cliente_home") { backStackEntry ->
-            val context = LocalContext.current
-            val rentaService = RetrofitClient.rentaService
-            val vehiculoService = RetrofitClient.vehiculoService
-            val sessionManager = SessionManager(context)
 
-            val viewModelFactory = ClienteViewModelFactory(rentaService, vehiculoService, sessionManager)
-            val viewModel = ViewModelProvider(backStackEntry, viewModelFactory)[ClienteViewModel::class.java]
+            // Pantalla Principal
+            composable("cliente_home") { backStackEntry ->
+                val context = LocalContext.current
+                val rentaService = RetrofitClient.rentaService
+                val vehiculoService = RetrofitClient.vehiculoService
+                val sessionManager = SessionManager(context)
 
-            ClienteHomeScreen(
-                viewModel = viewModel,
-                navController = navController,
-                context = context
-            )
+                val viewModelFactory = ClienteViewModelFactory(rentaService, vehiculoService, sessionManager)
+                val viewModel = ViewModelProvider(backStackEntry, viewModelFactory)[ClienteViewModel::class.java]
+
+                ClienteHomeScreen(
+                    viewModel = viewModel,
+                    navController = navController
+                )
+            }
+
+            // Pantalla de Rentas Actuales
+            composable("rentas_actuales") { backStackEntry ->
+                val context = LocalContext.current
+                val rentaService = RetrofitClient.rentaService
+                val vehiculoService = RetrofitClient.vehiculoService
+                val sessionManager = SessionManager(context)
+
+                val viewModelFactory = ClienteViewModelFactory(rentaService, vehiculoService, sessionManager)
+                val viewModel = ViewModelProvider(backStackEntry, viewModelFactory)[ClienteViewModel::class.java]
+
+                RentasActualesScreen(viewModel = viewModel)
+            }
+
+            // Pantalla del Historial de Rentas
+            composable("historial_rentas") { backStackEntry ->
+                val context = LocalContext.current
+                val rentaService = RetrofitClient.rentaService
+                val vehiculoService = RetrofitClient.vehiculoService
+                val sessionManager = SessionManager(context)
+
+                val viewModelFactory = ClienteViewModelFactory(rentaService, vehiculoService, sessionManager)
+                val viewModel = ViewModelProvider(backStackEntry, viewModelFactory)[ClienteViewModel::class.java]
+
+                HistorialRentasScreen(viewModel = viewModel)
+            }
         }
 
 
 
 
+
     }
-}
+
