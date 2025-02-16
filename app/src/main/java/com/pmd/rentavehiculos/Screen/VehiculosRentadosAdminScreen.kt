@@ -1,7 +1,9 @@
 package com.pmd.rentavehiculos.Screen
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +17,7 @@ import com.pmd.rentavehiculos.model.RentaRequest
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosRentadosAdminScreen(
@@ -77,6 +80,7 @@ fun VehiculosRentadosAdminScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("LongLogTag")
 @Composable
 fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: VehiculosViewModel) {
@@ -107,11 +111,14 @@ fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: Veh
             // ✅ Administrador puede liberar el vehículo rentado
             Button(
                 onClick = {
-                    if (!apiKey.isNullOrEmpty()) {
+                    if (!apiKey.isNullOrEmpty() && renta.vehiculo.id != null) {
                         vehiculosViewModel.liberarVehiculo(apiKey, renta.vehiculo.id) { success, message ->
-                            Log.d("VehiculosRentadosAdminScreen", "Liberación: $message")
+                            Log.d("VehiculosRentadosScreen", "Liberación: $message")
                         }
+                    } else {
+                        Log.e("VehiculosRentadosScreen", "❌ Error: API Key o ID del vehículo es nulo")
                     }
+
                 },
                 modifier = Modifier.padding(top = 8.dp)
             ) {

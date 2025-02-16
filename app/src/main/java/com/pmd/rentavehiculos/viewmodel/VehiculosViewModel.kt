@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.pmd.rentavehiculos.model.Persona
 import com.pmd.rentavehiculos.model.Vehiculo
 import com.pmd.rentavehiculos.model.RentaRequest
 import com.pmd.rentavehiculos.notification.EntregaNotificacionWorker
@@ -17,7 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class VehiculosViewModel : ViewModel() {
@@ -39,7 +42,8 @@ class VehiculosViewModel : ViewModel() {
             }
 
             try {
-                val vehiculosObtenidos = RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
+                val vehiculosObtenidos =
+                    RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
                 _vehiculosDisponibles.value = vehiculosObtenidos
                 Log.d("VehiculosViewModel", "✅ Vehículos obtenidos: ${vehiculosObtenidos.size}")
             } catch (e: Exception) {
@@ -52,6 +56,7 @@ class VehiculosViewModel : ViewModel() {
     /**
      * Obtiene los vehículos rentados por un usuario.
      */
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun obtenerVehiculosRentados(apiKey: String, personaId: Int, context: Context) {
         viewModelScope.launch {
@@ -61,19 +66,30 @@ class VehiculosViewModel : ViewModel() {
             }
 
             try {
-                Log.d("VehiculosViewModel", "📡 Obteniendo vehículos rentados por Persona ID: $personaId")
-                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
+                Log.d(
+                    "VehiculosViewModel",
+                    "📡 Obteniendo vehículos rentados por Persona ID: $personaId"
+                )
+                val rentasObtenidas =
+                    RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
                 rentas.value = rentasObtenidas
 
                 // 🔔 Programar notificación para vehículos próximos a entrega
                 rentasObtenidas.forEach { renta ->
                     if (!renta.fecha_estimada_entrega.isNullOrEmpty()) {
-                        val fechaEntrega = LocalDate.parse(renta.fecha_estimada_entrega, DateTimeFormatter.ISO_DATE_TIME)
+                        val fechaEntrega = LocalDate.parse(
+                            renta.fecha_estimada_entrega,
+                            DateTimeFormatter.ISO_DATE_TIME
+                        )
                         val hoy = LocalDate.now()
                         val diasRestantes = hoy.until(fechaEntrega).days
 
                         if (diasRestantes in 0..2) { // Si la entrega es hoy o en los próximos 2 días
-                            programarNotificacion(context, renta.vehiculo.marca, renta.fecha_estimada_entrega)
+                            programarNotificacion(
+                                context,
+                                renta.vehiculo.marca,
+                                renta.fecha_estimada_entrega
+                            )
                         }
                     }
                 }
@@ -90,9 +106,13 @@ class VehiculosViewModel : ViewModel() {
     fun obtenerHistorialRentasAdmin(apiKey: String, vehiculoId: Int) {
         viewModelScope.launch {
             try {
-                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
+                val rentasObtenidas =
+                    RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
                 rentas.value = rentasObtenidas
-                Log.d("VehiculosViewModel", "📋 Historial de rentas para vehículo ID $vehiculoId: ${rentasObtenidas.size}")
+                Log.d(
+                    "VehiculosViewModel",
+                    "📋 Historial de rentas para vehículo ID $vehiculoId: ${rentasObtenidas.size}"
+                )
             } catch (e: Exception) {
                 Log.e("VehiculosViewModel", "❌ Error al obtener historial de rentas: ${e.message}")
                 rentas.value = emptyList()
@@ -104,7 +124,7 @@ class VehiculosViewModel : ViewModel() {
      * Libera un vehículo rentado (tanto para Cliente como Admin).
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun liberarVehiculo(apiKey: String, vehiculoId: Int, personaId: Int, onResult: (Boolean, String) -> Unit) {
+    fun liberarVehiculo(apiKey: String, vehiculoId: Int, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (apiKey.isBlank()) {
                 onResult(false, "Error: API Key inválida")
@@ -117,7 +137,6 @@ class VehiculosViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     onResult(true, "✅ Vehículo liberado correctamente")
-                    obtenerVehiculosRentados(apiKey, personaId, applicationContext) // 🔄 Actualizar lista
                 } else {
                     onResult(false, "❌ Error al liberar vehículo")
                 }
@@ -127,22 +146,103 @@ class VehiculosViewModel : ViewModel() {
         }
     }
 
+
     /**
      * Programa una notificación para la entrega del vehículo.
      */
-    private fun programarNotificacion(context: Context, vehiculoNombre: String, fechaEntrega: String) {
+    fun programarNotificacion(context: Context, vehiculoNombre: String, fechaEntrega: String) {
         val inputData = Data.Builder()
             .putString("vehiculo_nombre", vehiculoNombre)
             .putString("fecha_entrega", fechaEntrega)
             .build()
 
         val request = OneTimeWorkRequestBuilder<EntregaNotificacionWorker>()
-            .setInitialDelay(1, TimeUnit.SECONDS)
+            .setInitialDelay(1, TimeUnit.HOURS) // ⏳ Ajusta según necesidad
             .setInputData(inputData)
             .build()
 
         WorkManager.getInstance(context).enqueue(request)
 
-        Log.d("VehiculosViewModel", "🔔 Notificación programada para $vehiculoNombre el $fechaEntrega")
+        Log.d(
+            "VehiculosViewModel",
+            "🔔 Notificación programada para $vehiculoNombre el $fechaEntrega"
+        )
     }
+
+    /**
+     * Reservar vehiculos
+     */
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun reservarVehiculo(
+        apiKey: String?,
+        usuario: Persona?,
+        vehiculo: Vehiculo,
+        diasRenta: Int,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        viewModelScope.launch {
+            if (apiKey.isNullOrEmpty()) {
+                onResult(false, "Error: API Key inválida")
+                return@launch
+            }
+            if (usuario == null) {
+                onResult(false, "Error: Usuario no autenticado")
+                return@launch
+            }
+
+            try {
+                val fechaRenta = obtenerFechaActual()
+                val fechaEntrega = obtenerFechaEntrega(diasRenta)
+
+                val rentaRequest = RentaRequest(
+                    persona = usuario,
+                    vehiculo = vehiculo,
+                    dias_renta = diasRenta,
+                    valor_total_renta = vehiculo.valor_dia * diasRenta,
+                    fecha_renta = fechaRenta,
+                    fecha_estimada_entrega = fechaEntrega
+                )
+
+                Log.d("VehiculosViewModel", "📩 Enviando solicitud de reserva con API Key: $apiKey")
+                val response = RetrofitClient.vehiculosService.reservarVehiculo(
+                    apiKey,
+                    vehiculo.id,
+                    rentaRequest
+                )
+
+                if (response.isSuccessful) {
+                    onResult(true, "✅ Reserva exitosa")
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    onResult(false, "❌ Error en la reserva: $errorBody")
+                }
+
+            } catch (e: Exception) {
+                onResult(false, "Error en la reserva: ${e.message}")
+            }
+        }
+
+    }
+
+    /**
+     * fucion para fecha actual
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun obtenerFechaActual(): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        return LocalDateTime.now().format(formatter)
+    }
+
+
+    /**
+     * fucion para fecha de entrega
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun obtenerFechaEntrega(diasRenta: Int): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        return LocalDateTime.now().plusDays(diasRenta.toLong()).format(formatter)
+    }
+
+
 }

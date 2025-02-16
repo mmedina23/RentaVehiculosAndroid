@@ -1,6 +1,9 @@
 package com.pmd.rentavehiculos.Screen
 
+import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,37 +18,34 @@ import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosRentadosScreen(
     navController: NavController,
     vehiculosViewModel: VehiculosViewModel = viewModel(),
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = viewModel(),
+    context: Context // ✅ Se añade el parámetro context
 ) {
     val apiKey = loginViewModel.apiKey.value
     val personaId = loginViewModel.usuario.value?.id
 
-    val rentas by vehiculosViewModel.rentas.collectAsState()  // 🛑 ¿Está vacío?
+    val rentas by vehiculosViewModel.rentas.collectAsState()
 
     LaunchedEffect(apiKey, personaId) {
         if (!apiKey.isNullOrEmpty() && personaId != null) {
             Log.d("VehiculosRentadosScreen", "🔄 Cargando rentas...")
-            vehiculosViewModel.obtenerVehiculosRentados(apiKey, personaId)
-        }
-    }
+            vehiculosViewModel.obtenerVehiculosRentados(apiKey, personaId, context) // ✅ Pasa los 3 parámetros
 
-    if (rentas.isEmpty()) {
-        Text("No tienes vehículos rentados.", modifier = Modifier.padding(16.dp))
-    } else {
-        LazyColumn {
-            items(rentas) { renta ->
-                RentaCard(renta, apiKey, vehiculosViewModel)
+
+            // ✅ Programar notificación si hay rentas con entrega próxima
+            rentas.forEach { renta ->
+                renta.fecha_estimada_entrega?.let { fechaEntrega ->
+                    vehiculosViewModel.programarNotificacion(context, renta.vehiculo.marca, fechaEntrega)
+                }
             }
         }
     }
-
-
-    Log.d("VehiculosRentadosScreen", "📡 Rentas cargadas en la UI: ${rentas.size}")
 
     Scaffold(
         topBar = {
@@ -73,10 +73,13 @@ fun VehiculosRentadosScreen(
     }
 }
 
+
+
 /**
  * Tarjeta que muestra los datos de una renta sin opción de liberar.
  */
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentaCard(renta: RentaRequest, apiKey: String?, vehiculosViewModel: VehiculosViewModel) {
     Card(

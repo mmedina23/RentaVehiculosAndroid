@@ -4,6 +4,7 @@ package com.pmd.rentavehiculos.core
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -49,9 +50,7 @@ fun Navigation(navController: NavHostController) {
         composable("vehiculos") {
             VehiculosScreen(navController, vehiculosViewModel, loginViewModel)
         }
-        composable("vehiculos_rentados") {
-            VehiculosRentadosScreen(navController, vehiculosViewModel, loginViewModel)
-        }
+
         composable("vehiculos_disponibles") {
             VehiculosAdminScreen(navController, vehiculosViewModel, loginViewModel)
         }
@@ -61,6 +60,11 @@ fun Navigation(navController: NavHostController) {
             VehiculosRentadosAdminScreen(navController, vehiculoId, vehiculosViewModel, loginViewModel)
         }
 
+
+        composable("vehiculos_rentados") {
+            val context = LocalContext.current  // ✅ Obtener el contexto de la app
+            VehiculosRentadosScreen(navController, vehiculosViewModel, loginViewModel, context)
+        }
 
 
     }

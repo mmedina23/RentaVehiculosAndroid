@@ -20,6 +20,10 @@ import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -87,17 +91,25 @@ fun VehiculoCard(
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            // 📸 Imagen del vehículo
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(vehiculo.imagen) // Aquí se usa la URL de la imagen
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Imagen del vehículo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentScale = ContentScale.Crop // Ajusta la imagen al tamaño del contenedor
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // 📋 Información del vehículo
-            Text(
-                text = "🚗 ${vehiculo.marca} - ${vehiculo.carroceria}",
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "🚗 ${vehiculo.marca} - ${vehiculo.carroceria}", fontWeight = FontWeight.Bold)
             Text(text = "🔹 Color: ${vehiculo.color}")
             Text(text = "⚙️ Cambio: ${vehiculo.cambios}")
             Text(text = "⛽ Combustible: ${vehiculo.tipo_combustible}")
@@ -124,7 +136,6 @@ fun VehiculoCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // 🛒 Botón de Renta
-
             Button(
                 onClick = {
                     Log.d("VehiculosScreen", "Botón alquilar presionado para ${vehiculo.marca}")
@@ -134,7 +145,7 @@ fun VehiculoCard(
                             apiKey,
                             usuario,
                             vehiculo,
-                            3  // Puedes cambiar el número de días de alquiler
+                            diasRenta.toIntOrNull() ?: 1
                         ) { success, message ->
                             Log.d("VehiculosScreen", "Resultado de la reserva: $message")
                         }
