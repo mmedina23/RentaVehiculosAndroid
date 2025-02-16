@@ -24,9 +24,6 @@ class LoginViewModel : ViewModel() {
                 user.value = response.persona
                 perfil.value = response.perfil //ADMIN o CLIENTE
 
-                Log.d("LoginViewModel", "Usuario: ${user.value}")
-                Log.d("LoginViewModel", "Perfil: ${perfil.value}")
-
 
                 onResult(true, perfil.value ?: "CLIENTE")
 

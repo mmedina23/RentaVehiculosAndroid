@@ -78,14 +78,14 @@ fun LogScreen(navController: NavController, viewModel: LoginViewModel = viewMode
                     viewModel.login(username, password) { success, perfil ->
                         isLoading = false
                         if (success) {
-                            val destination = if (perfil == "ADMIN") "menu_admin" else "menu_cliente"
-                            errorMessage = "Success"
+                            val destination = if (perfil == "ADMIN") "menu_ad" else "menu_cl"
+                            navController.navigate(destination);
                         } else {
-                            errorMessage = "Login failed: $perfil" // This triggers the toast
+                            errorMessage = "Login fallido: $perfil" // mensaje para el toast
                         }
                     }
                 } else {
-                    errorMessage = "Username and Password cannot be empty" // This triggers the toast
+                    errorMessage = "usuario y contraseña no pueden estar vacíos"
                 }
             },
             modifier = Modifier.fillMaxWidth(),
