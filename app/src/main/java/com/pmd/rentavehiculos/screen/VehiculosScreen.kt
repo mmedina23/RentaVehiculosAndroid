@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,10 +25,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import com.pmd.rentavehiculos.R
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import com.pmd.rentavehiculos.model.Vehiculo
 import kotlinx.coroutines.launch
+
+
+
+@Composable
+fun VehiculoImagen(urlImagen: String) {
+    AsyncImage(
+        model = urlImagen,
+        contentDescription = "Imagen del Vehículo",
+        contentScale = ContentScale.Crop, // Ajusta la imagen al contenedor
+        modifier = Modifier
+            .fillMaxSize() // Ocupa todo el espacio disponible en el Box
+            .clip(RoundedCornerShape(16.dp)),
+        error = painterResource(id = R.drawable.car), // Imagen si falla
+        placeholder = painterResource(id = R.drawable.car) // Imagen mientras carga
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,12 +184,9 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                     .background(Brush.horizontalGradient(listOf(Color(0xFF007DE8), Color(0xFF45A2EC)))),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    contentDescription = "Imagen del Vehículo",
-                    modifier = Modifier.size(140.dp)
-                )
+                VehiculoImagen(urlImagen = vehiculo.imagen)
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

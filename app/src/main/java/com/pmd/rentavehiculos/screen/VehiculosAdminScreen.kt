@@ -120,18 +120,18 @@ fun VehiculoAdminCard(vehiculo: Vehiculo) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "🚗 ${vehiculo.marca} - ${vehiculo.color}",
+                    text = "${vehiculo.marca} - ${vehiculo.color}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0055B7)
                 )
 
-                Text("🔹 Carrocería: ${vehiculo.carroceria}", fontSize = 14.sp, color = Color.Gray)
-                Text("🛑 Plazas: ${vehiculo.plazas}", fontSize = 14.sp, color = Color.Gray)
-                Text("⚙️ Cambios: ${vehiculo.cambios}", fontSize = 14.sp, color = Color.Gray)
-                Text("⛽ Combustible: ${vehiculo.tipo_combustible}", fontSize = 14.sp, color = Color.Gray)
+                Text(" Carrocería: ${vehiculo.carroceria}", fontSize = 14.sp, color = Color.Gray)
+                Text(" Plazas: ${vehiculo.plazas}", fontSize = 14.sp, color = Color.Gray)
+                Text(" Cambios: ${vehiculo.cambios}", fontSize = 14.sp, color = Color.Gray)
+                Text(" Combustible: ${vehiculo.tipo_combustible}", fontSize = 14.sp, color = Color.Gray)
                 Text(
-                    text = "💰 Precio/día: ${vehiculo.valor_dia} €",
+                    text = " Precio/día: ${vehiculo.valor_dia} €",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Green

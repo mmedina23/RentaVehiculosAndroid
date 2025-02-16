@@ -11,12 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -117,19 +114,19 @@ fun RentaCardAdmin(renta: RentaRequest) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "👤 Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}", fontSize = 16.sp, color = Color.DarkGray)
-            Text(text = "📆 Días rentados: ${renta.dias_renta}", fontSize = 16.sp, color = Color.DarkGray)
-            Text(text = "💰 Valor total: $${renta.valor_total_renta}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
-            Text(text = "📅 Fecha de renta: ${renta.fecha_renta}", fontSize = 16.sp, color = Color.DarkGray)
-            Text(text = "📅 Fecha estimada de entrega: ${renta.fecha_estimada_entrega}", fontSize = 16.sp, color = Color.DarkGray)
+            Text(text = " Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}", fontSize = 16.sp, color = Color.DarkGray)
+            Text(text = " Días rentados: ${renta.dias_renta}", fontSize = 16.sp, color = Color.DarkGray)
+            Text(text = " Valor total: $${renta.valor_total_renta}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+            Text(text = " Fecha de renta: ${renta.fecha_renta}", fontSize = 16.sp, color = Color.DarkGray)
+            Text(text = " Fecha estimada de entrega: ${renta.fecha_estimada_entrega}", fontSize = 16.sp, color = Color.DarkGray)
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = if (!renta.fecha_entregado.isNullOrEmpty()) {
-                    "✅ Entregado el: ${renta.fecha_entregado}"
+                    " Entregado el: ${renta.fecha_entregado}"
                 } else {
-                    "⏳ No entregado aún"
+                    " No entregado aún"
                 },
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,

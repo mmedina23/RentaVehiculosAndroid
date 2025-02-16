@@ -7,14 +7,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.pmd.rentavehiculos. screen.MenuAdminScreen
-import com.pmd.rentavehiculos. screen.MenuScreen
-import com.pmd.rentavehiculos.screen.Splash
-import com.pmd.rentavehiculos.screen.VehiculosRentadosAdminScreen
-import com.pmd.rentavehiculos.screen.VehiculosRentadosScreen
-import com.pmd.rentavehiculos.screen.VehiculosScreen
-import com.pmd.rentavehiculos.screen.VehiculosAdminScreen
-import com.pmd.rentavehiculos.screen.LoginScreen
+import com.pmd.rentavehiculos.screen.*
+
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
@@ -66,9 +60,9 @@ fun Navigation(navController: NavHostController) {
             }
         }
 
+        // Nueva pantalla de soporte
+        composable("support") {
+            Soporte(navController)
+        }
     }
 }
-
-
-
-
