@@ -68,7 +68,7 @@ fun DetalleVehiculoScreen(
             contentScale = ContentScale.Crop
         )
 
-        // Contenedor del contenido de la pantalla, con estilo similar al LoginScreen
+        // Contenedor del contenido de la pantalla
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .align(Alignment.Center)
@@ -79,7 +79,6 @@ fun DetalleVehiculoScreen(
                 .background(Color.White.copy(alpha = 0.80f), shape = RoundedCornerShape(16.dp))
                 .padding(24.dp)
         ) {
-            // Imagen del vehículo (por ejemplo, una miniatura)
             AsyncImage(
                 model = vehiculo.imagen,
                 contentDescription = "Imagen de ${vehiculo.marca}",
@@ -261,7 +260,7 @@ fun DetalleVehiculoScreen(
                             },
                             onError = { mensaje ->
                                 isProcessing = false
-                                // Puedes mostrar el mensaje de error recibido, por ejemplo, en un Snackbar.
+                                // si hay error finaliza el proceso
                             }
                         )
                     },

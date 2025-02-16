@@ -71,12 +71,12 @@ fun VehiculosDisponiblesScreen(
             ) {
                 IconButton(
                     onClick = onBackClick,
-                    modifier = Modifier.size(55.dp)
+                    modifier = Modifier.size(55.dp) // Botón más grande
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Volver atrás",
-                        modifier = Modifier.size(50.dp)
+                        modifier = Modifier.size(50.dp) // Flecha más grande
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
