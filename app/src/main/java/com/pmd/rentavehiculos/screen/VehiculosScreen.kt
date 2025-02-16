@@ -30,6 +30,8 @@ import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import com.pmd.rentavehiculos.model.Vehiculo
 import kotlinx.coroutines.launch
+import coil.compose.rememberAsyncImagePainter
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosScreen(
@@ -230,9 +232,9 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                    painter = rememberAsyncImagePainter(vehiculo.imagen),
                     contentDescription = "Imagen del Vehículo",
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(400.dp)
                 )
             }
 

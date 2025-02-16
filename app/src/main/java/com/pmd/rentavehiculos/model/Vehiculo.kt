@@ -11,5 +11,6 @@ data class Vehiculo(
      val tipo_combustible: String,
     val valor_dia: Double,
     val disponible: Boolean,
+    val imagen: String? = null,
 
 )

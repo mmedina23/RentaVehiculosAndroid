@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
+import coil.compose.rememberAsyncImagePainter
 import com.pmd.rentavehiculos.model.VehiculoRequest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -202,12 +203,9 @@ fun VehiculoAdminCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.coche),
+                painter = rememberAsyncImagePainter(vehiculo.imagen),
                 contentDescription = "Imagen del Vehículo",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.size(150.dp)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -291,7 +289,9 @@ fun EditarVehiculoDialog(
                         plazas = plazas.toInt(),
                         cambios = cambios,
                         tipo_combustible = tipoCombustible,
-                        valor_dia = valorDia.toDouble()
+                        valor_dia = valorDia.toDouble(),
+                        imagen = vehiculo.imagen
+
                     )
                 )
             },colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7), contentColor = Color.White)) {
@@ -362,7 +362,7 @@ fun InsertarVehiculoCard(
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(mensaje) // Muestra el mensaje de éxito o error
                         }
-                        onClose()  // 🔥 Cierra el diálogo siempre
+                        onClose()
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7), contentColor = Color.White)
