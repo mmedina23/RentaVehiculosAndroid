@@ -1,75 +1,105 @@
-// ViewModel: AdminViewModel.kt
 package com.pmd.rentavehiculos.ui.theme.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.*
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.Vehiculo
+import com.pmd.rentavehiculos.data.repository.RentaRepository
 import com.pmd.rentavehiculos.data.repository.RetrofitClient
-import com.pmd.rentavehiculos.data.repository.RetrofitClient.rentaService
 import com.pmd.rentavehiculos.data.repository.SessionManager
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+
 class AdminViewModel(context: Context) : ViewModel() {
     private val vehiculoService = RetrofitClient.vehiculoService
+    private val repository = RentaRepository()
     private val sessionManager = SessionManager(context)
 
     private val _vehiculosDisponibles = MutableLiveData<List<Vehiculo>>()
     val vehiculosDisponibles: LiveData<List<Vehiculo>> get() = _vehiculosDisponibles
 
-    private val _vehiculosRentados = MutableLiveData<List<Vehiculo>>() // Aquí almacenamos los vehículos rentados
-    val vehiculosRentados : LiveData<List<Vehiculo>> get() = _vehiculosRentados
-
-    private val _rentas = MutableLiveData<List<Renta>>() // Variable mutable
-    val rentas: LiveData<List<Renta>> get() = _rentas // Variable solo de lectura
+    val rentasLiveData = MutableLiveData<List<Renta>>()
+    val errorLiveData = MutableLiveData<String>()
+    val vehiculosRentadosAdminLiveData = MutableLiveData<List<VehiculoConRenta>>()
 
     private fun obtenerToken(): String? = sessionManager.token
 
-    // Cargar los vehículos disponibles
+    // 🔹 Cargar los vehículos disponibles
     fun loadVehiculosDisponibles() = viewModelScope.launch {
         obtenerToken()?.let { token ->
-            val response = vehiculoService.obtenerVehiculos(token, "disponibles")
-            if (response.isSuccessful) {
-                _vehiculosDisponibles.postValue(response.body() ?: emptyList())
-            }
-        }
-    }
-
-    // Cargar historial de rentas para un vehículo específico
-    fun loadVehiculosRentadosConHistorial(vehiculoId: Int) = viewModelScope.launch {
-        obtenerToken()?.let { token ->
-            val response = rentaService.obtenerHistorialRentas(token, vehiculoId)
-            if (response.isSuccessful) {
-                _vehiculosRentados.postValue((response.body() ?: emptyList()) as List<Vehiculo>?) // Aquí asignamos a vehiculosRentados
-            } else {
-                println("Error al cargar historial de rentas: ${response.errorBody()?.string()}")
-            }
-        }
-    }
-
-    // Cargar todos los vehículos rentados con sus rentas asociadas
-    // Cargar los vehículos rentados con sus rentas asociadas
-    fun loadVehiculosRentados() = viewModelScope.launch {
-        obtenerToken()?.let { token ->
-            val response = vehiculoService.obtenerVehiculos(token, "disponibles") // Obtener vehículos disponibles
-            if (response.isSuccessful) {
-                val vehiculos = response.body() ?: emptyList()
-                val rentas = mutableListOf<Renta>()
-                for (vehiculo in vehiculos) {
-                    val rentaResponse = rentaService.obtenerHistorialRentas(token, vehiculo.id)
-                    if (rentaResponse.isSuccessful) {
-                        val rentasHistorial = rentaResponse.body() ?: emptyList()
-                        if (rentasHistorial.isNotEmpty()) {
-                            rentas.addAll(rentasHistorial) // Guardamos las rentas
-                        }
-                    } else {
-                        println("Error al cargar historial de rentas para el vehículo ${vehiculo.id}: ${rentaResponse.errorBody()?.string()}")
-                    }
+            try {
+                val response = vehiculoService.obtenerVehiculos(token, "disponibles")
+                if (response.isSuccessful) {
+                    _vehiculosDisponibles.postValue(response.body() ?: emptyList())
+                } else {
+                    Log.e("AdminViewModel", "❌ Error obteniendo vehículos disponibles: ${response.errorBody()?.string()}")
                 }
-                _rentas.postValue(rentas) // Almacenamos las rentas en _rentas
-            } else {
-                println("Error al obtener vehículos disponibles: ${response.errorBody()?.string()}")
+            } catch (e: Exception) {
+                Log.e("AdminViewModel", "⚠️ Excepción obteniendo vehículos disponibles", e)
+                errorLiveData.postValue("Error obteniendo vehículos disponibles: ${e.message}")
             }
         }
     }
+
+    data class VehiculoConRenta(
+        val vehiculo: Vehiculo,
+        val renta: Renta?
+    )
+
+    fun loadVehiculosRentadosAdmin() {
+        viewModelScope.launch {
+            val token = obtenerToken()
+            if (token != null) {
+                try {
+                    val vehiculos = repository.obtenerVehiculosRentadosAdmin(token)
+
+                    // 🚀 Obtener rentas asociadas a cada vehículo
+                    val rentasPorVehiculo = vehiculos.map { vehiculo ->
+                        async {
+                            val rentas = repository.obtenerHistorialRentas(token, vehiculo.id)
+                            val rentaMasReciente = rentas.maxByOrNull { it.fechaRenta }
+                            VehiculoConRenta(vehiculo, rentaMasReciente)
+                        }
+                    }.awaitAll()
+
+                    // 🔥 🔹 Incluir vehículos que están disponibles = false aunque no tengan renta asociada
+                    val vehiculosSinRenta = vehiculos.filter { !it.disponible && rentasPorVehiculo.none { it.vehiculo.id == it.vehiculo.id } }
+                        .map { VehiculoConRenta(it, null) }
+
+                    // 🔄 Combinar ambas listas (con y sin rentas)
+                    val vehiculosFinal = rentasPorVehiculo + vehiculosSinRenta
+
+                    vehiculosRentadosAdminLiveData.postValue(vehiculosFinal)
+
+                } catch (ex: Exception) {
+                    Log.e("AdminViewModel", "❌ Error obteniendo vehículos rentados", ex)
+                    errorLiveData.postValue("Error al obtener vehículos rentados: ${ex.message}")
+                }
+            } else {
+                Log.e("AdminViewModel", "❌ Error: API Key no disponible en SessionManager")
+                errorLiveData.postValue("Error: Sesión no iniciada.")
+            }
+        }
+    }
+
+
+
+
+
+    fun obtenerHistorialRentas(apiKey: String, vehiculoId: Int) {
+        viewModelScope.launch {
+            try {
+                // Asegúrate de haber implementado esta función en el repositorio
+                val historial = repository.obtenerHistorialRentas(apiKey, vehiculoId)
+                rentasLiveData.value = historial
+            } catch (ex: Exception) {
+                errorLiveData.value = "Error al obtener historial de rentas: ${ex.message}"
+            }
+        }
+    }
+
+
 
 }

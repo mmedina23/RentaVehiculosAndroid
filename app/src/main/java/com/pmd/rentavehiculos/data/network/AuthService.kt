@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.data.repository
+package com.pmd.rentavehiculos.data.network
 
 import com.pmd.rentavehiculos.data.model.LoginRequest
 import com.pmd.rentavehiculos.data.model.LoginResponse

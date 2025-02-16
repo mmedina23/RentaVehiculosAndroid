@@ -4,14 +4,13 @@ import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.pmd.rentavehiculos.data.model.PersonaRequest
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.RentarVehiculoRequest
 import com.pmd.rentavehiculos.data.model.Vehiculo
-import com.pmd.rentavehiculos.data.repository.RentaService
+import com.pmd.rentavehiculos.data.network.RentaService
 import com.pmd.rentavehiculos.data.repository.SessionManager
-import com.pmd.rentavehiculos.data.repository.VehiculoService
+import com.pmd.rentavehiculos.data.network.VehiculoService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

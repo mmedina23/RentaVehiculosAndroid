@@ -2,9 +2,9 @@ package com.pmd.rentavehiculos.ui.theme.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.pmd.rentavehiculos.data.repository.RentaService
+import com.pmd.rentavehiculos.data.network.RentaService
 import com.pmd.rentavehiculos.data.repository.SessionManager
-import com.pmd.rentavehiculos.data.repository.VehiculoService
+import com.pmd.rentavehiculos.data.network.VehiculoService
 
 class ClienteViewModelFactory(
     private val rentaService: RentaService,

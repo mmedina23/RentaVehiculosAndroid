@@ -1,5 +1,8 @@
 package com.pmd.rentavehiculos.data.repository
 
+import com.pmd.rentavehiculos.data.network.AuthService
+import com.pmd.rentavehiculos.data.network.RentaService
+import com.pmd.rentavehiculos.data.network.VehiculoService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

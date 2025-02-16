@@ -26,12 +26,13 @@ fun AdminHomeScreen(
 
     // Obtenemos el estado de los vehículos disponibles y rentados
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
-    val vehiculosRentados by viewModel.vehiculosRentados.observeAsState(emptyList())
+    val vehiculosRentados by viewModel.vehiculosRentadosAdminLiveData.observeAsState(emptyList())
 
     // Cargar los vehículos rentados solo una vez
     LaunchedEffect(Unit) {
-        viewModel.loadVehiculosRentados() // Cargar los vehículos rentados
+        viewModel.loadVehiculosRentadosAdmin()
     }
+
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("👨‍💼 Bienvenido, Administrador", style = MaterialTheme.typography.titleLarge)

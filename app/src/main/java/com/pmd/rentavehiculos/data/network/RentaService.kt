@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.data.repository
+package com.pmd.rentavehiculos.data.network
 
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.RentarVehiculoRequest
@@ -42,4 +42,6 @@ interface RentaService {
     suspend fun obtenerTodasLasRentas(
         @Header("x-llave-api") apiKey: String
     ): Response<List<Renta>>
+
+
 }
