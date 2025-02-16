@@ -12,9 +12,7 @@ import com.pmd.rentavehiculos.viewmodel.LoginState
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: (String, String, String) -> Unit
-) {
+fun LoginScreen() {
     val viewModel: LoginViewModel = viewModel()
     var nombreUsuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
@@ -42,7 +40,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                println("🔄 Intentando iniciar sesión con usuario: $nombreUsuario")
+                println("Intentando iniciar sesión con usuario: $nombreUsuario")
                 viewModel.iniciarSesion(nombreUsuario, contrasena)
             },
             modifier = Modifier.fillMaxWidth()

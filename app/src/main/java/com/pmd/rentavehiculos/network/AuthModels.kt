@@ -1,5 +1,7 @@
 package com.pmd.rentavehiculos.network
 
+import com.pmd.rentavehiculos.model.Vehiculo
+
 // Modelo de la solicitud de login
 data class LoginRequest(
     val nombre_usuario: String,
@@ -28,4 +30,15 @@ data class Persona(
     val telefono: String,
     val tipoIdentificacion: String,
     val identificacion: String
+)
+
+data class Renta(
+    val id: Int,
+    val persona: Persona,
+    val vehiculo: Vehiculo,
+    val diasRenta: Int,
+    val valorTotalRenta: Double,
+    val fechaRenta: String,
+    val fechaEstimadaEntrega: String,
+    val fechaEntregado: String? // Puede ser null si el vehículo no ha sido entregado
 )

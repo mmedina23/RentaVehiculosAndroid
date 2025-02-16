@@ -45,7 +45,8 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun cerrarSesion(idUsuario: Int, llaveApi: String, onLogoutSuccess: () -> Unit, onLogoutError: (String) -> Unit) {
+    fun cerrarSesion(idUsuario: Int, llaveApi: String, onLogoutSuccess: () -> Unit, onLogoutError: (String) -> Unit)
+    {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.authApi.logout(
@@ -55,11 +56,11 @@ class LoginViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     _loginState.value = LoginState.LoggedOut // Cambio aquí en lugar de null
                     onLogoutSuccess()
-                    println("✅ Logout exitoso. H2 debería estar actualizada.")
+                    println("Logout exitoso. H2 debería estar actualizada.")
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "Error desconocido"
                     onLogoutError("Error en logout: ${response.code()}, $errorBody")
-                    println("❌ Error en logout. Código: ${response.code()}, Error: ${response.errorBody()?.string()}")
+                    println("Error en logout. Código: ${response.code()}, Error: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 onLogoutError("Excepción en logout: ${e.message}")
@@ -67,16 +68,4 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun resetLoginState() {
-        _loginState.value = LoginState.LoggedOut
-    }
-
-    fun setLoginState(perfil: String, llave: String, idUsuario: Int) {
-        _loginState.value = LoginState.Success(
-            mensaje = "Bienvenido, $perfil!",
-            perfil = perfil,
-            llave = llave,
-            idUsuario = idUsuario
-        )
-    }
 }
