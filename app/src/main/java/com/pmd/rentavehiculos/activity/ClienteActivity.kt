@@ -84,7 +84,7 @@ class ClienteActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        // Pantalla de detalle de vehículo (usando datos reales)
+                        // Pantalla de detalle de vehículo
                         composable(
                             route = "detalle_vehiculo/{vehiculoId}",
                             arguments = listOf(

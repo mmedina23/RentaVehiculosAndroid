@@ -79,7 +79,6 @@ class VehiculosViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.entregarVehiculo(apiKey, vehiculoId)
-                // Puedes actualizar la lista luego de entregar, si fuera necesario
             } catch (ex: Exception) {
                 errorLiveData.value = "Error al entregar vehículo: ${ex.message}"
             }

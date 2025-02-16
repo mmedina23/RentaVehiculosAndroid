@@ -42,5 +42,5 @@ class AdminViewModel : ViewModel() {
     }
 
 
-    // Aquí podrías agregar otras funciones, como crear, actualizar o eliminar vehículos.
+    // Aquí podría agregar otras funciones, como crear, actualizar o eliminar vehículos.
 }

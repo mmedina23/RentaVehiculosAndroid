@@ -65,7 +65,7 @@ class AdminActivity : ComponentActivity() {
                             AdminMenuScreen(
                                 onVerDisponibles = { navController.navigate("vehiculos_disponibles") },
                                 onVerRentados = { navController.navigate("rentas") },
-                                onGestionVehiculos = { /* Navega a la pantalla de gestión si la implementas */ },
+                                //onGestionVehiculos = { /* Navega a la pantalla de gestió */ },
                                 onLogoutClick = {
                                     // Limpia la sesión y redirige al login
                                     sessionManager.clearSession()
@@ -118,7 +118,7 @@ class AdminActivity : ComponentActivity() {
                                 DetalleVehiculoScreen(
                                     vehiculo = vehiculoLocal,
                                     apiKey = apiKey,
-                                    personaId = personaId, // o un valor dummy si no es relevante para admin
+                                    personaId = personaId,
                                     sessionManager = sessionManager,
                                     onRentSuccess = { navController.popBackStack() },
                                     onBack = { navController.popBackStack() },

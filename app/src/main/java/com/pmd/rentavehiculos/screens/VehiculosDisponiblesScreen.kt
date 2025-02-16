@@ -49,7 +49,7 @@ fun VehiculosDisponiblesScreen(
     val vehiculos by vehiculosViewModel.vehiculosDisponiblesLiveData.observeAsState(emptyList())
     val errorMessage by vehiculosViewModel.errorLiveData.observeAsState()
 
-    // Usamos un Box para colocar el fondo y el contenido encima
+    // Uso un Box para colocar el fondo y el contenido encima
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.disponiblecliente),

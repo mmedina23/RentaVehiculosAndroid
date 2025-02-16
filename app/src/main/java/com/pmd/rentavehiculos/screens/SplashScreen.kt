@@ -32,8 +32,8 @@ fun SplashScreen(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.splashbckg), // Usa tu imagen de fondo
-            contentDescription = null, // No necesitas descripción si es decorativa
+            painter = painterResource(id = R.drawable.splash1),
+            contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )

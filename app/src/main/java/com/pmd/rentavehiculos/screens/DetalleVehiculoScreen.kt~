@@ -167,7 +167,7 @@ fun DetalleVehiculoScreen(
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Si es admin, muestra botones para eliminar o modificar si se implementan, sino muestra mensaje de que no puede rentar
+            // Si es admin, muestra botones para eliminar o modificar.
             if (isAdmin) {
                 /*  Button(
                     onClick = { /* Acción extra para admin, por ejemplo editar */ },

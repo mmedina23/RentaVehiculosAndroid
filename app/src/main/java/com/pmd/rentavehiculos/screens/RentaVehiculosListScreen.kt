@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.pmd.rentavehiculos.R
 import com.pmd.rentavehiculos.modelo.Vehiculo
+
 @Composable
 fun RentaVehiculosListScreen(
     apiKey: String,
@@ -59,11 +62,11 @@ fun RentaVehiculosListScreen(
     val vehiculosRentados by adminViewModel.vehiculosRentadosAdminLiveData.observeAsState(emptyList())
     val errorMessage by adminViewModel.errorLiveData.observeAsState()
 
-    // Usamos un Box para colocar el fondo y el contenido encima
+    // Uso un Box para colocar el fondo y el contenido encima
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo que ocupa toda la pantalla
         Image(
-            painter = painterResource(id = R.drawable.rentcar),
+            painter = painterResource(id = R.drawable.rentlist),
             contentDescription = "Fondo del menú de vehículos rentados",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -75,6 +78,7 @@ fun RentaVehiculosListScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .align(Alignment.Center)
+                .offset(y = 200.dp)
                 .wrapContentHeight() // La altura se ajusta al contenido
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 48.dp)
@@ -86,24 +90,33 @@ fun RentaVehiculosListScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = onBackClick) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.size(55.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Volver"
+                        contentDescription = "Volver atrás",
+                        modifier = Modifier.size(50.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                // Usamos una Column para dividir "Vehículos" y "Rentados" en dos líneas
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                // Usamos una Column para dividir "Vehículos" y "Disponibles" en dos líneas
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 20.dp)
+                ) {
                     Text(
                         text = "Vehículos",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 40.sp),
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center
                     )
                     Text(
                         text = "Rentados",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 40.sp),
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFFFFC107),
                         textAlign = TextAlign.Center
@@ -132,43 +145,8 @@ fun RentaVehiculosListScreen(
                 else -> {
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(vehiculosRentados) { vehiculo ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                                    .clickable { onVehicleClick(vehiculo.id) },
-                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "ID: ${vehiculo.id}",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "Marca: ${vehiculo.marca}",
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                                    )
-                                    Text(
-                                        text = "Carrocería: ${vehiculo.carroceria}",
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                                    )
-                                    Text(
-                                        text = "Plazas: ${vehiculo.plazas}",
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                                    )
-                                    Text(
-                                        text = "Cambios: ${vehiculo.cambios}",
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                                    )
-                                    Text(
-                                        text = "Valor por día: ${vehiculo.valor_dia}",
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFFFFC107)
-                                        )
-                                    )
-                                }
+                            VehiculoItem(vehiculo = vehiculo) {
+                                onVehicleClick(vehiculo.id)
                             }
                         }
                     }

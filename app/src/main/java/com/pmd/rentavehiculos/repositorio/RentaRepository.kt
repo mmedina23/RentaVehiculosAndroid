@@ -16,7 +16,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 class RentaRepository {
 
-        // Método para hacer login
+        /* Método para hacer login*/
         suspend fun login(loginRequest: LoginRequest): LoginResponse {
             val response: Response<LoginResponse> = RetrofitClient.authService.login(loginRequest)
             if (response.isSuccessful) {
@@ -129,7 +129,7 @@ class RentaRepository {
                 throw HttpException(response)
             }
         }
-
+        // Obtener el historial de rentas de un vehículo
         suspend fun obtenerHistorialRentas(apiKey: String, vehiculoId: Int): List<RentaVehiculo> {
             val response = RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
             if (response.isSuccessful) {
