@@ -2,10 +2,18 @@ package com.pmd.rentavehiculos.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+//val Purple80 = Color(0xFFD0BCFF)
+//val PurpleGrey80 = Color(0xFFCCC2DC)
+//val Pink80 = Color(0xFFEFB8C8)
+//
+//val Purple40 = Color(0xFF6650a4)
+//val PurpleGrey40 = Color(0xFF625b71)
+//val Pink40 = Color(0xFF7D5260)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Black = Color(0xFF1B1B1B)  // Negro fondo oscuro
+val DarkGray = Color(0xFF2C2C2C)  // Gris oscuro para tarjetas
+val LightGray = Color(0xFFF5F5F5)  // Fondo claro
+val Yellow = Color(0xFFFFC107)  // Amarillo para botones y acentos
+val White = Color(0xFFFFFFFF)  // Texto sobre oscuro
+val DarkText = Color(0xFF212121)  // Texto oscuro sobre claro
+val LightText = Color(0xFFBDBDBD)  // Texto gris claro

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.pmd.rentavehiculos.R
 import com.pmd.rentavehiculos.screens.SplashScreen
+import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 
 class SplashActivity : ComponentActivity() {
 
@@ -14,14 +15,16 @@ class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SplashScreen(
-                splashDuration = splashDuration,
-                onSplashFinished = {
-                    // Después del tiempo definido, inicia LoginActivity
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish() // Termina SplashActivity para que el usuario no vuelva a ella al presionar "Atrás"
-                }
-            )
+            RentaVehiculosTheme{
+                SplashScreen(
+                    splashDuration = splashDuration,
+                    onSplashFinished = {
+                        // Después del tiempo definido, inicia LoginActivity
+                        startActivity(Intent(this, LoginActivity::class.java))
+                        finish() // Termina SplashActivity para que el usuario no vuelva a ella al presionar "Atrás"
+                    }
+                )
+            }
         }
     }
 }

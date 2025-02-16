@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.modelo.Vehiculo
 import com.pmd.rentavehiculos.viewModels.AdminViewModel
 import com.pmd.rentavehiculos.viewModels.VehiculosViewModel
@@ -82,6 +83,13 @@ fun RentasAdminScreen(
                                 .padding(8.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
+                                AsyncImage(
+                                    model = renta.vehiculo.imagen, // URL de la imagen
+                                    contentDescription = "Imagen de ${renta.vehiculo.marca} ${renta.vehiculo.id}",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(180.dp)
+                                )
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Text("Rentado por: ${renta.persona.nombre} ${renta.persona.apellidos}")
                                 Text("Identificación: ${renta.persona.tipo_identificacion} ${renta.persona.identificacion}")
