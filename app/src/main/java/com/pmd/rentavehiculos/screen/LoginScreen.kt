@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -74,8 +75,10 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
 
             Button(
                 onClick = {
+
                     if (username.isNotEmpty() && password.isNotEmpty()) {
-                        viewModel.login(username, password) { success , perfil ->
+                        viewModel.login(username, password) { success, perfil ->
+
                             if (success) {
                                 if (perfil == "ADMIN") {
                                     navController.navigate("menu_admin")
@@ -92,6 +95,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 },
+
                 enabled = username.isNotEmpty() && password.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth(0.6f)

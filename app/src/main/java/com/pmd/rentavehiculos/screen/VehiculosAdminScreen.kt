@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,9 +31,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -57,10 +58,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
+import com.pmd.rentavehiculos.model.VehiculoRequest
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun VehiculosAdminScreen(
     navController: NavController,
@@ -70,10 +74,8 @@ fun VehiculosAdminScreen(
     val apiKey = loginViewModel.apiKey.value
     val vehiculosDisponibles = vehiculosViewModel.vehiculosDisponibles
     var showInsertDialog by remember { mutableStateOf(false) }
-
-
-    var showEditDialog by remember { mutableStateOf(false) } // Estado para abrir el diálogo de edición
-    var vehiculoEditando by remember { mutableStateOf<Vehiculo?>(null) } // Almacenar vehículo a editar
+    var showEditDialog by remember { mutableStateOf(false) }
+    var vehiculoEditando by remember { mutableStateOf<Vehiculo?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -94,6 +96,7 @@ fun VehiculosAdminScreen(
                 )
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showInsertDialog = true },
@@ -147,7 +150,20 @@ fun VehiculosAdminScreen(
         }
     }
 
-    // Composable para editar vehículo
+    if (showInsertDialog) {
+        InsertarVehiculoCard(
+            vehiculosViewModel = vehiculosViewModel,
+            apiKey = apiKey ?: "",
+            onClose = {
+                showInsertDialog = false
+                vehiculosViewModel.obtenerVehiculosDisponibles(apiKey ?: "")
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("🚗 Vehículo creado con éxito") // 🔥 Muestra el mensaje después de insertar
+                }
+            }
+        )
+    }
+
     if (showEditDialog && vehiculoEditando != null) {
         EditarVehiculoDialog(
             vehiculo = vehiculoEditando!!,
@@ -162,15 +178,8 @@ fun VehiculosAdminScreen(
             }
         )
     }
-
-    if (showInsertDialog) {
-        InsertarVehiculoCard(
-            vehiculosViewModel = vehiculosViewModel,
-            apiKey = apiKey ?: "",
-            onClose = { showInsertDialog = false }
-        )
-    }
 }
+
 
 
 @Composable
@@ -297,6 +306,7 @@ fun EditarVehiculoDialog(
     )
 }
 
+
 @Composable
 fun InsertarVehiculoCard(
     vehiculosViewModel: VehiculosViewModel,
@@ -314,11 +324,12 @@ fun InsertarVehiculoCard(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    AlertDialog(containerColor = Color.White,
+    AlertDialog(
+        containerColor = Color.White,
         onDismissRequest = { onClose() },
         title = { Text("Añadir Nuevo Vehículo") },
         text = {
-            Column() {
+            Column {
                 OutlinedTextField(value = marca, onValueChange = { marca = it }, label = { Text("Marca") })
                 OutlinedTextField(value = color, onValueChange = { color = it }, label = { Text("Color") })
                 OutlinedTextField(value = carroceria, onValueChange = { carroceria = it }, label = { Text("Carrocería") })
@@ -336,21 +347,22 @@ fun InsertarVehiculoCard(
         confirmButton = {
             Button(
                 onClick = {
-                    val nuevoVehiculo = Vehiculo(
-                        id = 0,
+                    val nuevoVehiculo = VehiculoRequest(
                         marca = marca,
                         color = color,
                         carroceria = carroceria,
                         plazas = plazas.toIntOrNull() ?: 0,
                         cambios = cambios,
                         tipo_combustible = tipoCombustible,
-                        valor_dia = valorDia.toDoubleOrNull() ?: 0.0,
+                        valor_dia = valorDia.toBigDecimal(),
                         disponible = disponible
                     )
 
                     vehiculosViewModel.crearVehiculo(apiKey, nuevoVehiculo) { success, mensaje ->
-                        coroutineScope.launch { snackbarHostState.showSnackbar(mensaje) }
-                        if (success) onClose()
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(mensaje) // Muestra el mensaje de éxito o error
+                        }
+                        onClose()  // 🔥 Cierra el diálogo siempre
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7), contentColor = Color.White)
@@ -359,13 +371,15 @@ fun InsertarVehiculoCard(
             }
         },
         dismissButton = {
-            Button(onClick = { onClose() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7), contentColor = Color.White)) {
+            Button(
+                onClick = { onClose() },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7), contentColor = Color.White)
+            ) {
                 Text("Cancelar")
             }
         }
     )
 }
-
 
 
 

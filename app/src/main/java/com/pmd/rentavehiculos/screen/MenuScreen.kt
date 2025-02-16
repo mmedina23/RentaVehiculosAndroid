@@ -127,7 +127,6 @@ fun MenuScreen(
             HorizontalDivider(color = Color.Gray, thickness = 2.dp, modifier = Modifier.width(500.dp))
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 🔥 Pie de Página
             Text(
                 text = "📞 Atención al Cliente: 91-688-00-01",
                 fontSize = 14.sp,
@@ -145,7 +144,6 @@ fun MenuScreen(
         }
     }
 
-    // 🔥 Modal de Perfil de Usuario
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -182,7 +180,6 @@ fun MenuScreen(
     }
 }
 
-// 🔥 **Composable para Beneficios en una Tarjeta**
 @Composable
 fun BeneficioCard(beneficio: String) {
     Card(

@@ -21,27 +21,26 @@ class LoginViewModel : ViewModel() {
     fun login(username: String, password: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
-                Log.d("LoginViewModel", "sesion: $username")
 
                 val response = RetrofitClient.authService.login(LoginRequest(username, password))
+
+
                 apiKey.value = response.llave
                 usuario.value = response.persona
-                perfil.value = response.perfil
+                perfil.value = response.perfil  // ← Aquí obtenemos el perfil del usuario
 
+                Log.d("LoginViewModel", "Usuario autenticado: ${usuario.value}")
+                Log.d("LoginViewModel", "Perfil obtenido: ${perfil.value}")
 
-                //PRUEBAS POR SI ME FALLA LA API
-                Log.d("LoginViewModel", "Usuarioo: ${usuario.value}")
-                Log.d("LoginViewModel", "Perfil: ${perfil.value}")
-
-                onResult(true, perfil.value ?: "CLIENTE")  // ESTO ME DEVUELVE EL RETURN CON LA VALIDACION DEL EMNU CLIENTE
-
+                onResult(true, perfil.value ?: "CLIENTE") // ← Se envía a `LoginScreen`
             } catch (e: HttpException) {
                 onResult(false, "Error HTTP ${e.code()}")
-            } catch (e: IOException) {
-                onResult(false, "Error de conexión")
+            } catch (e: Exception) {
+                onResult(false, "Error inesperado: ${e.message}")
             }
         }
     }
+
 
 
 }

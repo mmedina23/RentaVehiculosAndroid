@@ -2,6 +2,7 @@ package com.pmd.rentavehiculos.remote
 
 import com.pmd.rentavehiculos.model.RentaRequest
 import com.pmd.rentavehiculos.model.Vehiculo
+import com.pmd.rentavehiculos.model.VehiculoRequest
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -65,7 +66,7 @@ interface VehiculosService {
     @POST("vehiculos")
     suspend fun crearVehiculo(
         @Header("x-llave-api") apiKey: String,
-        @Body vehiculo: Vehiculo
+        @Body vehiculo: VehiculoRequest
     ): Response<Vehiculo>
 
 }

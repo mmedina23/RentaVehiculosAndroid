@@ -20,7 +20,7 @@ import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigation(navController: NavHostController, loginViewModel: LoginViewModel) { // ✅ Recibe el ViewModel desde MainActivity
+fun Navigation(navController: NavHostController, loginViewModel: LoginViewModel) { //
     val vehiculosViewModel: VehiculosViewModel = viewModel()
 
     NavHost(navController, startDestination = "splash") {
@@ -35,14 +35,14 @@ fun Navigation(navController: NavHostController, loginViewModel: LoginViewModel)
             if (perfil == "ADMIN") {
                 MenuAdminScreen(navController)
             } else {
-                MenuScreen(navController, loginViewModel) // ✅ Ahora recibe el mismo LoginViewModel
+                MenuScreen(navController, loginViewModel)
             }
         }
         composable("menu_admin") {
             MenuAdminScreen(navController)
         }
         composable("menu_cliente") {
-            MenuScreen(navController, loginViewModel) // ✅ Se lo pasamos aquí también
+            MenuScreen(navController, loginViewModel)
         }
         composable("vehiculos") {
             VehiculosScreen(navController, vehiculosViewModel, loginViewModel)

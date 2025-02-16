@@ -1,5 +1,4 @@
 package com.pmd.rentavehiculos.screen
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,13 +47,10 @@ fun VehiculosScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    // Estado para almacenar la selección del tipo de combustible
     var tipoCombustibleSeleccionado by remember { mutableStateOf("TODOS") }
 
-    // Obtener la lista única de tipos de combustible
     val tiposCombustible = listOf("TODOS") + vehiculos.map { it.tipo_combustible }.distinct()
 
-    // Filtrar los vehículos según el tipo de combustible seleccionado
     val vehiculosFiltrados = if (tipoCombustibleSeleccionado == "TODOS") {
         vehiculos
     } else {
@@ -89,7 +85,6 @@ fun VehiculosScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Selector de Tipo de Combustible con RadioButtons en fila
             Text(
                 text = "Filtrar por tipo de combustible:",
                 fontSize = 18.sp,
@@ -141,7 +136,6 @@ fun VehiculosScreen(
         }
     }
 
-    // Diálogo de reserva
     if (showDialog && selectedVehiculo != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -227,7 +221,6 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🔹 Imagen del Vehículo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -245,7 +238,7 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 🔹 Marca del Vehículo
+
             Text(
                 text = "🚗 ${vehiculo.marca}",
                 fontWeight = FontWeight.Bold,
@@ -272,7 +265,6 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 🔹 Botón de Reservar
             Button(
                 onClick = { onReservarClick() },
                 modifier = Modifier

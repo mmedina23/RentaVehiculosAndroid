@@ -7,9 +7,11 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.pmd.rentavehiculos.model.Vehiculo
 import com.pmd.rentavehiculos.model.Persona
 import com.pmd.rentavehiculos.model.RentaRequest
+import com.pmd.rentavehiculos.model.VehiculoRequest
 import com.pmd.rentavehiculos.remote.RetrofitClient
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -22,11 +24,9 @@ import java.util.Locale
 class VehiculosViewModel : ViewModel() {
 
     val vehiculos = mutableStateListOf<Vehiculo>()
-    val vehiculosRentados = mutableStateListOf<Vehiculo>()
     val vehiculosDisponibles = mutableStateListOf<Vehiculo>()
     val rentas = mutableStateListOf<RentaRequest>()
-    private val _vehiculosDisponibles2 = mutableStateListOf<Vehiculo>()  // 🔹 Aquí se declara correctamente
-    val vehiculosDisponibles2: List<Vehiculo> get() = _vehiculosDisponibles2
+    private val _vehiculosDisponibles2 = mutableStateListOf<Vehiculo>()
     /**
      * Obtiene la lista de vehículos disponibles desde la API.
      */
@@ -166,34 +166,42 @@ class VehiculosViewModel : ViewModel() {
     /**
      * Obtiene la fecha actual formateada.
      */
+
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun obtenerFechaActual(): String {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        private fun obtenerFechaActual(): String {
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         return LocalDateTime.now().format(formatter)
     }
 
-
+    /**
+     * Actualzia el vehiculo.
+     */
     fun actualizarVehiculo(apiKey: String, vehiculo: Vehiculo, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.vehiculosService.actualizarVehiculo(apiKey, vehiculo.id, vehiculo)
+                val vehiculoActualizado = RetrofitClient.vehiculosService.actualizarVehiculo(apiKey, vehiculo.id, vehiculo)
 
+                //  Buscamos en _vehiculosDisponibles2 y lo reemplazamos
 
-                obtenerVehiculosDisponibles(apiKey)
+                val index = _vehiculosDisponibles2.indexOfFirst { it.id == vehiculo.id }
+                if (index != -1) {
+                    _vehiculosDisponibles2[index] = vehiculoActualizado
+                }
 
                 onResult(true, "Vehículo actualizado correctamente")
 
-            } catch (e: HttpException) {
-                onResult(false, "Error HTTP: ${e.code()}")
             } catch (e: IOException) {
                 onResult(false, "Error de conexión con el servidor")
-            } catch (e: Exception) {
-                onResult(false, "Error desconocido al actualizar")
             }
         }
     }
 
 
+
+    /**
+     * Elimina el vehiculo.
+     */
     fun eliminarVehiculo(apiKey: String, vehiculoId: Int, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
@@ -217,28 +225,27 @@ class VehiculosViewModel : ViewModel() {
         }
     }
 
-    fun crearVehiculo(apiKey: String, vehiculo: Vehiculo, onResult: (Boolean, String) -> Unit) {
+    /**
+     * Crea e inserta un vehiculo.
+     */
+
+    fun crearVehiculo(apiKey: String, vehiculo: VehiculoRequest, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
-
                 val response = RetrofitClient.vehiculosService.crearVehiculo(apiKey, vehiculo)
-                Log.d("VehiculosViewModel", "🚀 Enviando vehículo: $vehiculo")
 
                 if (response.isSuccessful) {
                     val vehiculoCreado = response.body()
-
                     if (vehiculoCreado != null) {
-
-                        _vehiculosDisponibles2.add(vehiculoCreado)
+                        vehiculosDisponibles.add(vehiculoCreado) //  Actualizo la lista directamente
 
                         onResult(true, "Vehículo creado exitosamente")
                     } else {
-                        onResult(false, "Error: Respuesta vacía del servidor")
+                        onResult(false, "Error del servidor")
                     }
                 } else {
                     onResult(false, "Error: ${response.code()}")
                 }
-
             } catch (e: IOException) {
                 onResult(false, "Error de conexión")
             }
