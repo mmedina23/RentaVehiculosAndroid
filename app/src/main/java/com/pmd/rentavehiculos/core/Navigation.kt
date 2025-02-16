@@ -56,10 +56,12 @@ fun Navigation(navController: NavHostController) {
             VehiculosAdminScreen(navController, vehiculosViewModel, loginViewModel)
         }
 
-        //ESTA FUNCION NO LA ENTIENDO MUY BIEN. VOLVER A CHQUEAR
         composable("vehiculos_rentados_admin/{vehiculoId}") { backStackEntry ->
             val vehiculoId = backStackEntry.arguments?.getString("vehiculoId")?.toIntOrNull() ?: 0
-            VehiculosRentadosAdminScreen(navController, vehiculoId, viewModel(), loginViewModel)
+            VehiculosRentadosAdminScreen(navController, vehiculoId, vehiculosViewModel, loginViewModel)
         }
+
+
+
     }
 }

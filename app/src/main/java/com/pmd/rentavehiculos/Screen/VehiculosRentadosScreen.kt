@@ -25,13 +25,27 @@ fun VehiculosRentadosScreen(
     val apiKey = loginViewModel.apiKey.value
     val personaId = loginViewModel.usuario.value?.id
 
-    val rentas by vehiculosViewModel.rentas.collectAsState() // ✅ Usa collectAsState()
+    val rentas by vehiculosViewModel.rentas.collectAsState()  // 🛑 ¿Está vacío?
 
     LaunchedEffect(apiKey, personaId) {
         if (!apiKey.isNullOrEmpty() && personaId != null) {
+            Log.d("VehiculosRentadosScreen", "🔄 Cargando rentas...")
             vehiculosViewModel.obtenerVehiculosRentados(apiKey, personaId)
         }
     }
+
+    if (rentas.isEmpty()) {
+        Text("No tienes vehículos rentados.", modifier = Modifier.padding(16.dp))
+    } else {
+        LazyColumn {
+            items(rentas) { renta ->
+                RentaCard(renta, apiKey, vehiculosViewModel)
+            }
+        }
+    }
+
+
+    Log.d("VehiculosRentadosScreen", "📡 Rentas cargadas en la UI: ${rentas.size}")
 
     Scaffold(
         topBar = {
@@ -44,17 +58,14 @@ fun VehiculosRentadosScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Historial de Rentas",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Text(text = "Historial de Rentas", style = MaterialTheme.typography.titleLarge)
 
-            if (rentas.isEmpty()) { // ✅ Ahora funciona correctamente
+            if (rentas.isEmpty()) {
                 Text("No tienes vehículos rentados.")
             } else {
                 LazyColumn {
                     items(rentas) { renta ->
-                        RentaCard(renta)
+                        RentaCard(renta, apiKey, vehiculosViewModel)
                     }
                 }
             }
@@ -75,36 +86,28 @@ fun RentaCard(renta: RentaRequest, apiKey: String?, vehiculosViewModel: Vehiculo
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}")
             Text(text = "Vehículo: ${renta.vehiculo.marca}")
             Text(text = "Días rentados: ${renta.dias_renta}")
-            Text(text = "Valor total: $${renta.valor_total_renta}")
             Text(text = "Fecha de renta: ${renta.fecha_renta}")
             Text(text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}")
 
-            // 🔥 Mostrar la fecha de entrega si ya fue devuelto
-            if (!renta.fecha_estimada_entrega.isNullOrEmpty()) {
-                Text(text = "Entregado: ${renta.fecha_estimada_entrega}")
-            } else {
-                Text(text = "No entregado aún")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // ✅ Cliente puede liberar el vehículo si aún no lo ha entregado
-            if (renta.fecha_estimada_entrega.isNullOrEmpty()) {
-                Button(
-                    onClick = {
-                        if (!apiKey.isNullOrEmpty()) {
-                            vehiculosViewModel.liberarVehiculo(apiKey, renta.vehiculo.id) { success, message ->
-                                Log.d("VehiculosRentadosScreen", "Liberación: $message")
-                            }
+            Button(
+                onClick = {
+                    if (!apiKey.isNullOrEmpty()) {
+                        vehiculosViewModel.liberarVehiculo(apiKey, renta.vehiculo.id) { success, message ->
+                            Log.d("VehiculosRentadosScreen", "Liberación: $message")
                         }
-                    },
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Text("Liberar Vehículo")
-                }
+                    }
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Liberar Vehículo")
             }
         }
     }
 }
+
+
+
+

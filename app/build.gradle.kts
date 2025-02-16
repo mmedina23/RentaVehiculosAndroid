@@ -73,11 +73,13 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
     implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.1.0")
 
     // Retrofit para llamadas API
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0") // 🔥 Versión más reciente
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
 
     // Gson (solo una versión)
     implementation("com.google.code.gson:gson:2.10.1") // 🔥 Versión más reciente
@@ -90,6 +92,8 @@ dependencies {
     implementation(libs.firebase.appdistribution.gradle)
     implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.core)
 
     // Pruebas
     testImplementation("junit:junit:4.13.2")

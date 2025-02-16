@@ -3,7 +3,6 @@ package com.pmd.rentavehiculos.Screen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,21 +19,23 @@ import com.pmd.rentavehiculos.model.Vehiculo
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.CalendarToday
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun VehiculosScreen(
     navController: NavController,
     vehiculosViewModel: VehiculosViewModel = viewModel(),
     loginViewModel: LoginViewModel = viewModel()
 ) {
+
     val apiKey = loginViewModel.apiKey.value
     val usuario = loginViewModel.usuario.value
     val vehiculos by vehiculosViewModel.vehiculosDisponibles.collectAsState()
+
 
     // 🔄 Obtener vehículos disponibles al cargar la pantalla
     LaunchedEffect(apiKey) {
@@ -43,6 +43,7 @@ fun VehiculosScreen(
             vehiculosViewModel.obtenerVehiculosDisponibles(apiKey)
         }
     }
+
 
     Scaffold(
         topBar = {
@@ -56,14 +57,15 @@ fun VehiculosScreen(
                 .padding(16.dp)
         ) {
             if (vehiculos.isEmpty()) {
-                Text("No hay vehículos disponibles.", modifier = Modifier.padding(16.dp))
-            } else {
-                LazyColumn {
-                    items(vehiculos) { vehiculo ->
-                        VehiculoCard(vehiculo, apiKey, usuario, vehiculosViewModel)
-                    }
+            Text("No hay vehículos disponibles.", modifier = Modifier.padding(16.dp))
+        } else {
+            LazyColumn {
+                items(vehiculos) { vehiculo ->
+                    VehiculoCard(vehiculo, apiKey, usuario, vehiculosViewModel)
                 }
             }
+        }
+
         }
     }
 }
@@ -92,7 +94,10 @@ fun VehiculoCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // 📋 Información del vehículo
-            Text(text = "🚗 ${vehiculo.marca} - ${vehiculo.carroceria}", fontWeight = FontWeight.Bold)
+            Text(
+                text = "🚗 ${vehiculo.marca} - ${vehiculo.carroceria}",
+                fontWeight = FontWeight.Bold
+            )
             Text(text = "🔹 Color: ${vehiculo.color}")
             Text(text = "⚙️ Cambio: ${vehiculo.cambios}")
             Text(text = "⛽ Combustible: ${vehiculo.tipo_combustible}")
@@ -119,14 +124,17 @@ fun VehiculoCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // 🛒 Botón de Renta
+
             Button(
                 onClick = {
+                    Log.d("VehiculosScreen", "Botón alquilar presionado para ${vehiculo.marca}")
+
                     if (!apiKey.isNullOrEmpty() && usuario != null) {
                         vehiculosViewModel.reservarVehiculo(
                             apiKey,
                             usuario,
                             vehiculo,
-                            diasRenta.toIntOrNull() ?: 1
+                            3  // Puedes cambiar el número de días de alquiler
                         ) { success, message ->
                             Log.d("VehiculosScreen", "Resultado de la reserva: $message")
                         }
@@ -134,10 +142,8 @@ fun VehiculoCard(
                         Log.e("VehiculosScreen", "❌ Error: API Key o Usuario es null")
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(top = 8.dp)
             ) {
-                Icon(imageVector = Icons.Filled.DirectionsCar, contentDescription = "Rentar")
-                Spacer(modifier = Modifier.width(8.dp))
                 Text("Alquilar")
             }
         }

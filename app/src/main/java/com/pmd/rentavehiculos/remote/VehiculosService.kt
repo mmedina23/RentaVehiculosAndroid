@@ -13,6 +13,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface VehiculosService {
+
     @GET("vehiculos")
     suspend fun obtenerVehiculos(
         @Header("x-llave-api") apiKey: String, // 🔥 Cambiado de Authorization a x-llave-api
@@ -46,6 +47,7 @@ interface VehiculosService {
         @Header("x-llave-api") apiKey: String,
         @Path("id") vehiculoId: Int
     ): Response<Unit>
+
 
 
 }

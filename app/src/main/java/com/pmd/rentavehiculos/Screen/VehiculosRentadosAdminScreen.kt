@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.Screen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,11 +15,11 @@ import com.pmd.rentavehiculos.model.RentaRequest
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehiculosRentadosAdminScreen(
     navController: NavController,
+    vehiculoId: Int,
     vehiculosViewModel: VehiculosViewModel = viewModel(),
     loginViewModel: LoginViewModel = viewModel()
 ) {
@@ -26,11 +27,25 @@ fun VehiculosRentadosAdminScreen(
 
     val rentas by vehiculosViewModel.rentas.collectAsState()
 
-    LaunchedEffect(apiKey) {
-        if (!apiKey.isNullOrEmpty()) {
-            vehiculosViewModel.obtenerHistorialRentasAdmin(apiKey)
+    LaunchedEffect(apiKey, vehiculoId) {
+        if (!apiKey.isNullOrEmpty() && vehiculoId != 0) {
+            vehiculosViewModel.obtenerHistorialRentasAdmin(apiKey, vehiculoId) // ✅ Ahora se pasa vehiculoId
         }
     }
+
+
+
+    if (rentas.isEmpty()) {
+        Text("No hay rentas registradas.")
+    } else {
+        LazyColumn {
+            items(rentas) { renta ->
+                RentaCardAdmin(renta, apiKey, vehiculosViewModel)
+            }
+        }
+    }
+
+
 
     Scaffold(
         topBar = {
@@ -62,8 +77,11 @@ fun VehiculosRentadosAdminScreen(
 }
 
 
+@SuppressLint("LongLogTag")
 @Composable
 fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: VehiculosViewModel) {
+    Log.d("RentaCardAdmin", "🎴 Mostrando renta: ${renta.vehiculo.marca}")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -77,13 +95,13 @@ fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: Veh
             Text(text = "Fecha de renta: ${renta.fecha_renta}")
             Text(text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}")
 
-            // ✅ Mostrar la fecha de entrega si ya fue devuelto
-            if (!renta..isNullOrEmpty()) {
+            if (!renta.fecha_estimada_entrega.isNullOrEmpty()) {
                 Text(text = "Entregado: ${renta.fecha_estimada_entrega}")
             } else {
                 Text(text = "No entregado aún")
             }
-
+        }
+    }
             Spacer(modifier = Modifier.height(8.dp))
 
             // ✅ Administrador puede liberar el vehículo rentado
@@ -100,6 +118,7 @@ fun RentaCardAdmin(renta: RentaRequest, apiKey: String?, vehiculosViewModel: Veh
                 Text("Liberar Vehículo")
             }
         }
-    }
-}
+
+
+
 

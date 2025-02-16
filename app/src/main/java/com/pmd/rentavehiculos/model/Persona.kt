@@ -7,5 +7,6 @@ data class Persona(
     val direccion: String,
     val telefono: String,
     val tipo_identificacion: String,
-    val identificacion: String
+    val identificacion: String,
+    val llave: String? // 🔥 Asegúrate de agregar esta propiedad
 )

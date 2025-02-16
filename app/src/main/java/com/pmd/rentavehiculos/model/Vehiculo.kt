@@ -9,5 +9,7 @@ data class Vehiculo(
     val plazas: Int,
     val cambios: String,
     val tipo_combustible: String,
-    val valor_dia: Double
+    val valor_dia: Int,
+    val disponible: Boolean, // 🔥 Asegúrate de que esta línea esté aquí
+    val imagen: String
 )
