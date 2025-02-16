@@ -35,9 +35,6 @@ fun ClienteHomeScreen(
                     TextButton(onClick = { navController.navigate("rentas_actuales") }) {
                         Text("Ver Rentas Actuales")
                     }
-                    TextButton(onClick = { navController.navigate("historial_rentas") }) {
-                        Text("Ver Historial de Rentas")
-                    }
                 }
             )
         },
@@ -149,31 +146,6 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo, onRentarClick: (Int) -> Unit) {
         )
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HistorialRentasScreen(viewModel: ClienteViewModel) {
-    val historialRentas by viewModel.historialRentas.collectAsState()
-
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Historial de Rentas") })
-        }
-    ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-            if (historialRentas.isEmpty()) {
-                Text("No tienes vehículos en el historial.", style = MaterialTheme.typography.bodyLarge)
-            } else {
-                LazyColumn {
-                    items(historialRentas) { renta ->
-                        VehiculoRentadoClienteCard(renta) {}
-                    }
-                }
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentasActualesScreen(viewModel: ClienteViewModel, navController: NavController) {

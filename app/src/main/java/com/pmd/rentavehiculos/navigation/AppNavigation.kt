@@ -13,10 +13,10 @@ import androidx.navigation.compose.composable
 import com.pmd.rentavehiculos.data.repository.RetrofitClient
 import com.pmd.rentavehiculos.data.repository.SessionManager
 import com.pmd.rentavehiculos.ui.auth.LoginScreen
+import com.pmd.rentavehiculos.ui.theme.admin.HistorialRentasScreen
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosDisponibles
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosRentados
 import com.pmd.rentavehiculos.ui.theme.cliente.ClienteHomeScreen
-import com.pmd.rentavehiculos.ui.theme.cliente.HistorialRentasScreen
 import com.pmd.rentavehiculos.ui.theme.cliente.RentasActualesScreen
 import com.pmd.rentavehiculos.ui.theme.home.HomeScreen
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
@@ -73,8 +73,21 @@ fun AppNavigation(
             RentasActualesScreen(viewModel = clienteViewModel, navController = navController)
         }
 
-        composable("historial_rentas") {
-            HistorialRentasScreen(viewModel = clienteViewModel)
+        composable("historial_rentas/{vehiculoId}") { backStackEntry ->
+            val vehiculoId = backStackEntry.arguments?.getString("vehiculoId")?.toIntOrNull()
+            val context = LocalContext.current  // Obtén el contexto actual
+
+            if (vehiculoId != null) {
+                val adminViewModel: AdminViewModel = viewModel(
+                    factory = AdminViewModelFactory(context) // Usa el factory correctamente
+                )
+
+                HistorialRentasScreen(
+                    viewModel = adminViewModel,
+                    vehiculoId = vehiculoId,
+                    navController = navController
+                )
+            }
         }
     }
 }

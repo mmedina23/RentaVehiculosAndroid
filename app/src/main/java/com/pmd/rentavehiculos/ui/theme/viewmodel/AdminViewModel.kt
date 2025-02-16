@@ -24,7 +24,7 @@ class AdminViewModel(context: Context) : ViewModel() {
     val errorLiveData = MutableLiveData<String>()
     val vehiculosRentadosAdminLiveData = MutableLiveData<List<VehiculoConRenta>>()
 
-    private fun obtenerToken(): String? = sessionManager.token
+    fun obtenerToken(): String? = sessionManager.token
 
     // 🔹 Cargar los vehículos disponibles
     fun loadVehiculosDisponibles() = viewModelScope.launch {

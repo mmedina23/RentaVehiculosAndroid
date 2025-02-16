@@ -42,12 +42,15 @@ fun ListaVehiculosRentados(
         if (vehiculosRentados.isNotEmpty()) {
             LazyColumn {
                 items(vehiculosRentados) { vehiculoConRenta ->
-                    VehiculoRentadoCard(vehiculo = vehiculoConRenta.vehiculo, renta = vehiculoConRenta.renta)
+                    VehiculoRentadoCard(
+                        vehiculo = vehiculoConRenta.vehiculo,
+                        renta = vehiculoConRenta.renta
+                    ) { vehiculoId ->
+                        navController.navigate("historial_rentas/$vehiculoId")
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
-
-
         } else {
             Text(
                 "No hay vehículos rentados actualmente.",
@@ -57,8 +60,9 @@ fun ListaVehiculosRentados(
     }
 }
 
+
 @Composable
-fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?) {
+fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?, onVerHistorialClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,7 +70,6 @@ fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            // Datos del vehículo
             AsyncImage(
                 model = vehiculo.imagen,
                 contentDescription = "Imagen del vehículo",
@@ -82,15 +85,12 @@ fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?) {
             Text("⛽ Combustible: ${vehiculo.tipo_combustible}")
 
             if (renta != null) {
-                // Datos de la persona que alquiló el vehículo
                 val persona = renta.persona
                 Text("👤 Persona que lo rentó:")
                 Text("  Nombre: ${persona.nombre} ${persona.apellidos}")
                 Text("  Dirección: ${persona.direccion}")
                 Text("  Teléfono: ${persona.telefono}")
                 Text("  Identificación: ${persona.identificacion}")
-
-                // Datos de la renta
                 Text("🗓️ Días Rentados: ${renta.dias}")
                 Text("📅 Fecha de Alquiler: ${renta.fechaRenta}")
                 Text("📆 Fecha Estimada de Entrega: ${renta.fechaPrevistaEntrega}")
@@ -99,9 +99,17 @@ fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?) {
             } else {
                 Text("⚠️ Este vehículo está marcado como NO DISPONIBLE pero no tiene historial de renta.")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 🔹 Botón para ver el historial de rentas
+            Button(onClick = { onVerHistorialClick(vehiculo.id) }) {
+                Text("Ver Historial")
+            }
         }
     }
 }
+
 
 
 

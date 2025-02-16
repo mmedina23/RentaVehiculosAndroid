@@ -16,7 +16,6 @@ import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
 @Composable
 fun ListaVehiculosDisponibles(navController: NavController, context: Context) {
-    // ✅ ViewModel con el contexto correcto
     val viewModel: AdminViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -25,25 +24,24 @@ fun ListaVehiculosDisponibles(navController: NavController, context: Context) {
         }
     )
 
-    // ✅ Carga los vehículos disponibles
     LaunchedEffect(Unit) {
         viewModel.loadVehiculosDisponibles()
     }
 
-    // ✅ Observar LiveData
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("🚘 Vehículos Disponibles", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ✅ Mostrar lista con LazyColumn
         if (vehiculosDisponibles.isEmpty()) {
             Text("No hay vehículos disponibles", style = MaterialTheme.typography.bodyMedium)
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(vehiculosDisponibles) { vehiculo ->
-                    VehiculoDisponibleCard(vehiculo)
+                    VehiculoDisponibleCard(vehiculo) { vehiculoId ->
+                        navController.navigate("historial_rentas/$vehiculoId")
+                    }
                     Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
@@ -51,8 +49,9 @@ fun ListaVehiculosDisponibles(navController: NavController, context: Context) {
     }
 }
 
+
 @Composable
-fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
+fun VehiculoDisponibleCard(vehiculo: Vehiculo, onVerHistorialClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,11 +60,11 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             AsyncImage(
-                model = vehiculo.imagen,  // URL de la imagen
+                model = vehiculo.imagen,
                 contentDescription = "Imagen del vehículo",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp) // Ajusta el tamaño según necesidad
+                    .height(200.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text("Marca: ${vehiculo.marca}", style = MaterialTheme.typography.bodyLarge)
@@ -74,6 +73,14 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
             Text("Plazas: ${vehiculo.plazas}")
             Text("Tipo Combustible: ${vehiculo.tipo_combustible}")
             Text("Valor por Día: $${vehiculo.valor_dia}")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 🔹 Botón para ver el historial de rentas
+            Button(onClick = { onVerHistorialClick(vehiculo.id) }) {
+                Text("Ver Historial")
+            }
         }
     }
 }
+
