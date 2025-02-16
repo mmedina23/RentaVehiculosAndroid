@@ -1,6 +1,7 @@
 package com.pmd.rentavehiculos.ui.theme.admin
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,10 +45,10 @@ fun ListaVehiculosRentados(
                 items(vehiculosRentados) { vehiculoConRenta ->
                     VehiculoRentadoCard(
                         vehiculo = vehiculoConRenta.vehiculo,
-                        renta = vehiculoConRenta.renta
-                    ) { vehiculoId ->
-                        navController.navigate("historial_rentas/$vehiculoId")
-                    }
+                        onClick = {
+                            navController.navigate("detalle_vehiculo_rentado/${vehiculoConRenta.vehiculo.id}")
+                        }
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -61,8 +62,80 @@ fun ListaVehiculosRentados(
 }
 
 
+
 @Composable
-fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?, onVerHistorialClick: (Int) -> Unit) {
+fun VehiculoRentadoCard(vehiculo: Vehiculo, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() }, // Al hacer clic, se navega a los detalles
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            AsyncImage(
+                model = vehiculo.imagen,
+                contentDescription = "Imagen del vehículo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("🚗 Vehículo: ${vehiculo.marca}")
+            Text("🎨 Color: ${vehiculo.color}")
+            Text("🚗 Carrocería: ${vehiculo.carroceria}")
+            Text("🚙 Plazas: ${vehiculo.plazas}")
+            Text("⛽ Combustible: ${vehiculo.tipo_combustible}")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Botón para ver detalles completos
+            Button(onClick = onClick) {
+                Text("Ver Detalles")
+            }
+        }
+    }
+}
+@Composable
+fun DetalleVehiculoRentadoScreen(
+    navController: NavController,
+    viewModel: AdminViewModel,
+    vehiculoId: Int
+) {
+    // Cargar la información del historial de rentas del vehículo
+    LaunchedEffect(Unit) {
+        viewModel.obtenerHistorialRentas(viewModel.obtenerToken() ?: "", vehiculoId)
+    }
+
+    val historialRentas by viewModel.rentasLiveData.observeAsState(emptyList())
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Button(onClick = { navController.popBackStack() }) {
+            Text("⬅ Volver")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (historialRentas.isNotEmpty()) {
+            val renta = historialRentas.last() // Tomar la última renta como la más reciente
+            VehiculoRentadoDetalleCard(vehiculo = renta.vehiculo, renta = renta) {
+                navController.navigate("historial_rentas/$vehiculoId")
+            }
+        } else {
+            Text("No hay historial de rentas para este vehículo.")
+        }
+    }
+}
+@Composable
+fun VehiculoRentadoDetalleCard(
+    vehiculo: Vehiculo,
+    renta: Renta,
+    onVerHistorialClick: (Int) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,31 +157,29 @@ fun VehiculoRentadoCard(vehiculo: Vehiculo, renta: Renta?, onVerHistorialClick: 
             Text("🚙 Plazas: ${vehiculo.plazas}")
             Text("⛽ Combustible: ${vehiculo.tipo_combustible}")
 
-            if (renta != null) {
-                val persona = renta.persona
-                Text("👤 Persona que lo rentó:")
-                Text("  Nombre: ${persona.nombre} ${persona.apellidos}")
-                Text("  Dirección: ${persona.direccion}")
-                Text("  Teléfono: ${persona.telefono}")
-                Text("  Identificación: ${persona.identificacion}")
-                Text("🗓️ Días Rentados: ${renta.dias}")
-                Text("📅 Fecha de Alquiler: ${renta.fechaRenta}")
-                Text("📆 Fecha Estimada de Entrega: ${renta.fechaPrevistaEntrega}")
-                Text("📅 Fecha de Entrega: ${renta.fechaEntrega ?: "No entregado"}")
-                Text("💰 Valor Total de la Renta: $${renta.valorTotal}")
-            } else {
-                Text("⚠️ Este vehículo está marcado como NO DISPONIBLE pero no tiene historial de renta.")
-            }
+            Text("👤 Persona que lo rentó:")
+            Text("  Nombre: ${renta.persona.nombre} ${renta.persona.apellidos}")
+            Text("  Dirección: ${renta.persona.direccion}")
+            Text("  Teléfono: ${renta.persona.telefono}")
+            Text("  Identificación: ${renta.persona.identificacion}")
+
+            Text("🗓️ Días Rentados: ${renta.dias}")
+            Text("📅 Fecha de Alquiler: ${renta.fechaRenta}")
+            Text("📆 Fecha Estimada de Entrega: ${renta.fechaPrevistaEntrega}")
+            Text("📅 Fecha de Entrega: ${renta.fechaEntrega ?: "No entregado"}")
+            Text("💰 Valor Total de la Renta: $${renta.valorTotal}")
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // 🔹 Botón para ver el historial de rentas
             Button(onClick = { onVerHistorialClick(vehiculo.id) }) {
-                Text("Ver Historial")
+                Text("Ver Historial de Rentas")
             }
         }
     }
 }
+
+
 
 
 

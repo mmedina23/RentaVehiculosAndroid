@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import com.pmd.rentavehiculos.data.repository.RetrofitClient
 import com.pmd.rentavehiculos.data.repository.SessionManager
 import com.pmd.rentavehiculos.ui.auth.LoginScreen
+import com.pmd.rentavehiculos.ui.theme.admin.DetalleVehiculoRentadoScreen
 import com.pmd.rentavehiculos.ui.theme.admin.HistorialRentasScreen
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosDisponibles
 import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosRentados
@@ -89,5 +90,19 @@ fun AppNavigation(
                 )
             }
         }
+
+        composable("detalle_vehiculo_rentado/{vehiculoId}") { backStackEntry ->
+            val vehiculoId = backStackEntry.arguments?.getString("vehiculoId")?.toIntOrNull()
+            if (vehiculoId != null) {
+                val adminViewModel: AdminViewModel = viewModel(factory = AdminViewModelFactory(context))
+
+                DetalleVehiculoRentadoScreen(
+                    navController = navController,
+                    viewModel = adminViewModel,
+                    vehiculoId = vehiculoId
+                )
+            }
+        }
+
     }
 }
