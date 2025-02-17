@@ -1,7 +1,12 @@
 package com.pmd.rentavehiculos.Entity
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Parcelize
+@Serializable
 data class Vehiculo(
     @SerializedName("disponible")
     val disponible : Boolean,
@@ -24,9 +29,12 @@ data class Vehiculo(
     @SerializedName("marca")
     val marca : String,
 
+    @SerializedName("valor_dia")
+    val precioDia : Int,
+
     @SerializedName("tipo_combustible")
     val tipoCombustible : String,
 
     @SerializedName("imagen")
     val imagen : String
-)
+) : Parcelable

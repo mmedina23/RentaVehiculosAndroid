@@ -1,25 +1,16 @@
 package com.pmd.rentavehiculos.Entity
 
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class Persona (
-    @SerializedName("id")
-    val id : Int,
-    @SerializedName("nombre")
+data class PersonaRequestRenta(
     val nombre : String,
-    @SerializedName("apellidos")
     val apellido : String,
-    @SerializedName("direccion")
     val direccion : String,
-    @SerializedName("telefono")
     val telefono : String,
-    @SerializedName("tipo_identificacion")
     val tipoIdentificacion : String,
-    @SerializedName("identificacion")
     val identificacion : String
 ) : Parcelable

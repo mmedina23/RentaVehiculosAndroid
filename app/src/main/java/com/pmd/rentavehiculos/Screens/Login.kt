@@ -45,10 +45,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
+import com.pmd.rentavehiculos.Entity.Persona
+import com.pmd.rentavehiculos.Entity.PersonaRequestRenta
 
 
 @Composable
-fun LoginFuncion(NavigationClient:(String) -> Unit, NavigationAdmind:(String) -> Unit){
+fun LoginFuncion(NavigationClient:(token : String, personaId : Int, Persona : PersonaRequestRenta) -> Unit, NavigationAdmind:(token : String, personaId : Int, Persona : PersonaRequestRenta) -> Unit){
     var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -159,8 +161,8 @@ fun enviarUsuario(
     userName: String,
     password: String,
     context: Context,
-    NavigationClient: (String) -> Unit,
-    NavigationAdmind: (String) -> Unit
+    NavigationClient: (token : String, personaId : Int, Persona : PersonaRequestRenta) -> Unit,
+    NavigationAdmind: (String, Int, Persona : PersonaRequestRenta) -> Unit
 ) {
     val userRequest = UserRequest(userName, password)
 
@@ -173,14 +175,23 @@ fun enviarUsuario(
                 val usuario = response.body()
                 val newLlave = usuario?.llave
                 val perfil = usuario?.perfil
+                val personaId = usuario?.persona?.id?: 0
+                val Persona = PersonaRequestRenta(
+                    nombre = usuario?.persona?.nombre?:"",
+                    apellido = usuario?.persona?.apellido?:"",
+                    direccion = usuario?.persona?.direccion?:"",
+                    telefono = usuario?.persona?.telefono?:"",
+                    tipoIdentificacion = usuario?.persona?.tipoIdentificacion?:"",
+                    identificacion = usuario?.persona?.identificacion?:""
+                    )
                 withContext(Dispatchers.Main) {
                     if (newLlave != null) {
                         mostrarAlerta(context, "Llave del usuario", "La llave es: $newLlave")
                         if(perfil == "ADMIN"){
                             println("este es el perfil $perfil")
-                            NavigationAdmind(newLlave)
+                            NavigationAdmind(newLlave, personaId, Persona)
                         }else if(perfil == "CLIENTE"){
-                            NavigationClient(newLlave)
+                            NavigationClient(newLlave, personaId, Persona)
                         }
                     } else {
                         mostrarAlerta(context, "Error", "No se pudo obtener la llave.")
@@ -229,9 +240,3 @@ fun mostrarAlerta(context: Context, title: String, message: String) {
             println(e)
         }
     }*/
-
-@Preview
-@Composable
-fun previewLogin(){
-    LoginFuncion(NavigationClient = {}, NavigationAdmind = {})
-}

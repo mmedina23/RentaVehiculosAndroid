@@ -1,7 +1,5 @@
-package com.pmd.rentavehiculos.Screens
+package com.pmd.rentavehiculos.Screens.Cliente
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,20 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.pmd.rentavehiculos.Api.RetrofitInstance
+import com.pmd.rentavehiculos.Entity.PersonaRequestRenta
+import com.pmd.rentavehiculos.Entity.Usuario
 import com.pmd.rentavehiculos.Entity.Vehiculo
+import com.pmd.rentavehiculos.Entity.VehiculoRequestRenta
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClienteScreen(
     token: String,
-    NavigationCarList: (token: String) -> Unit,
-    NavigationVehiculosRentados: (token: String) -> Unit
+    personaId: Int,
+    Persona : PersonaRequestRenta,
+    NavigationRentarVehiculo:(personaId : Int, vehiculoId : Int, token : String, precioDiaVehiculo : Double, Persona : PersonaRequestRenta, Vehiculo : VehiculoRequestRenta)->Unit
 ) {
     val service = RetrofitInstance.makeRetrofitService()
     var vehiculos by remember { mutableStateOf<List<Vehiculo>>(emptyList()) }
@@ -66,14 +67,14 @@ fun ClienteScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        /*Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Button(onClick = { NavigationCarList(token) }) {
                 Text(text = "Vehículos Disponibles")
             }
-            Button(onClick = { NavigationVehiculosRentados(token) }) {
+            Button(onClick = {}) {
                 Text(text = "Vehículos Rentados")
             }
-        }
+        }*/
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -139,7 +140,7 @@ fun ClienteScreen(
 
     // Mostrar el cuadro expandido si hay un vehículo seleccionado
     expandedVehiculo?.let { vehiculo ->
-        DetalleVehiculoDialog(vehiculo) {
+        DetalleVehiculoDialog(vehiculo, token, personaId, Persona,  NavigationRentarVehiculo) {
             expandedVehiculo = null
         }
     }
@@ -172,7 +173,7 @@ fun VehiculoItem(vehiculo: Vehiculo, onClick: (Vehiculo) -> Unit) {
 }
 
 @Composable
-fun DetalleVehiculoDialog(vehiculo: Vehiculo, onDismiss: () -> Unit) {
+fun DetalleVehiculoDialog(vehiculo: Vehiculo, token: String, personaId: Int, Persona: PersonaRequestRenta, NavigationRentarVehiculo: (personaId: Int, vehiculoId: Int, token : String, precioDiaVehiculo : Double, Persona : PersonaRequestRenta, Vehiculo : VehiculoRequestRenta) -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -202,10 +203,28 @@ fun DetalleVehiculoDialog(vehiculo: Vehiculo, onDismiss: () -> Unit) {
                 VehiculoInfoItem(label = "Plazas", value = vehiculo.plazas.toString())
                 VehiculoInfoItem(label = "Disponible", value = if (vehiculo.disponible) "Sí" else "No")
                 VehiculoInfoItem(label = "Combustible", value = vehiculo.tipoCombustible)
+                Spacer(modifier = Modifier.height(10.dp))
+                val vehiculoId = vehiculo.id
+                val precioVehiculo = vehiculo.precioDia?.toDouble()?:0.0
+                val Vehiculo = VehiculoRequestRenta(
+                    marca = vehiculo?.marca?:"",
+                    color = vehiculo?.color?:"",
+                    carroceria = vehiculo?.carroceria?:"",
+                    plazas = vehiculo?.plazas?:0,
+                    cambios = vehiculo?.cambios?:"",
+                    tipoCombustible = vehiculo?.tipoCombustible?:"",
+                    valorDia = vehiculo?.precioDia?.toDouble()?:0.0,
+                    disponible = vehiculo?.disponible?:false,
+                    imagen = vehiculo?.imagen?:""
+                    )
+                Button(onClick = {NavigationRentarVehiculo(personaId, vehiculoId, token, precioVehiculo,Persona, Vehiculo)}) {
+                    Text(text = "Rentar")
+                }
             }
         }
     )
 }
+
 
 @Composable
 fun VehiculoInfoItem(label: String, value: String) {
