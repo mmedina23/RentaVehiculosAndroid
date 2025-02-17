@@ -18,8 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.R
 import com.pmd.rentavehiculos.modelos.Renta
+import com.pmd.rentavehiculos.modelos.Vehiculo
 import com.pmd.rentavehiculos.viewmodels.VehiculosViewModel
 import kotlinx.coroutines.launch
 
@@ -64,7 +66,8 @@ fun VehiculosRentadosScreen(
             } else {
                 LazyColumn {
                     items(vehiculosRentados) { renta ->
-                        VehiculoRentadoCard(renta, viewModel, snackbarHostState)
+                        VehiculoRentadoCard(renta, viewModel, snackbarHostState, vehiculo = renta.vehiculo)
+                    //le paso vehiculo = renta.vehiculo para que me traiga la imagen del vehiculo
                     }
                 }
             }
@@ -81,9 +84,10 @@ fun VehiculosRentadosScreen(
 }
 
 @Composable
-fun VehiculoRentadoCard(renta: Renta, viewModel: VehiculosViewModel, snackbarHostState: SnackbarHostState) {
+fun VehiculoRentadoCard(renta: Renta, viewModel: VehiculosViewModel, snackbarHostState: SnackbarHostState, vehiculo: Vehiculo) {
     var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
 
     Card(
         modifier = Modifier
@@ -92,8 +96,8 @@ fun VehiculoRentadoCard(renta: Renta, viewModel: VehiculosViewModel, snackbarHos
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.vehiculo),
+            AsyncImage(
+                model = vehiculo.imagen,
                 contentDescription = "Imagen del vehículo",
                 modifier = Modifier
                     .fillMaxWidth()

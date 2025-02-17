@@ -49,7 +49,7 @@ class VehiculosViewModel(
     fun fetchVehiculosDisponibles() {
         viewModelScope.launch {
             try {
-                _vehiculosDisponibles.postValue(emptyList()) // 🔥 Limpia la caché antes de actualizar
+                _vehiculosDisponibles.postValue(emptyList()) // Limpia la caché antes de actualizar
                 val vehiculos = apiService.getVehiculos(apiKey)
 
                 vehiculos.forEach { vehiculo ->
@@ -108,11 +108,11 @@ class VehiculosViewModel(
                 if (response.isSuccessful) {
                     Log.d("API_DEBUG", "Vehículo rentado correctamente: ${vehiculo.marca}")
 
-                    // 🔥 Esperar 1 segundo antes de actualizar las listas
+                    // esperar 1 seg para actualizar la lista de vehículos disponibles
                     kotlinx.coroutines.delay(1000)
 
-                    fetchVehiculosRentados()  // ✅ Actualiza la lista de vehículos rentados
-                    fetchVehiculosDisponibles()  // ✅ Actualiza la lista de vehículos disponibles
+                    fetchVehiculosRentados()  //Actualiza la lista de vehículos rentados
+                    fetchVehiculosDisponibles()  //Actualiza la lista de vehículos disponibles
 
                     onResult(true, "Reserva exitosa")
                 } else {
@@ -170,10 +170,10 @@ class VehiculosViewModel(
 
 
 
-    fun fetchVehiculosRentados() {
+    fun fetchVehiculosRentados() {//PARA CLIENTE
         viewModelScope.launch {
             try {
-                _vehiculosRentados.postValue(emptyList()) // 🔥 Limpia la caché antes de actualizar
+                _vehiculosRentados.postValue(emptyList()) // Limpia la caché antes de actualizar
                 val rentasObtenidas = apiService.getRentasByPersona(apiKey, personaId)
 
                 rentasObtenidas.forEach { renta ->
@@ -188,5 +188,48 @@ class VehiculosViewModel(
             }
         }
     }
+
+
+    fun fetchVehiculosRentadosAdmin() {
+        viewModelScope.launch {
+            try {
+                Log.d("API_DEBUG", "Ejecutando fetchVehiculosRentadosAdmin()")
+
+                _vehiculosRentados.postValue(emptyList()) // 🔥 Limpia antes de actualizar
+
+                val vehiculos = apiService.getVehiculos(apiKey) // ✅ Obtener todos los vehículos
+                Log.d("API_DEBUG", "Vehículos obtenidos: ${vehiculos.size}")
+
+                val todasLasRentas = mutableListOf<Renta>()
+
+                for (vehiculo in vehiculos) {
+                    Log.d("API_DEBUG", "Obteniendo historial de rentas para vehículo ID: ${vehiculo.id}")
+
+                    try {
+                        val rentas = apiService.getRentasByVehiculo(apiKey, vehiculo.id) // ✅ Usa el historial de rentas
+                        Log.d("API_DEBUG", "Rentas obtenidas para vehículo ${vehiculo.id}: ${rentas.size}")
+
+                        todasLasRentas.addAll(rentas)
+                    } catch (e: Exception) {
+                        Log.e("API_DEBUG", "Error al obtener rentas del vehículo ${vehiculo.id}: ${e.message}")
+                    }
+                }
+
+                _vehiculosRentados.postValue(todasLasRentas) // ✅ Actualiza LiveData con todas las rentas
+                Log.d("API_DEBUG", "Total de rentas obtenidas: ${todasLasRentas.size}")
+
+            } catch (e: Exception) {
+                _vehiculosRentados.postValue(emptyList())
+                _errorMessage.postValue("Error al obtener rentas de todos los vehículos: ${e.message}")
+                Log.e("API_DEBUG", "Error en fetchVehiculosRentadosAdmin: ${e.message}")
+            }
+        }
+    }
+
+
+
+
+
+
 
 }

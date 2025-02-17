@@ -25,7 +25,8 @@ interface ApiService {
     suspend fun getRentasByPersona(
         @Header("x-llave-api") apiKey: String,
         @Path("id") id: Int
-    ): List<Renta>;
+    ): List<Renta>
+
 
     // Vehículos
     @GET("vehiculos")

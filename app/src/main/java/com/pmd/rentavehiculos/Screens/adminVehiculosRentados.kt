@@ -1,4 +1,4 @@
-package com.pmd.rentavehiculos.ui.admin
+package com.pmd.rentavehiculos.Screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -13,24 +13,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.pmd.rentavehiculos.modelos.Vehiculo
+import com.pmd.rentavehiculos.modelos.Renta
 import com.pmd.rentavehiculos.viewmodels.VehiculosViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun admin( //vision admin de los vehiculos disponibles
+fun adminVehiculosRentadosScreen(
     navController: NavHostController,
     viewModel: VehiculosViewModel
 ) {
-    val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
+    val vehiculosRentados by viewModel.vehiculosRentados.observeAsState(emptyList())
 
     LaunchedEffect(Unit) {
-        viewModel.fetchVehiculosDisponibles()
+        if (vehiculosRentados.isEmpty()) {
+            viewModel.fetchVehiculosRentadosAdmin() // ✅ Llamamos a la función correcta para administradores
+        }
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Admin - Vehículos Rentados") },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -39,18 +46,18 @@ fun admin( //vision admin de los vehiculos disponibles
                 .padding(16.dp)
         ) {
             Text(
-                text = "Lista de Vehículos Disponibles",
+                text = "Lista de Vehículos Rentados",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (vehiculosDisponibles.isEmpty()) {
-                Text("No hay vehículos disponibles", fontSize = 18.sp)
+            if (vehiculosRentados.isEmpty()) {
+                Text("No hay vehículos rentados", fontSize = 18.sp)
             } else {
                 LazyColumn {
-                    items(vehiculosDisponibles) { vehiculo ->
-                        VehiculoDisponibleCard(vehiculo)
+                    items(vehiculosRentados) { renta ->
+                        RentaCard(renta) // ✅ Muestra la información de cada renta
                     }
                 }
             }
@@ -59,8 +66,11 @@ fun admin( //vision admin de los vehiculos disponibles
 }
 
 
+
+
+
 @Composable
-fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
+fun RentaCard(renta: Renta) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,40 +78,25 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            AsyncImage(
-                model = vehiculo.imagen,
-                contentDescription = "Imagen del vehículo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             Text(
-                text = "${vehiculo.marca} ${vehiculo.carroceria}",
+                text = "Vehículo ID: ${renta.vehiculo.id} - ${renta.vehiculo.marca}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
 
-            Text("Color: ${vehiculo.color}")
-            Text("Plazas: ${vehiculo.plazas}")
-            Text("Cambio: ${vehiculo.cambios}")
-            Text("Combustible: ${vehiculo.tipo_combustible}")
+            Text("Rentado por: ${renta.persona.nombre} ${renta.persona.apellidos}")
+            Text("Días rentados: ${renta.dias_renta}")
+            Text("Fecha de renta: ${renta.fecha_renta}")
+            Text("Fecha estimada de entrega: ${renta.fecha_estimada_entrega}")
+
+            val fechaEntrega = renta.fecha_estimada_entrega ?: "No entregado aún"
+            Text("Fecha de entrega: $fechaEntrega")
+
             Text(
-                text = "Valor/día: ${vehiculo.valor_dia}€",
+                text = "Valor total: ${renta.valor_total_renta}€",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Estado: Disponible",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
             )
         }
     }
 }
-

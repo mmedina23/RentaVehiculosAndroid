@@ -13,9 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pmd.rentavehiculos.Screens.LoginScreen
 import com.pmd.rentavehiculos.Screens.VehiculosRentadosScreen
-import com.pmd.rentavehiculos.Screens.admin
+import com.pmd.rentavehiculos.Screens.adminOpciones.adminOpciones
+import com.pmd.rentavehiculos.Screens.adminVehiculosRentadosScreen
 import com.pmd.rentavehiculos.retrofit.RetrofitClient
-import com.pmd.rentavehiculos.ui.cliente
+import com.pmd.rentavehiculos.ui.admin.admin
 import com.pmd.rentavehiculos.ui.listaVehiculos
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import com.pmd.rentavehiculos.viewmodels.LoginViewModel
@@ -39,10 +40,10 @@ class MainActivity : ComponentActivity() {
 fun MainApp() {
     val navController = rememberNavController()
 
-    // ✅ Crear instancia de LoginViewModel
+    // Crear instancia de LoginViewModel
     val loginViewModel: LoginViewModel = viewModel()
 
-    // ✅ Crear instancia de VehiculosViewModel correctamente
+    //  Crear instancia de VehiculosViewModel correctamente
     val vehiculosViewModel: VehiculosViewModel = viewModel(
         factory = VehiculosViewModel.Factory(RetrofitClient.apiService)
     )
@@ -50,9 +51,40 @@ fun MainApp() {
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
         composable("login") { LoginScreen(navController, loginViewModel) }
-        composable("admin") { admin(navController) }
-        composable("cliente") { cliente(navController) }
-        composable("ListaVehiculos") {
+
+
+        composable("adminOpciones") {//menu admin
+            adminOpciones(navController)
+        }
+
+        composable("admin") {//vision admin de los vehiculos disponibles
+            val apiKey = loginViewModel.apiKey.value ?: ""
+
+            if (apiKey.isNotEmpty()) {
+                vehiculosViewModel.setCredentials(apiKey, -1) // El admin no necesita un personaId
+            } else {
+                Log.e("API_DEBUG", "Error: apiKey está vacía antes de iniciar AdminVehiculosScreen")
+            }
+
+            admin(navController, vehiculosViewModel)
+        }
+
+        composable("AdminVehiculosRentados") {
+            val apiKey = loginViewModel.apiKey.value ?: ""
+
+            if (apiKey.isNotEmpty()) {
+                vehiculosViewModel.setCredentials(apiKey, -1) // El admin no necesita personaId
+                vehiculosViewModel.fetchVehiculosRentadosAdmin() // Asegurar que se obtienen los datos
+            } else {
+                Log.e("API_DEBUG", "Error: apiKey está vacía antes de iniciar AdminVehiculosRentadosScreen")
+            }
+
+            adminVehiculosRentadosScreen(navController, vehiculosViewModel)
+        }
+
+
+
+        composable("ListaVehiculos") {//vision de los vehiculos disponibles del USUARIO
             val apiKey = loginViewModel.apiKey.value
             val personaId = loginViewModel.usuario.value?.id ?: -1
 
@@ -63,7 +95,7 @@ fun MainApp() {
                 Log.e("API_DEBUG", "Error: apiKey está vacía antes de iniciar ListaVehiculosViewModel")
             }
         }
-        composable("VehiculosRentados") {
+        composable("VehiculosRentados") {//vision de los vehiculos rentados del USUARIO
             val apiKey = loginViewModel.apiKey.value ?: ""
             val personaId = loginViewModel.usuario.value?.id ?: -1
 

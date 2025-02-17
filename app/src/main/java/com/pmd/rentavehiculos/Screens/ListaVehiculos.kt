@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.modelos.Vehiculo
 import com.pmd.rentavehiculos.viewmodels.LoginViewModel
 import com.pmd.rentavehiculos.viewmodels.VehiculosViewModel  // ✅ Importamos el ViewModel correcto
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 fun listaVehiculos(
     navController: NavHostController,
     viewModel: VehiculosViewModel,
-    loginViewModel: LoginViewModel  // 🔥 Se agrega LoginViewModel para obtener la Persona
+    loginViewModel: LoginViewModel
 ) {
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
     val errorMessage by viewModel.errorMessage.observeAsState()
@@ -45,24 +46,44 @@ fun listaVehiculos(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
         ) {
-            if (vehiculosDisponibles.isEmpty()) {
-                Text("No hay vehículos disponibles", fontSize = 18.sp)
-            } else {
-                LazyColumn {
-                    items(vehiculosDisponibles) { vehiculo ->
-                        VehiculoCard(vehiculo, viewModel, loginViewModel)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                if (vehiculosDisponibles.isEmpty()) {
+                    Text("No hay vehículos disponibles", fontSize = 18.sp)
+                } else {
+                    LazyColumn {
+                        items(vehiculosDisponibles) { vehiculo ->
+                            VehiculoCard(vehiculo, viewModel, loginViewModel)
+                        }
                     }
                 }
             }
+
+            //BOTON MIS VEHICULOS RENTADOS
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate("VehiculosRentados") },
+                text = { Text("Mis vehículos rentados") },
+                icon = { Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = "Mis Rentados") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            )
         }
     }
 }
+
+
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -77,7 +98,7 @@ fun VehiculoCard(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val persona = loginViewModel.usuario.value // 🔥 Obtener la persona autenticada
+    val persona = loginViewModel.usuario.value //Obtener la persona autenticada
 
     Card(
         modifier = Modifier
@@ -86,13 +107,15 @@ fun VehiculoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Image(
-                painter = painterResource(id = com.pmd.rentavehiculos.R.drawable.vehiculo),
-                contentDescription = "Imagen del vehículo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-            )
+
+            AsyncImage(
+                        model = vehiculo.imagen,
+                        contentDescription = "Imagen del vehículo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                    )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -149,7 +172,7 @@ fun VehiculoCard(
                     coroutineScope.launch {
                         viewModel.rentarVehiculo(
                             vehiculo = vehiculo,
-                            persona = persona!!,  // 🔥 Se pasa la persona autenticada
+                            persona = persona!!,  // Paso la persona autenticada
                             diasRenta = diasRenta.toInt(),
                             onResult = { success, message ->
                                 coroutineScope.launch {
@@ -169,6 +192,8 @@ fun VehiculoCard(
                 }
             }
         )
+
     }
+
 }
 

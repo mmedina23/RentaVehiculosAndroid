@@ -157,8 +157,8 @@ fun loginUser(
 
                 // segun perfil ir a blabla o blabla
                 when (response.perfil.uppercase()) {
-                    "ADMIN" -> navController.navigate("admin")
-                    "CLIENTE" -> navController.navigate("cliente")
+                    "ADMIN" -> navController.navigate("adminOpciones")
+                    "CLIENTE" -> navController.navigate("ListaVehiculos")
                     else -> Toast.makeText(context, "Rol desconocido", Toast.LENGTH_SHORT).show()
                 }
             }
