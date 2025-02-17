@@ -12,4 +12,4 @@ interface AuthService {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): AuthResponse
 }
-//SEGUN STACKOVERFLOW ESTO ES ASI. CHEQUEAR EN YOUTUBE. DE MOMENTO FUNCIONANDO
+

@@ -11,6 +11,8 @@ import com.pmd.rentavehiculos.pantallas.LoginScreen
 import com.pmd.rentavehiculos.pantallas.PantallaInicio
 import com.pmd.rentavehiculos.pantallas.PantallaInicioAdmi
 import com.pmd.rentavehiculos.pantallas.SplashScreen
+import com.pmd.rentavehiculos.pantallas.VehiculosRentadosScreen
+import com.pmd.rentavehiculos.pantallas.VehiculosScreen
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
@@ -40,6 +42,12 @@ fun Navigation(navController: NavHostController) {
         }
         composable("menu_cliente") {
             PantallaInicio(navController)
+        }
+        composable("vehiculos") {
+            VehiculosScreen(navController, vehiculosViewModel, loginViewModel)
+        }
+        composable("vehiculos_rentados") {
+            VehiculosRentadosScreen(navController, vehiculosViewModel, loginViewModel)
         }
 
     }
