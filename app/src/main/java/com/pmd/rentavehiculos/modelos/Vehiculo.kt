@@ -1,6 +1,7 @@
 package com.pmd.rentavehiculos.modelos
 
 data class Vehiculo(
+    val id: Int,
     val marca: String,
     val color: String,
     val carroceria: String,

@@ -59,11 +59,15 @@ interface ApiService {
         @Path("id") id: Int
     ): Response<Unit>;
 
-    @PATCH("vehiculos/{id}")
+    @POST("vehiculos/liberar/{vehiculoId}")
     suspend fun liberarVehiculo(
-        @Header("x-llave-api") apiKey: String,
-        @Path("id") id: Int
-    ): Vehiculo;
+        @Header("Authorization") apiKey: String,
+        @Path("vehiculoId") vehiculoId: Int
+    ): Response<Unit>
+ // compruebo que retorne Response<Unit>
+
+
+
 
     @GET("vehiculos/{id}/rentas")
     suspend fun getRentasByVehiculo(

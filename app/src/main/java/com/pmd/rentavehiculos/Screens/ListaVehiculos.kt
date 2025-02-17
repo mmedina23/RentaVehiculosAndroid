@@ -15,7 +15,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,17 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.pmd.rentavehiculos.modelos.Vehiculo
-import com.pmd.rentavehiculos.viewmodels.ListaVehiculosViewModel  // ✅ Importamos el ViewModel correcto
+import com.pmd.rentavehiculos.viewmodels.LoginViewModel
+import com.pmd.rentavehiculos.viewmodels.VehiculosViewModel  // ✅ Importamos el ViewModel correcto
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun listaVehiculos(
     navController: NavHostController,
-    viewModel: ListaVehiculosViewModel,  //cambio a viewmodelVehiculos
+    viewModel: VehiculosViewModel,
+    loginViewModel: LoginViewModel  // 🔥 Se agrega LoginViewModel para obtener la Persona
 ) {
-
-    val context = LocalContext.current
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.observeAsState(emptyList())
     val errorMessage by viewModel.errorMessage.observeAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -41,14 +40,6 @@ fun listaVehiculos(
 
     LaunchedEffect(Unit) {
         viewModel.fetchVehiculosDisponibles()
-    }
-
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar(it)
-            }
-        }
     }
 
     Scaffold(
@@ -65,7 +56,7 @@ fun listaVehiculos(
             } else {
                 LazyColumn {
                     items(vehiculosDisponibles) { vehiculo ->
-                        VehiculoCard(vehiculo, viewModel)
+                        VehiculoCard(vehiculo, viewModel, loginViewModel)
                     }
                 }
             }
@@ -73,13 +64,20 @@ fun listaVehiculos(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
+fun VehiculoCard(
+    vehiculo: Vehiculo,
+    viewModel: VehiculosViewModel,
+    loginViewModel: LoginViewModel // 🔥 Se agrega LoginViewModel
+) {
     var diasRenta by remember { mutableStateOf("1") }
     var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val persona = loginViewModel.usuario.value // 🔥 Obtener la persona autenticada
 
     Card(
         modifier = Modifier
@@ -88,9 +86,8 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Imagen del vehículo
             Image(
-                painter = painterResource(id = com.pmd.rentavehiculos.R.drawable.vehiculo), // Reemplázalo con una imagen real
+                painter = painterResource(id = com.pmd.rentavehiculos.R.drawable.vehiculo),
                 contentDescription = "Imagen del vehículo",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,7 +96,6 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Información del vehículo
             Text(
                 text = "${vehiculo.marca} ${vehiculo.carroceria}",
                 fontSize = 20.sp,
@@ -117,7 +113,6 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Input para los días de renta
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Días: ")
                 OutlinedTextField(
@@ -130,7 +125,6 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Botón para rentar el vehículo
             Button(
                 onClick = { showDialog = true },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
@@ -143,7 +137,6 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
         }
     }
 
-    // Diálogo de confirmación para rentar el vehículo
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -154,9 +147,16 @@ fun VehiculoCard(vehiculo: Vehiculo, viewModel: ListaVehiculosViewModel) {
             confirmButton = {
                 TextButton(onClick = {
                     coroutineScope.launch {
-                        // Aquí tengo que llamar a la función de ViewModel para rentar el vehículo
-                        // viewModel.rentarVehiculo(vehiculo, diasRenta.toInt())
-                        snackbarHostState.showSnackbar("Vehículo rentado con éxito!")
+                        viewModel.rentarVehiculo(
+                            vehiculo = vehiculo,
+                            persona = persona!!,  // 🔥 Se pasa la persona autenticada
+                            diasRenta = diasRenta.toInt(),
+                            onResult = { success, message ->
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                            }
+                        )
                     }
                     showDialog = false
                 }) {

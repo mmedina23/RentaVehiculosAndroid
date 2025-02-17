@@ -34,7 +34,7 @@ fun cliente(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate("rentarVehiculo") },
+                onClick = { navController.navigate("VehiculosRentados") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Mis vehículos rentados")
