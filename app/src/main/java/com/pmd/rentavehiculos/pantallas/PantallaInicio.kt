@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.pantallas
 
+import android.graphics.Color.rgb
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,72 +10,100 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pmd.rentavehiculos.R
 
+/*
+El NavController es un componente de Jetpack Navigation que se usa en Jetpack
+Compose para gestionar la navegación entre pantallas de una aplicación Android.
+*/
+
 @Composable
 fun PantallaInicio(navController: NavController) {
-    // Usamos una Column para apilar los elementos verticalmente con un fondo negro
-    Column(
-        modifier = Modifier
-            .fillMaxSize() // Rellena todo el tamaño de la pantalla
-            .background(Color(0, 0, 0)) // Fondo negro para la pantalla (RGB(0, 0, 0))
-            .padding(20.dp), // Agrega un padding general a toda la columna
-        horizontalAlignment = Alignment.CenterHorizontally // Centra los elementos horizontalmente
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Imagen del logo en la parte superior
+        // Imagen de fondo con desenfoque
         Image(
-            painter = painterResource(id = R.drawable.logo5), // Carga el recurso de imagen
-            contentDescription = "Logo principal", // Descripción accesible para la imagen
+            painter = painterResource(id = R.drawable.logo4), // Asegúrate de que la imagen está en res/drawable
+            contentDescription = "Fondo de la pantalla",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
+        )
+
+        // Capa semitransparente para mejorar la legibilidad
+        Box(
             modifier = Modifier
-                .width(250.dp) // Establece un ancho fijo para la imagen
-                .height(300.dp) // Establece una altura fija para la imagen
-                .padding(bottom = 20.dp) // Espacio entre la imagen y el texto
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)) // Oscurece un poco la imagen
         )
 
-        // Título en la parte superior de la pantalla
-        Text(
-            text = "Bienvenidos a Nuestro Servicio", // Título informativo
-            fontSize = 32.sp, // Tamaño de fuente más grande
-            fontWeight = FontWeight.Bold, // Peso de la fuente en negrita
-            fontFamily = FontFamily.Serif, // Tipo de fuente Serif para un estilo clásico
-            color = Color(255, 111, 0), // Color naranja para el texto (RGB(255, 111, 0))
-            modifier = Modifier.padding(bottom = 20.dp) // Espacio entre el texto y los botones
-        )
-
-        // Primer botón para alquilar un vehículo
-        Button(
-            onClick = { navController.navigate("vehiculos") }, // Navega a la pantalla "vehiculos"
-            modifier = Modifier.fillMaxWidth(0.75f), // Ocupa el 75% del ancho disponible
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(255, 111, 0), // Color de fondo naranja para el botón (RGB(255, 111, 0))
-                contentColor = Color(0, 0, 0) // Texto negro en el botón (RGB(0, 0, 0))
-            ),
-            shape = RoundedCornerShape(12.dp) // Bordes del botón redondeados
+        // Contenido principal
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Alquilar un Vehículo", fontSize = 16.sp) // Texto dentro del botón
-        }
+            // Logo
+            Image(
+                painter = painterResource(id = R.drawable.logo7),//logo de la app en el header
+                contentDescription = "Logo principal",
+                modifier = Modifier
+                    .width(400.dp)
+                    .height(400.dp)
+                    .padding(bottom = 20.dp)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Espacio entre los botones
+            // Botón para alquilar un vehículo
+            BotonAnimado(
+                text = "Alquilar un Vehículo",
+                onClick = { navController.navigate("vehiculos") }
+            )
 
-        // Segundo botón para ver los vehículos alquilados
-        Button(
-            onClick = { navController.navigate("vehiculos_rentados") }, // Navega a la pantalla "vehiculos_rentados"
-            modifier = Modifier.fillMaxWidth(0.75f), // Ocupa el 75% del ancho disponible
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(255, 111, 0), // Mismo color de fondo naranja (RGB(255, 111, 0))
-                contentColor = Color(0, 0, 0) // Texto negro en el botón (RGB(0, 0, 0))
-            ),
-            shape = RoundedCornerShape(12.dp) // Bordes redondeados del botón
-        ) {
-            Text("Mis Vehículos Alquilados", fontSize = 16.sp) // Texto dentro del botón
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Botón para ver vehículos alquilados
+            BotonAnimado(
+                text = "Mis Vehículos Alquilados",
+                onClick = { navController.navigate("vehiculos_rentados") }
+            )
         }
     }
+}
+
+// Composable para un botón con animación y mejor diseño
+@Composable
+fun BotonAnimado(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(0.75f)
+            .height(50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(251, 191, 36),
+            contentColor = Color.Black
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPantallaInicio() {
+    PantallaInicio(navController = NavController(LocalContext.current)) // Vista previa de la pantalla de inicio
 }
 
 

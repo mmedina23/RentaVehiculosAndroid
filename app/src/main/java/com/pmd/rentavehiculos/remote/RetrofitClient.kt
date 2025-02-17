@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-
+                                                        
     // ipconfig: Cambiar la Url de casa y la de clase
 
     private const val BASE_URL = "http://192.168.211.1:8080/api/v1/" //URL CASA
