@@ -91,7 +91,7 @@ fun listaVehiculos(
 fun VehiculoCard(
     vehiculo: Vehiculo,
     viewModel: VehiculosViewModel,
-    loginViewModel: LoginViewModel // 🔥 Se agrega LoginViewModel
+    loginViewModel: LoginViewModel // Se agrega LoginViewModel
 ) {
     var diasRenta by remember { mutableStateOf("1") }
     var showDialog by remember { mutableStateOf(false) }

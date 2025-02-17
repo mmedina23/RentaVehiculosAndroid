@@ -85,6 +85,14 @@ class VehiculosViewModel(
                     return@launch
                 }
 
+                // 🔥 Verificar si el usuario ya tiene 3 rentas activas
+                val rentasActuales = apiService.getRentasByPersona(apiKey, personaId)
+                if (rentasActuales.size >= 3) {
+                    Log.w("API_DEBUG", "Usuario ya tiene 3 vehículos rentados, no puede rentar más.")
+                    onResult(false, "No puedes rentar más de 3 vehículos a la vez.")
+                    return@launch
+                }
+
                 Log.d("API_DEBUG", "Intentando rentar vehículo con ID: ${vehiculo.id}, Persona ID: $personaId")
 
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -141,10 +149,10 @@ class VehiculosViewModel(
                     return@launch
                 }
 
-                val authHeader = "Bearer $apiKey"
-                Log.d("API_DEBUG", "Enviando solicitud con Authorization: $authHeader")
 
-                val response = apiService.liberarVehiculo(authHeader, vehiculoId)
+
+                val response = apiService.liberarVehiculo(apiKey, vehiculoId)
+
 
                 if (response.isSuccessful) {
                     Log.d("API_DEBUG", "Vehículo liberado correctamente")

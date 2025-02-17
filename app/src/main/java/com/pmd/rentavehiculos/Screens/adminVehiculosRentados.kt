@@ -27,7 +27,7 @@ fun adminVehiculosRentadosScreen(
 
     LaunchedEffect(Unit) {
         if (vehiculosRentados.isEmpty()) {
-            viewModel.fetchVehiculosRentadosAdmin() // ✅ Llamamos a la función correcta para administradores
+            viewModel.fetchVehiculosRentadosAdmin() //llAMO a la función correcta para administradores
         }
     }
 
@@ -57,7 +57,7 @@ fun adminVehiculosRentadosScreen(
             } else {
                 LazyColumn {
                     items(vehiculosRentados) { renta ->
-                        RentaCard(renta) // ✅ Muestra la información de cada renta
+                        RentaCard(renta) //muestro la información de cada renta
                     }
                 }
             }
