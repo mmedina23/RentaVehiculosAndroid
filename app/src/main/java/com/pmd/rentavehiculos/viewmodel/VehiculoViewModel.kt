@@ -30,10 +30,37 @@ class VehiculoViewModel : ViewModel() {
     fun obtenerVehiculosRentados(idUsuario: Int, llaveApi: String) {
         viewModelScope.launch {
             try {
-                val vehiculosRentados = RetrofitClient.vehiculoApi.obtenerVehiculosRentados(idUsuario, llaveApi)
+                val vehiculosRentados =
+                    RetrofitClient.vehiculoApi.obtenerVehiculosRentados(idUsuario, llaveApi)
                 _listaVehiculosRentados.value = vehiculosRentados
             } catch (e: Exception) {
                 println("Error obteniendo vehículos rentados: ${e.message}")
+            }
+        }
+    }
+
+    fun reservarVehiculo(
+        idVehiculo: Int,
+        idUsuario: Int,
+        llaveApi: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.vehiculoApi.reservarVehiculo(idVehiculo, llaveApi)
+
+                println("🔍 Respuesta del servidor: Código ${response.code()} - ${response.message()}")
+
+                if (response.isSuccessful) {
+                    onSuccess("Vehículo rentado exitosamente.")
+                    obtenerVehiculosDisponibles(llaveApi) // Refrescar lista
+                    obtenerVehiculosRentados(idUsuario, llaveApi) // Actualizar lista de rentados
+                } else {
+                    onError("Error al rentar vehículo. Código: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                onError("Error en la conexión: ${e.message}")
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,10 +13,17 @@ import com.pmd.rentavehiculos.components.VehiculoCard
 import com.pmd.rentavehiculos.components.VehiculoItemConBoton
 import com.pmd.rentavehiculos.components.VehiculoRentadoCard
 import com.pmd.rentavehiculos.viewmodel.VehiculoViewModel
+import androidx.compose.ui.platform.LocalContext
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClienteScreen(nombreUsuario: String, llaveApi: String, idUsuario: Int, onLogout: () -> Unit) {
+fun ClienteScreen(
+    nombreUsuario: String,
+    llaveApi: String,
+    idUsuario: Int,
+    onLogout: () -> Unit
+) {
     val viewModel: VehiculoViewModel = viewModel()
     val listaVehiculosDisponibles by viewModel.listaVehiculosDisponibles.collectAsState()
     val listaVehiculosRentados by viewModel.listaVehiculosRentados.collectAsState()
@@ -63,11 +71,27 @@ fun ClienteScreen(nombreUsuario: String, llaveApi: String, idUsuario: Int, onLog
                     if (listaVehiculosDisponibles.isEmpty()) {
                         Text("No hay vehículos disponibles.", modifier = Modifier.padding(16.dp))
                     } else {
+                        val context = LocalContext.current
                         LazyColumn {
                             items(listaVehiculosDisponibles) { vehiculo ->
-                                VehiculoCard(vehiculo, onRentar = { /* Lógica de renta */ })
+                                VehiculoCard(vehiculo, onRentar = {
+                                    viewModel.reservarVehiculo(
+                                        idVehiculo = vehiculo.id,
+                                        idUsuario = idUsuario,
+                                        llaveApi = llaveApi,
+                                        onSuccess = { mensaje ->
+                                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT)
+                                                .show()
+                                        },
+                                        onError = { error ->
+                                            Toast.makeText(context, error, Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
+                                    )
+                                })
                             }
                         }
+
                     }
                 }
 
@@ -83,6 +107,6 @@ fun ClienteScreen(nombreUsuario: String, llaveApi: String, idUsuario: Int, onLog
                     }
                 }
             }
-            }
+        }
     }
 }

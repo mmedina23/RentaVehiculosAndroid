@@ -26,30 +26,14 @@ fun VehiculoCard(vehiculo: Vehiculo, onRentar: () -> Unit) {
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            // Imagen del vehículo con Coil
+        Column(modifier = Modifier.padding(16.dp)) {
             AsyncImage(
                 model = vehiculo.imagen,
                 contentDescription = "Imagen del vehículo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
+                modifier = Modifier.fillMaxWidth().height(150.dp),
                 contentScale = ContentScale.Crop
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Información del vehículo
-            Text(
-                text = "${vehiculo.marca} - ${vehiculo.carroceria}",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Botón para rentar el vehículo
+            Text(text = "${vehiculo.marca} - ${vehiculo.carroceria}", style = MaterialTheme.typography.titleMedium)
             Button(
                 onClick = onRentar,
                 modifier = Modifier.fillMaxWidth()
