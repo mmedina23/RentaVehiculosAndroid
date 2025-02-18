@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -29,19 +30,26 @@ fun vehiculoRentadoDetalle(token: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Campo de texto para ingresar el ID del vehículo
         OutlinedTextField(
             value = vehiculoId,
             onValueChange = { vehiculoId = it },
-            label = { Text("Ingrese el ID del vehículo") },
+            label = { Text("Ingrese el ID del vehículo", style = MaterialTheme.typography.bodyMedium) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            ),
+            shape = MaterialTheme.shapes.medium
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Botón para confirmar
         Button(
@@ -67,21 +75,37 @@ fun vehiculoRentadoDetalle(token: String) {
                     }
                 }
             },
-            enabled = vehiculoId.isNotEmpty()
+            enabled = vehiculoId.isNotEmpty(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = MaterialTheme.shapes.large,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            Text("Confirmar")
+            Text("Confirmar", style = MaterialTheme.typography.labelLarge)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Indicador de carga
         if (isLoading) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
         // Mostrar error si lo hay
         errorMessage?.let {
-            Text(text = it, color = MaterialTheme.colorScheme.error)
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(8.dp)
+            )
         }
 
         // Mostrar los datos del vehículo rentado si están disponibles
@@ -92,8 +116,14 @@ fun vehiculoRentadoDetalle(token: String) {
             ) {
                 items(it) { renta ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             // Imagen del vehículo
@@ -103,23 +133,56 @@ fun vehiculoRentadoDetalle(token: String) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
+                                    .clip(MaterialTheme.shapes.medium)
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             // Datos de la persona
-                            Text(text = "Rentado por: ${renta.persona.nombre} ${renta.persona.apellido}", fontSize = 18.sp)
-                            Text(text = "Teléfono: ${renta.persona.telefono}")
-                            Text(text = "Identificación: ${renta.persona.tipoIdentificacion} - ${renta.persona.identificacion}")
+                            Text(
+                                text = "Rentado por: ${renta.persona.nombre} ${renta.persona.apellido}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Teléfono: ${renta.persona.telefono}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
+                            Text(
+                                text = "Identificación: ${renta.persona.tipoIdentificacion} - ${renta.persona.identificacion}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             // Datos del alquiler
-                            Text(text = "Días rentado: ${renta.dias_renta}", fontSize = 16.sp)
-                            Text(text = "Fecha de renta: ${renta.fecha_renta}")
-                            Text(text = "Fecha prevista de entrega: ${renta.fecha_estimada_entrega}")
-                            Text(text = "Fecha de entrega: ${renta.fecha_entregado ?: "No entregado aún"}")
-                            Text(text = "Valor total: \$${renta.valor_total_renta}", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = "Días rentado: ${renta.dias_renta}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Fecha de renta: ${renta.fecha_renta}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
+                            Text(
+                                text = "Fecha prevista de entrega: ${renta.fecha_estimada_entrega}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
+                            Text(
+                                text = "Fecha de entrega: ${renta.fecha_entregado ?: "No entregado aún"}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
+                            Text(
+                                text = "Valor total: \$${renta.valor_total_renta}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
