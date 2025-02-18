@@ -177,6 +177,7 @@ fun enviarUsuario(
                 val perfil = usuario?.perfil
                 val personaId = usuario?.persona?.id?: 0
                 val Persona = PersonaRequestRenta(
+                    personaId = personaId,
                     nombre = usuario?.persona?.nombre?:"",
                     apellido = usuario?.persona?.apellido?:"",
                     direccion = usuario?.persona?.direccion?:"",

@@ -27,3 +27,11 @@ data class Admind(val token: String, val personaId: Int, val Persona : PersonaRe
 
 @Serializable
 data class RentarVehiculo(val personaId: Int, val vehiculoId : Int, val token: String, val precioDiaVehiculo : Double, val Persona: PersonaRequestRenta, val Vehiculo : VehiculoRequestRenta)
+
+@Parcelize
+@Serializable
+data class MisVehiculos(val token : String, val personaId : Int) : Parcelable
+
+@Parcelize
+@Serializable
+data class VehiculoRentadoDetalle(val token : String) : Parcelable

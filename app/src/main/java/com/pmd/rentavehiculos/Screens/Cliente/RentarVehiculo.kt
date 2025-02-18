@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.Screens.Cliente
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -49,29 +50,40 @@ import java.util.Locale
 import java.util.TimeZone
 
 @Composable
-fun RentarVehiculoFunction(personaId: Int,
-                           vehiculoId: Int,
-                           token: String,
-                           precioDiaVehiculo : Double,
-                           Persona : PersonaRequestRenta,
-                           Vehiculo : VehiculoRequestRenta
-                           ) {
+fun RentarVehiculoFunction(
+    personaId: Int,
+    vehiculoId: Int,
+    token: String,
+    precioDiaVehiculo: Double,
+    Persona: PersonaRequestRenta,
+    Vehiculo: VehiculoRequestRenta
+) {
     // Estados para almacenar la selección del usuario
     var selectedYear by remember { mutableStateOf("2025") }
     var selectedMonth by remember { mutableStateOf("01") }
     var selectedDay by remember { mutableStateOf("01") }
-    var diasRentados by remember { mutableStateOf(1) } // Nuevo estado para los días rentados
+    var diasRentados by remember { mutableStateOf(1) }
     var fechaGenerada by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Selecciona una fecha", fontWeight = FontWeight.Bold)
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .background(Color.White, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Selecciona una fecha",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = Color(0xFF6200EE)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Selector de Año
         DropdownSelector(
             label = "Año",
-            options = (2000..2025).map { it.toString() },
+            options = (2025..2045).map { it.toString() },
             selectedValue = selectedYear,
             onValueChange = { selectedYear = it }
         )
@@ -94,8 +106,13 @@ fun RentarVehiculoFunction(personaId: Int,
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Nuevo selector de días rentados
-        Text(text = "Elige los días que lo rentarás", fontWeight = FontWeight.Bold)
+        // Selector de días rentados
+        Text(
+            text = "Elige los días que lo rentarás",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = Color(0xFF6200EE)
+        )
 
         DropdownSelector(
             label = "Días",
@@ -106,70 +123,133 @@ fun RentarVehiculoFunction(personaId: Int,
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        val Persona = Persona
-        val Vehiculo = Vehiculo
+        val fechaEstimadaEntrega = "$selectedYear-$selectedMonth-${(selectedDay.toInt() + 1).toString().padStart(2, '0')}T21:45:41.647000Z"
+        val valorTotalRenta = (precioDiaVehiculo * diasRentados).toInt()
+        val fechaGenerada = "$selectedYear-$selectedMonth-${selectedDay.padStart(2, '0')}T21:45:41.647000Z"
 
-        Spacer(modifier = Modifier.height(20.dp))
+        val RentaRequest = RentaRequest(
+            persona = Persona,
+            diasRenta = diasRentados,
+            valorTotalRenta = valorTotalRenta,
+            fechaRenta = fechaGenerada,
+            fechaEstimadaEntrega = fechaEstimadaEntrega
+        )
 
-        val fechaEstimadaEntrega = "$selectedYear-$selectedMonth-${(selectedDay.toInt() + 1).toString()}" + "T21:45:41.647Z"
-
-        Button(onClick = {rentarVehiculo(Vehiculo, Persona,vehiculoId, token, personaId, diasRentados  ,fechaGenerada, fechaEstimadaEntrega)}) {
-        }
-        // Botón para generar fecha
-        Button(onClick = {
-            fechaGenerada = "$selectedYear-$selectedMonth-$selectedDay" + "T21:45:41.647Z"
-        }) {
-            Text("Generar Fecha")
+        // Botón para rentar vehículo
+        Button(
+            onClick = { rentarVehiculo(RentaRequest, token, vehiculoId) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .background(Color(0xFF6200EE), RoundedCornerShape(8.dp))
+        ) {
+            Text(
+                text = "Rentar Vehículo",
+                fontSize = 16.sp,
+                color = Color.White
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Mostrar la fecha generada y los días rentados
         if (fechaGenerada.isNotEmpty()) {
-            Text(text = "Fecha Generada: $fechaGenerada", fontWeight = FontWeight.Bold)
-            Text(text = "Días Rentados: $diasRentados", fontWeight = FontWeight.Bold)
+            Text(
+                text = "Fecha Generada: $fechaGenerada",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF6200EE)
+            )
+            Text(
+                text = "Días Rentados: $diasRentados",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF6200EE)
+            )
         }
     }
 }
 
-fun rentarVehiculo(Vehiculo : VehiculoRequestRenta, Persona: PersonaRequestRenta, vehiculoId: Int, token: String, personaId: Int, diasRenta : Int  ,fechaGenerada : String, fechaEstimadaEntrega : String){
-    val RentaRequest = RentaRequest(persona = Persona, vehiculo = Vehiculo, diasRenta = diasRenta.toDouble(), fechaRenta = fechaGenerada, fechaEstimadaEntrega = fechaEstimadaEntrega)
-    GlobalScope.launch(Dispatchers.IO) {
-        try {
-            val service = RetrofitInstance.makeRetrofitService()
-            val response = service.rentarVehiculo(vehiculoId = vehiculoId, apiKey = token, RentaRequest)
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                println(e)
+@Composable
+fun DropdownSelector(
+    label: String,
+    options: List<String>,
+    selectedValue: String,
+    onValueChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text(
+            text = label,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = Color(0xFF6200EE)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .padding(vertical = 8.dp)
+                .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                .animateContentSize() // Animación de expansión
+        ) {
+            Text(
+                text = selectedValue,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .fillMaxWidth(0.8f)
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = option,
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    },
+                    onClick = {
+                        onValueChange(option)
+                        expanded = false
+                    },
+                    modifier = Modifier
+                        .background(Color.White)
+                        .fillMaxWidth()
+                )
             }
         }
     }
 }
 
+fun rentarVehiculo(RentaRequest : RentaRequest, token: String, vehiculoId: Int){
+    GlobalScope.launch(Dispatchers.IO) {
+        try {
+            val service = RetrofitInstance.makeRetrofitService()
+            val response = service.rentarVehiculo(vehiculoId = vehiculoId, apiKey = token, rentaRequest = RentaRequest)
 
-@Composable
-fun DropdownSelector(label: String, options: List<String>, selectedValue: String, onValueChange: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column {
-        Text(text = label, fontWeight = FontWeight.SemiBold)
-
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-            .padding(vertical = 8.dp)) {
-            Text(text = selectedValue, modifier = Modifier.padding(8.dp))
-        }
-
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onValueChange(option)
-                        expanded = false
-                    }
-                )
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    println("Renta exitosa")
+                } else {
+                    println("Error en la renta: ${response.errorBody()?.string()}")
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                println("Excepción: ${e.message}")
             }
         }
     }

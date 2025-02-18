@@ -28,8 +28,14 @@ fun ClienteScreen(
     token: String,
     personaId: Int,
     Persona : PersonaRequestRenta,
-    NavigationRentarVehiculo:(personaId : Int, vehiculoId : Int, token : String, precioDiaVehiculo : Double, Persona : PersonaRequestRenta, Vehiculo : VehiculoRequestRenta)->Unit
-) {
+    NavigationRentarVehiculo:(personaId : Int,
+                              vehiculoId : Int,
+                              token : String,
+                              precioDiaVehiculo : Double, Persona : PersonaRequestRenta,
+                              Vehiculo : VehiculoRequestRenta)->Unit,
+    NavigationMisVehiculos:(token: String, personaId : Int) -> Unit
+    )
+{
     val service = RetrofitInstance.makeRetrofitService()
     var vehiculos by remember { mutableStateOf<List<Vehiculo>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -41,13 +47,14 @@ fun ClienteScreen(
     val filtros = listOf("Todos", "Disponibles", "No Disponibles")
     var expanded by remember { mutableStateOf(false) }
 
+
     fun cargarVehiculos(filtro: String) {
         coroutineScope.launch {
             isLoading = true
             try {
                 val filtroApi = when (filtro) {
                     "Disponibles" -> "disponibles"
-                    "No Disponibles" -> "no disponibles"
+                    "No Disponibles" -> "rentados"
                     else -> null
                 }
                 vehiculos = service.obtenervehiculos(token, filtroApi)
@@ -75,6 +82,11 @@ fun ClienteScreen(
                 Text(text = "Vehículos Rentados")
             }
         }*/
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {NavigationMisVehiculos(token, personaId)}) {
+            Text(text = "Mis vehiculos")
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -206,6 +218,7 @@ fun DetalleVehiculoDialog(vehiculo: Vehiculo, token: String, personaId: Int, Per
                 Spacer(modifier = Modifier.height(10.dp))
                 val vehiculoId = vehiculo.id
                 val precioVehiculo = vehiculo.precioDia?.toDouble()?:0.0
+                VehiculoInfoItem(label = "valor Renta", value = precioVehiculo.toString())
                 val Vehiculo = VehiculoRequestRenta(
                     marca = vehiculo?.marca?:"",
                     color = vehiculo?.color?:"",

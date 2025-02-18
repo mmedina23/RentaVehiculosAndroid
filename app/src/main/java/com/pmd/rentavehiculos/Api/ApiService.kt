@@ -1,6 +1,8 @@
 package com.pmd.rentavehiculos.Api
 
 import com.pmd.rentavehiculos.Entity.Persona
+import com.pmd.rentavehiculos.Entity.Renta
+import com.pmd.rentavehiculos.Entity.RentaAdmin
 import com.pmd.rentavehiculos.Entity.RentaRequest
 import com.pmd.rentavehiculos.Entity.UserRequest
 import com.pmd.rentavehiculos.Entity.Usuario
@@ -25,10 +27,17 @@ interface ApiService{
     @GET("vehiculos")
     suspend fun obtenervehiculos(@Header("x-llave-api") token: String, @Query("estado") estado : String? = null) : List<Vehiculo>;
 
-    @POST("/vehiculos/{id}/rentas")
+    @POST("vehiculos/{id}/rentas")
     suspend fun rentarVehiculo(
-        @Path("id") vehiculoId : Int,
-        @Header("x-llave-api") apiKey : String,
-        @Body rentaRequest : RentaRequest
-    )
+        @Path("id") vehiculoId: Int,
+        @Header("x-llave-api") apiKey: String,
+        @Body rentaRequest: RentaRequest
+    ): Response<Unit>
+
+    @GET("personas/{id}/rentas")
+    suspend fun obtenerMisVehiculos(@Path("id") id:Int ,@Header("x-llave-api") token: String) : List<Renta>
+
+    //Metodo para admind
+    @GET("vehiculos/{id}/rentas")
+    suspend fun obtenerDetalleVehiculo(@Path("id") id:Int, @Header("x-llave-api") token: String) : List<RentaAdmin>
 }
