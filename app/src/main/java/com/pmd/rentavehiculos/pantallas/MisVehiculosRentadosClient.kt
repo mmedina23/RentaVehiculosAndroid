@@ -79,7 +79,10 @@ fun VehiculosRentadosScreen(
                     items(rentas) { renta ->
                         RentaCard(renta) { vehiculoId ->
                             if (apiKey != null) {
-                                vehiculosViewModel.entregarVehiculo(apiKey, vehiculoId) { success, message ->
+                                vehiculosViewModel.entregarVehiculo(
+                                    apiKey,
+                                    vehiculoId
+                                ) { success, message ->
                                     coroutineScope.launch {
                                         snackbarHostState.showSnackbar(message)
                                     }
@@ -130,7 +133,10 @@ fun RentaCard(renta: RentaRequest, onEntregarVehiculo: (Int) -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "Fecha de alquiler: ${renta.fecha_renta}", fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Fecha entrega estimada: ${renta.fecha_estimada_entrega}", fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "Fecha entrega estimada: ${renta.fecha_estimada_entrega}",
+                fontWeight = FontWeight.SemiBold
+            )
 
             // Estado de la entrega
             if (yaEntregado) {

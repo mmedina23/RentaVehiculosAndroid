@@ -32,7 +32,8 @@ class VehiculosViewModel : ViewModel() {
     fun obtenerVehiculos(apiKey: String) {
         viewModelScope.launch {
             try {
-                val vehiculosObtenidos = RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
+                val vehiculosObtenidos =
+                    RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
                 vehiculos.clear()
                 vehiculos.addAll(vehiculosObtenidos)
             } catch (e: Exception) {
@@ -47,7 +48,8 @@ class VehiculosViewModel : ViewModel() {
     fun obtenerVehiculosRentados(apiKey: String, personaId: Int) {
         viewModelScope.launch {
             try {
-                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
+                val rentasObtenidas =
+                    RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, personaId)
                 rentas.clear()
                 rentas.addAll(rentasObtenidas)
             } catch (e: Exception) {
@@ -62,7 +64,8 @@ class VehiculosViewModel : ViewModel() {
     fun obtenerVehiculosRentadosAdmin(apiKey: String, vehiculoId: Int) {
         viewModelScope.launch {
             try {
-                val rentasObtenidas = RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
+                val rentasObtenidas =
+                    RetrofitClient.vehiculosService.obtenerHistorialRentas(apiKey, vehiculoId)
                 rentas.clear()
                 rentas.addAll(rentasObtenidas)
             } catch (e: Exception) {
@@ -77,9 +80,20 @@ class VehiculosViewModel : ViewModel() {
     fun obtenerVehiculosDisponibles(apiKey: String) {
         viewModelScope.launch {
             try {
-                val vehiculosObtenidos = RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
+                val vehiculosObtenidos =
+                    RetrofitClient.vehiculosService.obtenerVehiculos(apiKey, "disponibles")
+                // Imprimir la respuesta completa de la API
+                println("Respuesta completa de la API: $vehiculosObtenidos")
                 vehiculosDisponibles.clear()
                 vehiculosDisponibles.addAll(vehiculosObtenidos)
+
+                // Imprimir cada vehículo recibido
+                vehiculos.forEach { vehiculo ->
+                    println("Vehículo recibido: $vehiculo")
+                    println("Marca: ${vehiculo.marca}")
+                    println("Imagen URL: ${vehiculo.imagen}")  // ← Imprime la URL de la imagen
+                }
+
             } catch (e: Exception) {
                 vehiculosDisponibles.clear()
             }
@@ -104,7 +118,8 @@ class VehiculosViewModel : ViewModel() {
                 }
 
                 // Obtener la lista actualizada de vehículos rentados
-                val rentasActualizadas = RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, usuario.id)
+                val rentasActualizadas =
+                    RetrofitClient.vehiculosService.obtenerVehiculosRentados(apiKey, usuario.id)
                 rentas.clear()
                 rentas.addAll(rentasActualizadas)
 
@@ -116,7 +131,8 @@ class VehiculosViewModel : ViewModel() {
                 }
 
                 // Generar fechas para la renta
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                val dateFormat =
+                    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                 val calendar = Calendar.getInstance()
                 val fechaRenta = dateFormat.format(calendar.time) // Fecha actual
                 calendar.add(Calendar.DAY_OF_YEAR, diasRenta)
@@ -164,7 +180,8 @@ class VehiculosViewModel : ViewModel() {
                 // Buscar la renta asociada al vehículo y actualizar su estado
                 val rentaIndex = rentas.indexOfFirst { it.vehiculo.id == vehiculoId }
                 if (rentaIndex != -1) {
-                    val rentaActualizada = rentas[rentaIndex].copy(fecha_entregado = obtenerFechaActual())
+                    val rentaActualizada =
+                        rentas[rentaIndex].copy(fecha_entregado = obtenerFechaActual())
                     rentas[rentaIndex] = rentaActualizada
                 }
 

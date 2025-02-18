@@ -128,7 +128,11 @@ fun VehiculoAdminCard(vehiculo: Vehiculo) {
                 Text("Carrocería: ${vehiculo.carroceria}", fontSize = 14.sp, color = Color.Gray)
                 Text("Plazas: ${vehiculo.plazas}", fontSize = 14.sp, color = Color.Gray)
                 Text("Cambios: ${vehiculo.cambios}", fontSize = 14.sp, color = Color.Gray)
-                Text("Combustible: ${vehiculo.tipo_combustible}", fontSize = 14.sp, color = Color.Gray)
+                Text(
+                    "Combustible: ${vehiculo.tipo_combustible}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
 
                 // 🔹 Precio del vehículo
                 Text(

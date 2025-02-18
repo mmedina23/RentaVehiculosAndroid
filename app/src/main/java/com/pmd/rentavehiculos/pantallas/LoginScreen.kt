@@ -84,7 +84,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                         viewModel.login(username, password) { success, perfil ->
                             if (success) {
                                 // Redirigir al menú correspondiente según el perfil del usuario
-                                val destino = if (perfil == "ADMIN") "menu_admin" else "menu_cliente"
+                                val destino =
+                                    if (perfil == "ADMIN") "menu_admin" else "menu_cliente"
                                 navController.navigate(destino)
                             } else {
                                 errorMessage = "Error de autenticación"
@@ -137,7 +138,13 @@ fun CustomTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, color = Color(0xFF800080)) }, // Morado fuerte para el texto del label
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF800080)) },
+        leadingIcon = {
+            Icon(
+                imageVector = leadingIcon,
+                contentDescription = null,
+                tint = Color(0xFF800080)
+            )
+        },
         visualTransformation = visualTransformation,
         singleLine = true,
         modifier = Modifier

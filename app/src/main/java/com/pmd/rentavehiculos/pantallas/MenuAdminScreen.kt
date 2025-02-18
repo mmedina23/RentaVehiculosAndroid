@@ -102,10 +102,18 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
             if (isDialogOpen) {
                 AlertDialog(
                     onDismissRequest = { isDialogOpen = false },
-                    title = { Text("Buscar Vehículo", color = Color(0xFF800080)) }, // Morado fuerte para el título
+                    title = {
+                        Text(
+                            "Buscar Vehículo",
+                            color = Color(0xFF800080)
+                        )
+                    }, // Morado fuerte para el título
                     text = {
                         Column {
-                            Text("ID del vehículo:", color = Color(0xFF4B0082)) // Morado intermedio para el texto
+                            Text(
+                                "ID del vehículo:",
+                                color = Color(0xFF4B0082)
+                            ) // Morado intermedio para el texto
                             OutlinedTextField(
                                 value = vehiculoId,
                                 onValueChange = { vehiculoId = it },

@@ -104,11 +104,20 @@ fun RentaCardAdmin(renta: RentaRequest) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // 🔹 Información detallada de la renta
-            Text(text = "Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}", color = Color.Black)
+            Text(
+                text = "Cliente: ${renta.persona.nombre} ${renta.persona.apellidos}",
+                color = Color.Black
+            )
             Text(text = "Días rentados: ${renta.dias_renta}", color = Color.Black)
-            Text(text = "Valor total: $${renta.valor_total_renta}", color = Color(0xFF9932CC)) // Morado claro
+            Text(
+                text = "Valor total: $${renta.valor_total_renta}",
+                color = Color(0xFF9932CC)
+            ) // Morado claro
             Text(text = "Fecha de renta: ${renta.fecha_renta}", color = Color.Black)
-            Text(text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}", color = Color.Black)
+            Text(
+                text = "Fecha estimada de entrega: ${renta.fecha_estimada_entrega}",
+                color = Color.Black
+            )
 
             // 🔹 Estado de la entrega
             Text(
