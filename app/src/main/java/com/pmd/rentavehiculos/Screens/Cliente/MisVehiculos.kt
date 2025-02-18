@@ -2,44 +2,33 @@ package com.pmd.rentavehiculos.Screens.Cliente
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.Api.RetrofitInstance
 import com.pmd.rentavehiculos.Entity.Renta
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -73,10 +62,13 @@ fun ListaMisVehiculos(token: String, personaId: Int) {
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .animateContentSize(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
                 ) {
                     AsyncImage(
                         model = renta.vehiculo.imagen,
@@ -141,51 +133,45 @@ fun ListaMisVehiculos(token: String, personaId: Int) {
                         modifier = Modifier.padding(bottom = 16.dp),
                     )
 
-                    Button(onClick = {
-                        // Usar GlobalScope para lanzar la coroutine
-                        GlobalScope.launch {
-                            liberarVehiculo(renta.vehiculo.id, token)
-                        }
-                    }) {
-                        Text(text = "Liberar")
-                    }
-
-                    /*Button(
+                    Button(
                         onClick = {
-                            Log.d("ListaMisVehiculos", "Renta seleccionada: ${renta.vehiculo.marca}")
+                            GlobalScope.launch {
+                                liberarVehiculo(renta.vehiculo.id, token)
+                            }
                         },
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
                         shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White
+                        )
                     ) {
                         Text(
-                            text = "Ver más detalles",
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelLarge
+                            text = "Liberar",
+                            style = MaterialTheme.typography.bodyLarge
                         )
-                    }*/
-
+                    }
                 }
             }
         }
     }
 }
 
+
+
 suspend fun liberarVehiculo(id: Int, token: String) {
     try {
-        // Hacer la llamada a la API
         val service = RetrofitInstance.makeRetrofitService()
         val response = service.liberarVehiculo(id, token)
 
         if (response.isSuccessful) {
-            // Si la respuesta es exitosa
             Log.d("LiberarVehiculo", "Vehículo liberado correctamente.")
         } else {
-            // Si la respuesta no es exitosa
             Log.e("LiberarVehiculo", "Error al liberar vehículo: ${response.message()}")
         }
     } catch (e: Exception) {
-        // Manejar cualquier excepción
         Log.e("LiberarVehiculo", "Excepción: ${e.message}")
     }
 }
