@@ -10,13 +10,19 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,23 +32,27 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.Api.RetrofitInstance
 import com.pmd.rentavehiculos.Entity.Renta
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.concurrent.TimeUnit
+
 @Composable
 fun ListaMisVehiculos(token: String, personaId: Int) {
     val vehiculosList = remember { mutableStateOf<List<Renta>>(emptyList()) }
 
-    // Llamada a la API en un hilo de fondo
     LaunchedEffect(personaId) {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val service = RetrofitInstance.makeRetrofitService()
                 val response = service.obtenerMisVehiculos(personaId, token)
                 withContext(Dispatchers.Main) {
-                    vehiculosList.value = response // Actualiza el estado con la respuesta
+                    vehiculosList.value = response
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -53,70 +63,139 @@ fun ListaMisVehiculos(token: String, personaId: Int) {
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         items(vehiculosList.value) { renta ->
-            // Card con sombra, padding, y contenido animado
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    .animateContentSize(), // Animación al cambiar el tamaño
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    .animateContentSize(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
             ) {
-                // Contenido dentro de la tarjeta
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(20.dp)
                 ) {
-                    // Imagen del vehículo
                     AsyncImage(
                         model = renta.vehiculo.imagen,
                         contentDescription = "Imagen del vehículo",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(180.dp)
-                            .padding(bottom = 12.dp),
+                            .height(200.dp)
+                            .padding(bottom = 16.dp),
                     )
-
-                    // Título de la tarjeta con estilo
                     Text(
                         text = "Marca: ${renta.vehiculo.marca}",
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp),
                     )
                     Text(
                         text = "Color: ${renta.vehiculo.color}",
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 6.dp),
                     )
                     Text(
                         text = "Carrocería: ${renta.vehiculo.carroceria}",
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 6.dp),
                     )
                     Text(
                         text = "Plazas: ${renta.vehiculo.plazas}",
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 6.dp),
                     )
                     Text(
                         text = "Valor del día: ${renta.vehiculo.precioDia} €",
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 6.dp),
                     )
                     Text(
                         text = "Disponible: ${renta.vehiculo.disponible}",
-                        modifier = Modifier.padding(bottom = 8.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                    )
+                    Text(
+                        text = "Fecha renta: ${renta.fecha_renta}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                    )
+                    Text(
+                        text = "Fecha estimada entrega: ${renta.fecha_estimada_entrega}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 12.dp),
                     )
 
-                    // Botón para más detalles
-                    Button(
+                    val currentDate = System.currentTimeMillis()
+                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    val estimatedDeliveryDate = formatter.parse(renta.fecha_estimada_entrega)?.time ?: 0
+                    val daysRemaining = calculateDaysRemaining(currentDate, estimatedDeliveryDate)
+
+                    Text(
+                        text = "Días restantes para entrega: $daysRemaining días",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+
+                    Button(onClick = {
+                        // Usar GlobalScope para lanzar la coroutine
+                        GlobalScope.launch {
+                            liberarVehiculo(renta.vehiculo.id, token)
+                        }
+                    }) {
+                        Text(text = "Liberar")
+                    }
+
+                    /*Button(
                         onClick = {
-                            // Acción del botón, como navegar a los detalles de renta.
                             Log.d("ListaMisVehiculos", "Renta seleccionada: ${renta.vehiculo.marca}")
                         },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Ver más detalles")
-                    }
+                        Text(
+                            text = "Ver más detalles",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }*/
+
                 }
             }
         }
     }
+}
+
+suspend fun liberarVehiculo(id: Int, token: String) {
+    try {
+        // Hacer la llamada a la API
+        val service = RetrofitInstance.makeRetrofitService()
+        val response = service.liberarVehiculo(id, token)
+
+        if (response.isSuccessful) {
+            // Si la respuesta es exitosa
+            Log.d("LiberarVehiculo", "Vehículo liberado correctamente.")
+        } else {
+            // Si la respuesta no es exitosa
+            Log.e("LiberarVehiculo", "Error al liberar vehículo: ${response.message()}")
+        }
+    } catch (e: Exception) {
+        // Manejar cualquier excepción
+        Log.e("LiberarVehiculo", "Excepción: ${e.message}")
+    }
+}
+
+
+
+
+
+
+fun calculateDaysRemaining(currentDate: Long, estimatedDeliveryDate: Long): Long {
+    val diffInMillis = estimatedDeliveryDate - currentDate
+    return TimeUnit.MILLISECONDS.toDays(diffInMillis)
 }

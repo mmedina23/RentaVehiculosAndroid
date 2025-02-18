@@ -13,6 +13,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -40,4 +41,7 @@ interface ApiService{
     //Metodo para admind
     @GET("vehiculos/{id}/rentas")
     suspend fun obtenerDetalleVehiculo(@Path("id") id:Int, @Header("x-llave-api") token: String) : List<RentaAdmin>
+
+    @PATCH("vehiculos/{id}")
+    suspend fun liberarVehiculo(@Path("id") id : Int, @Header("x-llave-api") token : String) : Response<Unit>
 }

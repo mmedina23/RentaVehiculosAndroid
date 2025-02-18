@@ -82,6 +82,7 @@ fun ClienteScreen(
                 Text(text = "Vehículos Rentados")
             }
         }*/
+        
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {NavigationMisVehiculos(token, personaId)}) {
