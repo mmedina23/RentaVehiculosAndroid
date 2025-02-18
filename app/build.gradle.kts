@@ -64,7 +64,7 @@ dependencies {
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.kotlinx.coroutines.android)
-
+    implementation("io.coil-kt:coil-compose:2.1.0")
     implementation (libs.hilt.android)
     implementation (libs.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.compose)

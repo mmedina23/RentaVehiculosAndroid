@@ -1,39 +1,13 @@
 package com.pmd.rentavehiculos.pantallas
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -46,6 +20,7 @@ import androidx.navigation.NavController
 import com.pmd.rentavehiculos.modelo.Vehiculo
 import com.pmd.rentavehiculos.viewModels.LoginViewModel
 import com.pmd.rentavehiculos.viewModels.VehiculosViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,13 +30,14 @@ fun VehiculosScreen(
     loginViewModel: LoginViewModel = viewModel()
 ) {
     val apiKey = loginViewModel.apiKey.value
-    loginViewModel.usuario.value
+    val usuario = loginViewModel.usuario.value
     val vehiculos = vehiculosViewModel.vehiculos
 
     var selectedVehiculo by remember { mutableStateOf<Vehiculo?>(null) }
     var showDialog by remember { mutableStateOf(false) }
+    var diasRenta by remember { mutableStateOf("1") }
     val snackbarHostState = remember { SnackbarHostState() }
-    rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     // Estado para almacenar la selección del tipo de combustible
     var tipoCombustibleSeleccionado by remember { mutableStateOf("TODOS") }
@@ -153,6 +129,75 @@ fun VehiculosScreen(
             }
         }
     }
+
+    // Diálogo de reserva
+    if (showDialog && selectedVehiculo != null) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Reservar ${selectedVehiculo?.marca}") },
+            text = {
+                Column {
+                    Text("Introduce los días de renta:")
+
+                    OutlinedTextField(
+                        value = diasRenta,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() }) {
+                                diasRenta = input
+                            }
+                        },
+                        label = { Text("Días de renta") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    val dias = diasRenta.toIntOrNull() ?: 1
+                    val total = selectedVehiculo!!.valor_dia * dias
+                    Text("Total a pagar: $${total}")
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (apiKey != null && usuario != null) {
+                            val dias = diasRenta.toIntOrNull() ?: 1
+                            vehiculosViewModel.reservarVehiculo(
+                                apiKey,
+                                usuario,
+                                selectedVehiculo!!,
+                                dias
+                            ) { success, message ->
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                                showDialog = false
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF800080),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF800080),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = Color.White
+        )
+    }
 }
 
 @Composable
@@ -190,26 +235,18 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                 text = "${vehiculo.valor_dia} €/día",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 18.sp,
-                color = Color.Red
+                color = Color.Black
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botón de Reservar
             Button(
                 onClick = { onReservarClick() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800080)), // Morado fuerte
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800080)),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(
-                    "Reservar",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                Text("Reservar", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
