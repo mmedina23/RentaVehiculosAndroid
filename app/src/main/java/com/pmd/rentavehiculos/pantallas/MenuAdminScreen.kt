@@ -80,7 +80,7 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: LoginViewModel
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Gestión de Vehículos", fontSize = 16.sp)
+                Text("Listado de Vehículos", fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
