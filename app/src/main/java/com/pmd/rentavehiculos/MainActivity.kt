@@ -44,8 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import com.pmd.rentavehiculos.data.service.RetrofitServiceFactory
 import com.pmd.rentavehiculos.data.model.Persona
+import com.pmd.rentavehiculos.data.service.RetrofitClient.RetrofitService
 import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import kotlinx.coroutines.launch
 
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
         )
 
 
-        val service = RetrofitServiceFactory.retrofitService()
+        val service = RetrofitService.retrofitService()
         lifecycleScope.launch {
             val vehiculo = service.listaVehiculosDisponibles("30012025005447394", "disponibles")
             println(vehiculo)
@@ -95,6 +95,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+private fun RetrofitService.retrofitService() {
+    TODO("Not yet implemented")
 }
 
 @Composable

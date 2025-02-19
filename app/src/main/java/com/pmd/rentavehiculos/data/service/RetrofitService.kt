@@ -1,45 +1,55 @@
 package com.pmd.rentavehiculos.data.service
 
+import com.pmd.rentavehiculos.data.model.RentaRquest
 import com.pmd.rentavehiculos.data.model.Vehiculo
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface RetrofitService {
-
-    //servicio
+interface VehiculosService {
     @GET("vehiculos")
-    suspend fun listaVehiculosDisponibles(
-        @Header("x-llave-api") token: String,
-        @Query("estado") estado:String
+    suspend fun obtenerVehiculos(
+        @Header("x-llave-api") apiKey: String,
+        @Query("estado") estado: String = "disponibles"
     ): List<Vehiculo>
-}
 
-//implementacion del servicio
-object RetrofitServiceFactory{
-    fun retrofitService(): RetrofitService{
-        return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/v1/")//parte de url que es fija
-            .addConverterFactory(GsonConverterFactory.create())//convierte el resultado de la peticion a objeto
-            .client(provideClient())
-            .build().create(RetrofitService::class.java)
-    }
 
-    private fun provideClient(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor() // esta pendiente de lo que entra y sale
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
+    @POST("vehiculos/{id}/rentas")
+    suspend fun reservarVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int,
+        @Body rentaRquest: RentaRquest
+    )
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .retryOnConnectionFailure(true)
-            .build()
+    @GET("vehiculos/{id}")
+    suspend fun obtenerVehiculoPorId(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    ): Vehiculo
 
-        return client
-    }
+    @GET("personas/{id}/rentas")
+    suspend fun obtenerVehiculosRentados(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") personaId: Int
+    ): List<RentaRquest>
+
+    @PATCH("vehiculos/{id}")
+    suspend fun entregarVehiculo(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    )
+
+    @GET("vehiculos/{id}/rentas")
+    suspend fun obtenerHistorialRentas(
+        @Header("x-llave-api") apiKey: String,
+        @Path("id") vehiculoId: Int
+    ): List<RentaRquest>
+
 }
 
 
