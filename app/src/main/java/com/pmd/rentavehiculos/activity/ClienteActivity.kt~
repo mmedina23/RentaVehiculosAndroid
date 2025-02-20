@@ -1,18 +1,13 @@
 package com.pmd.rentavehiculos.activity
-
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -33,13 +28,9 @@ import com.pmd.rentavehiculos.ui.theme.RentaVehiculosTheme
 import com.pmd.rentavehiculos.viewModels.VehiculosViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
-import com.pmd.rentavehiculos.screens.AdminMenuScreen
-import com.pmd.rentavehiculos.screens.RentaVehiculosListScreen
-import com.pmd.rentavehiculos.screens.RentasAdminScreen
-import com.pmd.rentavehiculos.screens.VehiculosDisponiblesAdminScreen
 
-class AdminActivity : ComponentActivity() {
+
+class ClienteActivity : ComponentActivity() {
 
     private lateinit var sessionManager: SessionManager
 
@@ -48,8 +39,8 @@ class AdminActivity : ComponentActivity() {
         sessionManager = SessionManager(this)
 
         val personaId: Int = sessionManager.personaId ?: 0
+        // Si token es nullable, asigna un valor por defecto (aunque lo ideal es que sea no nulo)
         val apiKey: String = sessionManager.token ?: ""
-        Log.d("AdminActivity", "Se inició AdminActivity")
 
         setContent {
             RentaVehiculosTheme {
@@ -57,19 +48,22 @@ class AdminActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
-                        startDestination = "admin_menu",
+                        startDestination = "client_menu",
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        // Pantalla de menú de administración
-                        composable("admin_menu") {
-                            AdminMenuScreen(
-                                onVerDisponibles = { navController.navigate("vehiculos_disponibles") },
-                                onVerRentados = { navController.navigate("rentas") },
-                                //onGestionVehiculos = { /* Navega a la pantalla de gestió */ },
+                        // Pantalla de menú del cliente
+                        composable("client_menu") {
+                            ClientMenuScreen(
+                                onVehiculosDisponiblesClick = {
+                                    navController.navigate("vehiculos_disponibles")
+                                },
+                                onHistorialRentadosClick = {
+                                    navController.navigate("vehiculos_rentados")
+                                },
                                 onLogoutClick = {
-                                    // Limpia la sesión y redirige al login
-                                    sessionManager.clearSession()
-                                    val intent = Intent(this@AdminActivity, LoginActivity::class.java).apply {
+                                    val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                                    sharedPreferences.edit().clear().apply()
+                                    val intent = Intent(this@ClienteActivity, LoginActivity::class.java).apply {
                                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     }
                                     startActivity(intent)
@@ -77,17 +71,20 @@ class AdminActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        // Pantalla de vehículos disponibles para admin
+                        // Pantalla de vehículos disponibles
                         composable("vehiculos_disponibles") {
-                            VehiculosDisponiblesAdminScreen(
+                            VehiculosDisponiblesScreen(
                                 apiKey = apiKey,
-                                onBackClick = { navController.popBackStack() },
                                 onVehiculoClick = { vehiculo ->
+                                    Log.d("NAVIGATION", "Navegando a detalle del vehículo id: ${vehiculo.id}")
                                     navController.navigate("detalle_vehiculo/${vehiculo.id}")
+                                },
+                                onBackClick = {
+                                    navController.popBackStack()
                                 }
                             )
                         }
-
+                        // Pantalla de detalle de vehículo
                         composable(
                             route = "detalle_vehiculo/{vehiculoId}",
                             arguments = listOf(
@@ -95,9 +92,9 @@ class AdminActivity : ComponentActivity() {
                             )
                         ) { backStackEntry ->
                             val vehiculoId = backStackEntry.arguments?.getInt("vehiculoId") ?: 0
-                            Log.d("DETALLE_ADMIN", "Detalle solicitado para vehículo id: $vehiculoId")
+                            Log.d("DETALLE", "Detalle solicitado para vehículo id: $vehiculoId")
 
-                            // Obtén el ViewModel (puedes usar el mismo VehiculosViewModel o uno propio)
+                            // Obtén el ViewModel
                             val vehiculosViewModel: VehiculosViewModel = viewModel()
 
                             // Llama a la función para obtener el detalle del vehículo
@@ -107,54 +104,35 @@ class AdminActivity : ComponentActivity() {
 
                             // Observa el LiveData del detalle del vehículo
                             val vehiculo: Vehiculo? by vehiculosViewModel.vehiculoDetalleLiveData.observeAsState(initial = null)
+
                             val vehiculoLocal = vehiculo
                             if (vehiculoLocal == null) {
-                                Log.d("DETALLE_ADMIN", "Vehículo aún nulo, mostrando indicador de carga")
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    CircularProgressIndicator()
-                                }
+                                Log.d("DETALLE", "Vehículo aún nulo, mostrando indicador de carga")
+                                CircularProgressIndicator()
                             } else {
-                                Log.d("DETALLE_ADMIN", "Detalle del vehículo obtenido: ${vehiculoLocal.id}")
+                                Log.d("DETALLE", "Detalle del vehículo obtenido: ${vehiculoLocal.id}")
                                 DetalleVehiculoScreen(
                                     vehiculo = vehiculoLocal,
                                     apiKey = apiKey,
                                     personaId = personaId,
-                                    sessionManager = sessionManager,
+                                    sessionManager = sessionManager, // Pasar la instancia de SessionManager
                                     onRentSuccess = { navController.popBackStack() },
                                     onBack = { navController.popBackStack() },
-                                    isAdmin = true, // Especifica que es para admin
-                                    onVerHistorialClick = { id ->
-                                        // Navegar a la pantalla de historial de rentas con el id del vehículo
-                                        navController.navigate("rentas/$id")
-                                    }
-                                    // Si en el futuro el admin tiene acciones propias (editar/eliminar), se activarán en función de este flag.
+                                    
                                 )
                             }
                         }
-                        // Pantalla de lista de vehículos rentados
-                        composable("rentas") {
-                            RentaVehiculosListScreen(
+                        // Pantalla de vehículos rentados
+                        composable("vehiculos_rentados") {
+                            VehiculosRentadosScreen(
                                 apiKey = apiKey,
-                                onVehicleClick = { vehiculoId ->
-                                    navController.navigate("rentas/$vehiculoId")
+                                personaId = personaId,
+                                onEntregarVehiculo = { vehiculoId ->
+                                    // Aquí defines la acción para entregar un vehículo
                                 },
-                                onBackClick = { navController.popBackStack() }
+                                onBack = { navController.popBackStack() }
                             )
                         }
-
-                        // Pantalla de historial de rentas de un vehículo específico
-                        composable(
-                            route = "rentas/{vehiculoId}",
-                            arguments = listOf(navArgument("vehiculoId") { type = NavType.IntType })
-                        ) { backStackEntry ->
-                            val vehiculoId = backStackEntry.arguments?.getInt("vehiculoId") ?: 0
-                            RentasAdminScreen(
-                                apiKey = apiKey,
-                                vehiculoId = vehiculoId,
-                                onBackClick = { navController.popBackStack() }
-                            )
-                        }
-
                     }
                 }
             }

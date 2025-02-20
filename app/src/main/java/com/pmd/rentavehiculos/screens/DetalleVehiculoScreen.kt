@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.pmd.rentavehiculos.modelo.Vehiculo
@@ -50,7 +51,8 @@ fun DetalleVehiculoScreen(
     onBack: () -> Unit,
     sessionManager: SessionManager,
     isAdmin: Boolean = false, // Indica si es admin
-    vehiculosViewModel: VehiculosViewModel = viewModel()
+    vehiculosViewModel: VehiculosViewModel = viewModel(),
+    onVerHistorialClick: (Int) -> Unit, // Nuevo parámetro para navegar al historial
 ) {
     var diasRenta by remember { mutableStateOf("") }
     var isProcessing by remember { mutableStateOf(false) }
@@ -169,6 +171,17 @@ fun DetalleVehiculoScreen(
 
             // Si es admin, muestra botones para eliminar o modificar si se implementan, sino muestra mensaje de que no puede rentar
             if (isAdmin) {
+                Button(
+                    onClick = { onVerHistorialClick(vehiculo.id) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Ver historial de rentas",
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 /*  Button(
                     onClick = { /* Acción extra para admin, por ejemplo editar */ },
                     modifier = Modifier.fillMaxWidth()

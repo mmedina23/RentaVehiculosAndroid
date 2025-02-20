@@ -117,7 +117,9 @@ class ClienteActivity : ComponentActivity() {
                                     personaId = personaId,
                                     sessionManager = sessionManager, // Pasar la instancia de SessionManager
                                     onRentSuccess = { navController.popBackStack() },
-                                    onBack = { navController.popBackStack() }
+                                    onBack = { navController.popBackStack() },
+                                    isAdmin = false, // Para el cliente
+                                    onVerHistorialClick = { /* No hace nada para el cliente */ }
                                 )
                             }
                         }
