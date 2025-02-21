@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -179,8 +180,14 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
                 AsyncImage(
                     model = vehiculo.imagen,
                     contentDescription = "Imagen del Vehículo",
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.LightGray),
+                    contentScale = ContentScale.Crop
                 )
+
             }
 
             Spacer(modifier = Modifier.height(12.dp))
