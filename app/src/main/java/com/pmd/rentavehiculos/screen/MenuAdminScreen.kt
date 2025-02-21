@@ -1,32 +1,16 @@
 package com.pmd.rentavehiculos.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,79 +29,81 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: VistaLogin = v
     var isDialogOpen by remember { mutableStateOf(false) }
     var vehiculoId by remember { mutableStateOf("") }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Panel de Administrador", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF0D77A1),
-                    titleContentColor = Color.White
-                )
-            )
-        }
-    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(listOf(Color(0xFF0077B7), Color(0xFF003366))))
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Título de la aplicación
+            Text(
+                text = "DriveGo Admin🚗",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Imagen de Administrador
             Image(
                 painter = painterResource(id = R.drawable.npc),
                 contentDescription = "Imagen de Administrador",
                 modifier = Modifier
-                    .size(300.dp)
-                    .padding(bottom = 16.dp)
+                    .size(250.dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(20.dp))
             )
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Texto de bienvenida
             Text(
                 text = "Bienvenido, Administrador",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = Color.White,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            Button(
-                onClick = { navController.navigate("vehiculos_disponibles") },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Gestión de Vehículos", fontSize = 16.sp)
-            }
+            // Botón de Gestión de Vehículos
+            AdminButton(
+                text = "🚘 Gestión de Vehículos",
+                onClick = { navController.navigate("vehiculos_disponibles") }
+            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { isDialogOpen = true },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Ver Historial de Rentas", fontSize = 16.sp)
-            }
+            // Botón de Historial de Rentas
+            AdminButton(
+                text = "📋 Ver Historial de Rentas",
+                onClick = { isDialogOpen = true }
+            )
 
+            // Diálogo para buscar vehículo por ID
             if (isDialogOpen) {
                 AlertDialog(
                     onDismissRequest = { isDialogOpen = false },
-                    title = { Text("Buscar vehiculo") },
+                    title = { Text("Buscar vehículo") },
                     text = {
                         Column {
-                            Text("ID del vehículo:")
+                            Text("ID del vehículo:", color = Color.Black)
                             OutlinedTextField(
                                 value = vehiculoId,
                                 onValueChange = { vehiculoId = it },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true
+                                singleLine = true,
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = Color(0xFF0077B7),
+                                    unfocusedBorderColor = Color(0xFF0077B7).copy(alpha = 0.5f),
+                                    cursorColor = Color(0xFF0077B7)
+                                )
                             )
                         }
                     },
@@ -129,28 +115,47 @@ fun MenuAdminScreen(navController: NavController, loginViewModel: VistaLogin = v
                                     navController.navigate("vehiculos_rentados_admin/$vehiculoId")
                                 }
                             },
-
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF0077B7),
                                 contentColor = Color.White
-                        ) ){
+                            )
+                        ) {
                             Text("Buscar")
                         }
                     },
                     dismissButton = {
-                        Button(onClick = { isDialogOpen = false },
-
+                        Button(
+                            onClick = { isDialogOpen = false },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF0077B7),
-                                contentColor = Color.White)) {
+                                contentColor = Color.White
+                            )
+                        ) {
                             Text("Cancelar")
                         }
                     },
                     containerColor = Color.White
-
                 )
             }
         }
     }
 }
 
+// Función para los botones con diseño mejorado
+@Composable
+fun AdminButton(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .height(52.dp)
+            .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF00A86B),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    }
+}
