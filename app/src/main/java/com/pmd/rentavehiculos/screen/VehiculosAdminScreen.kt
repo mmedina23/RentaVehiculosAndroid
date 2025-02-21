@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,7 +37,6 @@ fun VehiculosAdminScreen(
     val apiKey = loginViewModel.apiKey.value
     val vehiculosDisponibles = vehiculosViewModel.vehiculosDisponibles
 
-
     LaunchedEffect(apiKey) {
         if (apiKey != null) {
             vehiculosViewModel.obtenerVehiculosDisponibles(apiKey)
@@ -48,7 +46,7 @@ fun VehiculosAdminScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Panel de Administración", fontSize = 22.sp) },
+                title = { Text("🚗 DriveGo Admin", fontSize = 22.sp, fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFF0066A2),
                     titleContentColor = Color.White
@@ -61,11 +59,12 @@ fun VehiculosAdminScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
-                .background(Brush.verticalGradient(listOf(Color(0xFFF3F3F3), Color.White)))
+                .background(Brush.verticalGradient(listOf(Color(0xFFEEF2F3), Color.White)))
         ) {
             Text(
                 text = "Gestión de Vehículos",
                 fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color(0xFF0066A2),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -98,7 +97,7 @@ fun VehiculoAdminCard(vehiculo: Vehiculo) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 12.dp)
-            .shadow(4.dp, shape = RoundedCornerShape(16.dp))
+            .shadow(6.dp, shape = RoundedCornerShape(16.dp))
             .animateContentSize(
                 animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
             ),
@@ -116,18 +115,21 @@ fun VehiculoAdminCard(vehiculo: Vehiculo) {
                 model = vehiculo.imagen,
                 contentDescription = "Imagen del Vehículo",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(110.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
-                    .fillMaxSize(),
+                    .background(Color.White),
                 contentScale = ContentScale.Crop
             )
-
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "${vehiculo.marca} - ${vehiculo.color}", fontSize = 18.sp, color = Color.Black)
+                Text(
+                    text = "${vehiculo.marca} - ${vehiculo.color}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
                 Text(text = "Carrocería: ${vehiculo.carroceria}", fontSize = 14.sp, color = Color.Gray)
                 Text(text = "Plazas: ${vehiculo.plazas}", fontSize = 14.sp, color = Color.Gray)
                 Text(text = "Cambio: ${vehiculo.cambios}", fontSize = 14.sp, color = Color.Gray)
@@ -135,7 +137,8 @@ fun VehiculoAdminCard(vehiculo: Vehiculo) {
                 Text(
                     text = "Valor por día: $${vehiculo.valor_dia}",
                     fontSize = 16.sp,
-                    color = Color(0xFF0066A2),
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF00A86B)
                 )
             }
         }
