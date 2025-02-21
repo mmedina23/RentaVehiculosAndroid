@@ -11,10 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHomeScreen(
     navController: NavController,
-    context: Context
+    context: Context,
+    onLogoutSuccess: () -> Unit
 ) {
     val viewModel: AdminViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -33,7 +35,6 @@ fun AdminHomeScreen(
         viewModel.loadVehiculosRentadosAdmin()
     }
 
-
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("👨‍💼 Bienvenido, Administrador", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
@@ -47,8 +48,26 @@ fun AdminHomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        TopAppBar(
+            title = { Text("Renta de Vehículos") },
+            actions = {
+                Button(
+                    onClick = {
+                        viewModel.logout(
+                            onLogoutSuccess = {
+                                navController.navigate("login") {
+                                    popUpTo("admin_home") { inclusive = true }
+                                }
+                            },
+                            onLogoutError = { errorMessage -> println(errorMessage) }
+                        )
+                    }
+                ) {
+                    Text("Cerrar Sesión")
+                }
+            }
+        )
 
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
-

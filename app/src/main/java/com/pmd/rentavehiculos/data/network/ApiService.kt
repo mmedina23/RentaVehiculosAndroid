@@ -44,4 +44,3 @@ interface ApiService {
     @GET("vehiculos/{id}/rentas")
     suspend fun getRentasPorVehiculo(@Path("id") id: Int): Response<List<Renta>>
 }
-

@@ -1,10 +1,10 @@
 package com.pmd.rentavehiculos.ui.theme.cliente
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,17 +15,21 @@ import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.ClienteViewModel
 import kotlinx.coroutines.launch
-
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ClienteHomeScreen(
     viewModel: ClienteViewModel,
     navController: NavController,
+    onLogoutSuccess: () -> Unit // <-- Agregamos esta función
 ) {
     val vehiculosDisponibles by viewModel.vehiculosDisponibles.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarVehiculosDisponibles()
+    }
 
     Scaffold(
         topBar = {
@@ -35,13 +39,24 @@ fun ClienteHomeScreen(
                     TextButton(onClick = { navController.navigate("rentas_actuales") }) {
                         Text("Ver Rentas Actuales")
                     }
+                    Button(
+                        onClick = {
+                            viewModel.logout(
+                                onLogoutSuccess = { onLogoutSuccess() }, // Llamamos al callback de logout
+                                onLogoutError = { errorMessage -> println(errorMessage) }
+                            )
+                        }
+                    ) {
+                        Text("Cerrar Sesión")
+                    }
                 }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
@@ -49,27 +64,8 @@ fun ClienteHomeScreen(
 
             LazyColumn {
                 items(vehiculosDisponibles) { vehiculo ->
-                    VehiculoDisponibleCard(vehiculo) { diasRenta ->
-                        scope.launch {
-                            viewModel.rentarVehiculo(vehiculo, diasRenta) { success, message ->
-                                scope.launch {
-                                    val snackbarMessage = if (success) "✅ Renta exitosa: $message"
-                                    else "❌ Error al rentar: $message"
-
-                                    snackbarHostState.showSnackbar(
-                                        snackbarMessage,
-                                        duration = SnackbarDuration.Short
-                                    )
-                                }
-
-                                if (success) {
-                                    viewModel.cargarVehiculosDisponibles()
-                                    navController.navigate("rentas_actuales") {
-                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
-                                    }
-                                }
-                            }
-                        }
+                    VehiculoDisponibleCard(vehiculo) {
+                        navController.navigate("detalle_vehiculo/${vehiculo.id}")
                     }
                 }
             }
@@ -77,15 +73,12 @@ fun ClienteHomeScreen(
     }
 }
 
-@Composable
-fun VehiculoDisponibleCard(vehiculo: Vehiculo, onRentarClick: (Int) -> Unit) {
-    var showDialog by remember { mutableStateOf(false) }
-    var diasRenta by remember { mutableStateOf("1") }
-    val valorPorDia = vehiculo.valor_dia ?: 0.0
-    var totalCosto by remember { mutableStateOf(valorPorDia) }
 
+
+@Composable
+fun VehiculoDisponibleCard(vehiculo: Vehiculo, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(8.dp).clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -96,66 +89,23 @@ fun VehiculoDisponibleCard(vehiculo: Vehiculo, onRentarClick: (Int) -> Unit) {
             )
             Text("Marca: ${vehiculo.marca}")
             Text("Modelo: ${vehiculo.carroceria}")
-            Text("Valor por Día: $${"%.2f".format(valorPorDia)}")
-
-            Button(onClick = { showDialog = true }) {
-                Text("Rentar")
-            }
+            Text("Valor por Día: $${"%.2f".format(vehiculo.valor_dia)}")
         }
     }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Seleccionar días de renta") },
-            text = {
-                Column {
-                    Text("Ingrese la cantidad de días:")
-                    OutlinedTextField(
-                        value = diasRenta,
-                        onValueChange = { input ->
-                            if (input.all { it.isDigit() }) {
-                                diasRenta = input
-                                val dias = input.toIntOrNull()?.coerceAtLeast(1) ?: 1
-                                totalCosto = dias * valorPorDia
-                            }
-                        },
-                        label = { Text("Días") },
-                        singleLine = true
-                    )
-                    Text("Costo Total: $${"%.2f".format(totalCosto)}")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val dias = diasRenta.toIntOrNull()?.coerceAtLeast(1) ?: 1
-                        onRentarClick(dias)
-                        showDialog = false
-                    },
-                    enabled = diasRenta.isNotEmpty()
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentasActualesScreen(viewModel: ClienteViewModel, navController: NavController) {
     val vehiculosRentados by viewModel.vehiculosRentados.collectAsState()
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        viewModel.cargarVehiculosRentados()  // 🔹 Recargar rentas al entrar a la pantalla
+    }
+
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Mis Rentas Actuales") })
-        }
+        topBar = { TopAppBar(title = { Text("Mis Rentas Actuales") }) }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
             if (vehiculosRentados.isEmpty()) {
@@ -169,8 +119,6 @@ fun RentasActualesScreen(viewModel: ClienteViewModel, navController: NavControll
                                     if (success) {
                                         viewModel.cargarVehiculosDisponibles()
                                         viewModel.cargarVehiculosRentados()
-
-                                        // 🔹 Navegar a `cliente_home` para reflejar los cambios en la UI
                                         navController.navigate("cliente_home") {
                                             popUpTo("rentas_actuales") { inclusive = true }
                                         }
@@ -184,7 +132,6 @@ fun RentasActualesScreen(viewModel: ClienteViewModel, navController: NavControll
         }
     }
 }
-
 
 @Composable
 fun VehiculoRentadoClienteCard(renta: Renta, onEntregarClick: () -> Unit) {
@@ -204,4 +151,3 @@ fun VehiculoRentadoClienteCard(renta: Renta, onEntregarClick: () -> Unit) {
         }
     }
 }
-

@@ -3,14 +3,18 @@ package com.pmd.rentavehiculos.ui.theme.viewmodel
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
+import com.pmd.rentavehiculos.data.model.LogoutRequest
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.data.repository.RentaRepository
 import com.pmd.rentavehiculos.data.repository.RetrofitClient
+import com.pmd.rentavehiculos.data.repository.RetrofitClient.authService
 import com.pmd.rentavehiculos.data.repository.SessionManager
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class AdminViewModel(context: Context) : ViewModel() {
     private val vehiculoService = RetrofitClient.vehiculoService
@@ -96,6 +100,33 @@ class AdminViewModel(context: Context) : ViewModel() {
                 rentasLiveData.value = historial
             } catch (ex: Exception) {
                 errorLiveData.value = "Error al obtener historial de rentas: ${ex.message}"
+            }
+        }
+    }
+
+    fun logout(onLogoutSuccess: () -> Unit, onLogoutError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val logoutRequest = LogoutRequest(
+                    id_usuario = sessionManager.personaId ?: 0,
+                    llave_api = sessionManager.token ?: ""
+                )
+
+                val response: Response<Void> = authService.logout(logoutRequest)
+
+                if (response.isSuccessful) {
+                    onLogoutSuccess() // 🔹 Primero navegar fuera de la pantalla
+
+                    delay(500) // 🔹 Pequeña pausa para evitar que la UI se actualice antes de salir
+
+                    sessionManager.clearSession() // Ahora limpiar la sesión
+                    _vehiculosDisponibles.value = emptyList() // Ahora limpiar lista de vehículos
+
+                } else {
+                    onLogoutError("Error al cerrar sesión: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                onLogoutError("Excepción: ${e.localizedMessage}")
             }
         }
     }

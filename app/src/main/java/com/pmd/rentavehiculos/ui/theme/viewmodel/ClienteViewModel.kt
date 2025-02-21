@@ -4,17 +4,25 @@ import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pmd.rentavehiculos.data.model.LogoutRequest
 import com.pmd.rentavehiculos.data.model.PersonaRequest
 import com.pmd.rentavehiculos.data.model.Renta
 import com.pmd.rentavehiculos.data.model.RentarVehiculoRequest
 import com.pmd.rentavehiculos.data.model.Vehiculo
+import com.pmd.rentavehiculos.data.network.AuthService
 import com.pmd.rentavehiculos.data.network.RentaService
 import com.pmd.rentavehiculos.data.repository.SessionManager
 import com.pmd.rentavehiculos.data.network.VehiculoService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 import java.util.Calendar
 import java.util.Locale
@@ -22,7 +30,8 @@ import java.util.Locale
 class ClienteViewModel(
     private val rentaService: RentaService,
     private val vehiculoService: VehiculoService,
-    private val sessionManager: SessionManager
+    private val authService: AuthService,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
 
     private val _vehiculosDisponibles = MutableStateFlow<List<Vehiculo>>(emptyList())
@@ -36,7 +45,10 @@ class ClienteViewModel(
 
     init {
         cargarVehiculosDisponibles()
-        cargarVehiculosRentados()
+        viewModelScope.launch {
+            delay(500)  // Espera breve para asegurar que sessionManager está listo
+            cargarVehiculosRentados()
+        }
     }
 
     /**
@@ -64,18 +76,21 @@ class ClienteViewModel(
         viewModelScope.launch {
             sessionManager.personaId?.let { personaId ->
                 try {
+                    Log.d("ClienteViewModel", "Cargando rentas para usuario: $personaId")
                     val response = rentaService.obtenerVehiculosRentados(sessionManager.token!!, personaId)
                     if (response.isSuccessful) {
                         _vehiculosRentados.value = response.body() ?: emptyList()
+                        Log.d("ClienteViewModel", "Rentas obtenidas: ${_vehiculosRentados.value.size}")
                     } else {
                         Log.e("ClienteViewModel", "Error obteniendo vehículos rentados: ${response.message()}")
                     }
                 } catch (e: Exception) {
                     Log.e("ClienteViewModel", "Excepción obteniendo vehículos rentados", e)
                 }
-            }
+            } ?: Log.e("ClienteViewModel", "Error: personaId es null")
         }
     }
+
 
     /**
      * Obtiene el historial de rentas del usuario.
@@ -174,6 +189,54 @@ class ClienteViewModel(
             }
         }
     }
+
+    fun obtenerDetalleVehiculo(vehiculoId: Int): Flow<Vehiculo?> = flow {
+        try {
+            val response = vehiculoService.obtenerDetalleVehiculo(sessionManager.token!!, vehiculoId)
+            if (response.isSuccessful) {
+                emit(response.body())
+            } else {
+                Log.e("ClienteViewModel", "Error obteniendo detalle del vehículo: ${response.message()}")
+                emit(null)
+            }
+        } catch (e: Exception) {
+            Log.e("ClienteViewModel", "Excepción obteniendo detalle del vehículo", e)
+            emit(null)
+        }
+    }.flowOn(Dispatchers.IO)
+
+
+    fun logout(onLogoutSuccess: () -> Unit, onLogoutError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val logoutRequest = LogoutRequest(
+                    id_usuario = sessionManager.personaId ?: 0,
+                    llave_api = sessionManager.token ?: ""
+                )
+
+                val response: Response<Void> = authService.logout(logoutRequest)
+
+                if (response.isSuccessful) {
+                    onLogoutSuccess() // 🔹 Primero navegar fuera de la pantalla
+
+                    delay(500) // 🔹 Pequeña pausa para evitar que la UI se actualice antes de salir
+
+                    sessionManager.clearSession() // Ahora limpiar la sesión
+                    _vehiculosDisponibles.value = emptyList() // Ahora limpiar lista de vehículos
+
+                } else {
+                    onLogoutError("Error al cerrar sesión: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                onLogoutError("Excepción: ${e.localizedMessage}")
+            }
+        }
+    }
+
+
+
+
+
 
 }
 
