@@ -12,6 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +38,7 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF2F2F2))
+            .background(Brush.verticalGradient(listOf(Color(0xFF0077B7), Color(0xFF003366))))
     ) {
         Column(
             modifier = Modifier
@@ -45,10 +47,21 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "DriveGo🚗",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(180.dp)
+                modifier = Modifier.size(160.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,21 +101,22 @@ fun LoginScreen(navController: NavController, viewModel: VistaLogin = viewModel(
                 },
                 enabled = username.isNotEmpty() && password.isNotEmpty(),
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(48.dp),
+                    .fillMaxWidth(0.75f)
+                    .height(50.dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0A74DA),
+                    containerColor = Color(0xFF00A86B),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Iniciar Sesión", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = "Iniciar Sesión", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
             TextButton(onClick = { /* Implementar recuperación de contraseña */ }) {
-                Text("¿Olvidaste tu contraseña?", color = Color(0xFF0A74DA), fontSize = 14.sp)
+                Text("¿Olvidaste tu contraseña?", color = Color.White, fontSize = 14.sp)
             }
         }
     }
@@ -120,18 +134,19 @@ fun CustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color(0xFF43A047)) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF43A047)) },
+        label = { Text(label, color = Color.White) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.White) },
         visualTransformation = visualTransformation,
         singleLine = true,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .fillMaxWidth(0.9f)
+            .padding(vertical = 6.dp)
+            .background(Color.Transparent),
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color(0xFF43A047),
-            unfocusedBorderColor = Color(0xFF43A047).copy(alpha = 0.5f),
-            cursorColor = Color(0xFF43A047)
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+            cursorColor = Color.White
         )
     )
 }
