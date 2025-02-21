@@ -30,7 +30,6 @@ import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoVehiculosRentados(
     navController: NavController,
@@ -70,7 +69,7 @@ fun ListadoVehiculosRentados(
         ) {
             if (rentas.isEmpty()) {
                 Text(
-                    "Aún no has alquilado ningún vehículo",
+                    "Sin vehiculos alquilados",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
@@ -144,6 +143,7 @@ fun ListadoRentaCard(renta: RentaRequest, onEntregarVehiculo: (Int) -> Unit) {
                 Text(
                     text = "Vehículo devuelto el: ${renta.fecha_entrega}",
                     fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
                     color = Color(rgb(250, 204, 21))
                 )
             } else {
