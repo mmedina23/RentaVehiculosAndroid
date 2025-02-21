@@ -21,7 +21,7 @@ import com.pmd.rentavehiculos.ui.theme.admin.ListaVehiculosRentados
 import com.pmd.rentavehiculos.ui.theme.cliente.ClienteHomeScreen
 import com.pmd.rentavehiculos.ui.theme.cliente.DetalleVehiculoScreen
 import com.pmd.rentavehiculos.ui.theme.cliente.RentasActualesScreen
-import com.pmd.rentavehiculos.ui.theme.home.HomeScreen
+import com.pmd.rentavehiculos.ui.theme.home.SplashScreen
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModel
 import com.pmd.rentavehiculos.ui.theme.viewmodel.AdminViewModelFactory
 import com.pmd.rentavehiculos.ui.theme.viewmodel.ClienteViewModel
@@ -44,14 +44,16 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = "login",
+        startDestination = "splash",
         modifier = modifier
     ) {
         composable("login") {
             LoginScreen(navController = navController, context = context)
         }
 
-        composable("home") { HomeScreen() }
+        composable("splash") {
+            SplashScreen(navController = navController)
+        }
 
         composable("admin_home") {
             AdminHomeScreen(

@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +101,12 @@ fun DetalleVehiculoScreen(
     }
 
     if (showDialog) {
+        // 🔹 Recalcular el costo total al abrir el diálogo
+        LaunchedEffect(showDialog) {
+            val dias = diasRenta.toIntOrNull()?.coerceAtLeast(1) ?: 1
+            totalCosto = dias * valorPorDia
+        }
+
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Seleccionar días de renta") },
