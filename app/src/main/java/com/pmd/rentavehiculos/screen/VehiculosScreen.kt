@@ -1,6 +1,5 @@
 package com.pmd.rentavehiculos.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -52,18 +51,13 @@ fun VehiculosScreen(
     }
 
     Scaffold(
-        Modifier.background(color = Color.White),
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Vehículos Para Alquilar",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF43A047))
+                title = { Text("🚗 DriveGo - Alquiler de Vehículos", fontSize = 22.sp, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF0077B7),
+                    titleContentColor = Color.White
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -72,7 +66,8 @@ fun VehiculosScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp).background(color = Color.White)
+                .padding(16.dp)
+                .background(Brush.verticalGradient(listOf(Color(0xFFF3F3F3), Color.White)))
         ) {
             LazyColumn {
                 items(vehiculos) { vehiculo ->
@@ -86,88 +81,98 @@ fun VehiculosScreen(
     }
 
     if (showDialog && selectedVehiculo != null) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Alquilar ${selectedVehiculo?.marca}") },
-            text = {
-                Column {
-
-                    OutlinedTextField(
-                        value = diasRenta,
-                        onValueChange = { input ->
-                            if (input.all { it.isDigit() }) {
-                                diasRenta = input
-                            }
-                        },
-                        label = { Text("Días de renta") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
+        AlquilerDialog(
+            vehiculo = selectedVehiculo!!,
+            diasRenta = diasRenta,
+            onDiasChange = { diasRenta = it },
+            onConfirm = {
+                if (apiKey != null && usuario != null) {
                     val dias = diasRenta.toIntOrNull() ?: 1
-                    val total = selectedVehiculo!!.valor_dia * dias
-                    Text("Total a pagar: $${total}")
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    if (apiKey != null && usuario != null) {
-                        val dias = diasRenta.toIntOrNull() ?: 1
-                        vehiculosViewModel.reservarVehiculo(
-                            apiKey,
-                            usuario,
-                            selectedVehiculo!!,
-                            dias
-                        ) { success, message ->
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(message)
-                            }
-                            showDialog = false
+                    vehiculosViewModel.reservarVehiculo(
+                        apiKey,
+                        usuario,
+                        selectedVehiculo!!,
+                        dias
+                    ) { success, message ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(message)
                         }
+                        showDialog = false
                     }
-                },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF43A047),
-                        contentColor = Color.White)) {
-                    Text("Confirmar")
                 }
             },
-            dismissButton = { Button(onClick = { showDialog = false },colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF43A047),
-                contentColor = Color.White)) { Text("Cancelar") } },
-            containerColor = Color.White
-
+            onDismiss = { showDialog = false }
         )
     }
-
 }
 
+@Composable
+fun AlquilerDialog(
+    vehiculo: Vehiculo,
+    diasRenta: String,
+    onDiasChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Alquilar ${vehiculo.marca}") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = diasRenta,
+                    onValueChange = { input ->
+                        if (input.all { it.isDigit() }) {
+                            onDiasChange(input)
+                        }
+                    },
+                    label = { Text("Días de renta") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val dias = diasRenta.toIntOrNull() ?: 1
+                val total = vehiculo.valor_dia * dias
+                Text("💰 Total a pagar: $${total}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF00A86B))
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))) {
+                Text("Cancelar")
+            }
+        },
+        containerColor = Color.White
+    )
+}
 
 @Composable
 fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
-    println("Cargando imagen: ${vehiculo.imagen}") //PRUEBA PARA LAS IMAGENES
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
             .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp) //
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Imagen del vehículo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
@@ -180,84 +185,47 @@ fun VehiculoCard(vehiculo: Vehiculo, onReservarClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Nombre del vehículo
+            Text(
+                text = vehiculo.marca,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                color = Color(0xFF0077B7),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Información extra en columnas
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = vehiculo.marca,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = Color(0xFF43A047),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Color: ${vehiculo.color}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Plazas: ${vehiculo.plazas}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Carrocería: ${vehiculo.carroceria}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Cambios: ${vehiculo.cambios}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Precio/día: ${vehiculo.valor_dia} €",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp,
-                    color = Color.Blue
-                )
+                Text(text = "🎨 Color: ${vehiculo.color}", fontSize = 14.sp, color = Color.Gray)
+                Text(text = "🚘 Carrocería: ${vehiculo.carroceria}", fontSize = 14.sp, color = Color.Gray)
+                Text(text = "🛑 Plazas: ${vehiculo.plazas}", fontSize = 14.sp, color = Color.Gray)
+                Text(text = "⚙️ Cambio: ${vehiculo.cambios}", fontSize = 14.sp, color = Color.Gray)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Precio del vehículo
+            Text(
+                text = "💰 Precio/día: ${vehiculo.valor_dia} €",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = Color(0xFF0077B7)
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-
+            // Botón de alquiler
             Button(
                 onClick = { onReservarClick() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047)),
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B7)),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = "Alquilar",
-                    tint = Color.White
-                )
+                Icon(Icons.Default.ShoppingCart, contentDescription = "Alquilar", tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Alquilar",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                Text("Alquilar", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
