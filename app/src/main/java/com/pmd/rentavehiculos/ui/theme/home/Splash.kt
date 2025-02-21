@@ -18,7 +18,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // ⏳ Espera 3 segundos antes de navegar
+        delay(1300) // ⏳ Espera 3 segundos antes de navegar
         navController.navigate("login") {
             popUpTo("splash") { inclusive = true } // 🔹 Evita que el usuario vuelva atrás
         }
@@ -30,7 +30,7 @@ fun SplashScreen(navController: NavController) {
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding(),) {
+            ) {
             Image(
                 painter = painterResource(id = R.drawable.splash_screen_innovador),
                 contentDescription = "Splash Screen",
