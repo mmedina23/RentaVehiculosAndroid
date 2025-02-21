@@ -11,8 +11,10 @@ import com.pmd.rentavehiculos.pantallas.LoginScreen
 import com.pmd.rentavehiculos.pantallas.PantallaInicio
 import com.pmd.rentavehiculos.pantallas.PantallaInicioAdmi
 import com.pmd.rentavehiculos.pantallas.SplashScreen
-import com.pmd.rentavehiculos.pantallas.VehiculosRentadosScreen
-import com.pmd.rentavehiculos.pantallas.VehiculosScreen
+import com.pmd.rentavehiculos.pantallas.ListadoVehiculosRentados
+import com.pmd.rentavehiculos.pantallas.ListadoVehiculos
+import com.pmd.rentavehiculos.pantallas.ListadoVehiculosAdmin
+import com.pmd.rentavehiculos.pantallas.VehiculosRentadosAdminScreen
 import com.pmd.rentavehiculos.viewmodel.LoginViewModel
 import com.pmd.rentavehiculos.viewmodel.VehiculosViewModel
 
@@ -44,11 +46,17 @@ fun Navigation(navController: NavHostController) {
             PantallaInicio(navController)
         }
         composable("vehiculos") {
-            VehiculosScreen(navController, vehiculosViewModel, loginViewModel)
+            ListadoVehiculos(navController, vehiculosViewModel, loginViewModel)
         }
         composable("vehiculos_rentados") {
-            VehiculosRentadosScreen(navController, vehiculosViewModel, loginViewModel)
+            ListadoVehiculosRentados(navController, vehiculosViewModel, loginViewModel)
         }
-
+        composable("vehiculos_disponibles") {
+            ListadoVehiculosAdmin(navController, vehiculosViewModel, loginViewModel)
+        }
+        composable("vehiculos_rentados_admin/{vehiculoId}") { backStackEntry ->
+            val vehiculoId = backStackEntry.arguments?.getString("vehiculoId")?.toIntOrNull() ?: 0
+            VehiculosRentadosAdminScreen(navController, vehiculoId, viewModel(), loginViewModel)
+        }
     }
 }

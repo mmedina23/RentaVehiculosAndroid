@@ -7,5 +7,5 @@ data class RentaRequest(
     val valor_total_renta: Double,
     val fecha_renta: String,
     val fecha_estimada_entrega: String,
-    val fecha_entregado: String
+    val fecha_entrega: String
 )
