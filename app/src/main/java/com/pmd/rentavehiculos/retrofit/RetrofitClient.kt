@@ -1,11 +1,12 @@
 package com.pmd.rentavehiculos.remote
 
 import com.pmd.rentavehiculos.service.AuthService
+import com.pmd.rentavehiculos.service.VehiculosService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.60:8080/api/v1/" // URL a la que se conecta Retrofit
+    private const val BASE_URL = "http://192.168.1.42:8080/api/v1/" // URL a la que se conecta Retrofit
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -19,6 +20,6 @@ object RetrofitClient {
     }
 
     val vehiculosService: VehiculosService by lazy {
-
+            retrofit.create(VehiculosService::class.java)
     }
 }

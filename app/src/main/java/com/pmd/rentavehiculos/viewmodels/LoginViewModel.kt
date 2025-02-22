@@ -20,19 +20,21 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.authService.login(LogRequest(username, password))
-                key.value = response.key
+                key.value = response.llave
                 user.value = response.persona
                 perfil.value = response.perfil //ADMIN o CLIENTE
 
 
                 onResult(true, perfil.value ?: "CLIENTE")
+                Log.e("KEY", "API KEY: ${key}")
 
             } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string() ?: "Unknown error"
                 Log.e("LoginViewModel", "HTTP Error ${e.code()}: $errorBody")
                 Log.e("LoginViewModel", "usuario: ${username} contraseña: ${password}")
-                onResult(false, "Error HTTP ${e.code()}: $errorBody")
+                onResult(false, "HTTP ${e.code()}: $errorBody")
             } catch (e: IOException) {
+                Log.e("LoginViewModel", "io Error: ${e.localizedMessage}")
                 onResult(false, "Error de conexión")
             }
         }

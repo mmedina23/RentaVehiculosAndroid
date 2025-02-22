@@ -42,6 +42,7 @@ fun LogScreen(navController: NavController, viewModel: LoginViewModel = viewMode
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            errorMessage = null
         }
     }
 
