@@ -14,16 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.pmd.rentavehiculos.data.model.Vehiculo
 import com.pmd.rentavehiculos.ui.theme.viewmodel.ClienteViewModel
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ClienteHomeScreen(
@@ -66,7 +63,7 @@ fun ClienteHomeScreen(
                         onLogoutError = { errorMessage -> println(errorMessage) }
                     )
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)), // 🔹 Mismo azul para consistencia
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Cerrar Sesión", color = Color.White)
@@ -89,6 +86,7 @@ fun ClienteHomeScreen(
                 VehiculoDisponibleCard(vehiculo) {
                     navController.navigate("detalle_vehiculo/${vehiculo.id}")
                 }
+                Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp), color = Color.White)
             }
         }
     }

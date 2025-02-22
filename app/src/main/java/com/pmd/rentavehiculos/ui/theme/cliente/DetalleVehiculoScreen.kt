@@ -36,6 +36,7 @@ fun DetalleVehiculoScreen(
     var diasRenta by remember { mutableStateOf("1") }
     val valorPorDia = vehiculoDetalle?.valor_dia ?: 0.0
     var totalCosto by remember { mutableStateOf(valorPorDia) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         vehiculoDetalle?.let { vehiculo ->
@@ -65,6 +66,10 @@ fun DetalleVehiculoScreen(
                     Button(onClick = { showDialog = true },colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),) {
                         Text("Rentar Vehículo", color = Color.White)
                     }
+                    errorMessage?.let {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(it, color = Color.Red)
+                    }
                 }
             }
         } ?: CircularProgressIndicator()
@@ -81,7 +86,7 @@ fun DetalleVehiculoScreen(
                 modifier = Modifier.padding(16.dp),
                 border = BorderStroke(2.dp, Color.White),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xAA000000)) // Fondo semitransparente para mejor visibilidad
+                colors = CardDefaults.cardColors(containerColor = Color(0xAA000000))
             ) {
                 Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Seleccionar días de renta", color = Color.White)
@@ -105,11 +110,13 @@ fun DetalleVehiculoScreen(
                             onClick = {
                                 val dias = diasRenta.toIntOrNull()?.coerceAtLeast(1) ?: 1
                                 scope.launch {
-                                    viewModel.rentarVehiculo(vehiculoDetalle!!, dias) { success, _ ->
+                                    viewModel.rentarVehiculo(vehiculoDetalle!!, dias) { success, message ->
                                         if (success) {
                                             navController.navigate("rentas_actuales") {
-                                                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                                popUpTo("cliente_home") { inclusive = false }
                                             }
+                                        } else {
+                                            errorMessage = message
                                         }
                                     }
                                 }
