@@ -38,12 +38,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LoginScreen(
     navController: NavController,
-    // Recibimos el LoginViewModel
     loginViewModel: LoginViewModel
 ) {
     val context = LocalContext.current
-
-    // Estados locales para username, password y error
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -51,7 +48,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -60,17 +57,14 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
             Image(
                 painter = painterResource(id = R.drawable.vehiculo),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.size(200.dp)
             )
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SimpleCustomTextField(
+            CustomTextField(
                 value = username,
                 onValueChange = { username = it },
                 label = "Nombre de usuario",
@@ -78,7 +72,7 @@ fun LoginScreen(
                 keyboardType = KeyboardType.Text
             )
 
-            SimpleCustomTextField(
+            CustomTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = "Contraseña",
@@ -87,7 +81,7 @@ fun LoginScreen(
                 keyboardType = KeyboardType.Password
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
@@ -95,31 +89,15 @@ fun LoginScreen(
                         errorMessage = "Por favor, completa todos los campos."
                         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     } else {
-                        // Llamamos a la función loginUser pasando el ViewModel
-                        loginUser(
-                            username,
-                            password,
-                            navController,
-                            context,
-                            loginViewModel
-                        )
+                        loginUser(username, password, navController, context, loginViewModel)
                     }
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6200EE),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
+                    .fillMaxWidth(0.8f)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(
-                    text = "Iniciar Sesión",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White
-                )
+                Text(text = "Iniciar Sesión", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
 
             if (errorMessage.isNotEmpty()) {
@@ -127,7 +105,7 @@ fun LoginScreen(
                     text = errorMessage,
                     color = Color.Red,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(top = 6.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
@@ -138,28 +116,34 @@ fun loginUser(
     username: String,
     password: String,
     navController: NavController,
-    context: Context,
-    loginViewModel: LoginViewModel
+    context: Context,      // Contexto de la app para mostrar mensajes en pantalla
+    loginViewModel: LoginViewModel      // ViewModel donde guardo el usuario
 ) {
+
+    // Conecto con la api
     val retrofitService = RetrofitClient.apiService
+    //creo la solicitud de login
     val loginRequest = LoginRequest(nombre_usuario = username, contrasena = password)
 
+
+    // ejecuto en un hilo aparte para no bloquear el hilo principal(la propia app)
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val response = retrofitService.loginUser(loginRequest)
-            withContext(Dispatchers.Main) {
-               //guardo apiKey EN EL VIEWMODEL
+            val response = retrofitService.loginUser(loginRequest) // Llamo a la api y espera la respuesta
+            withContext(Dispatchers.Main) { //aqui cambio al hilo principal para actualizar la interfaz de usuario
+
+                //guardo la apikey, el usuario y el tipo de perfil en el viewModel
                 loginViewModel.apiKey.value = response.llave
                 loginViewModel.usuario.value = response.persona
                 loginViewModel.perfil.value = response.perfil
 
+                //depuro mostrando en el logCat la api
                 Log.d("API_DEBUG", "API Key recibida: ${response.llave}")
 
-                // segun perfil ir a blabla o blabla
-                when (response.perfil.uppercase()) {
+                when (response.perfil.uppercase()) { //compruebo el perfil del usuario y lo llevo a donde admin o cliente
                     "ADMIN" -> navController.navigate("adminOpciones")
                     "CLIENTE" -> navController.navigate("ListaVehiculos")
-                    else -> Toast.makeText(context, "Rol desconocido", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(context, "Rol desconocido", Toast.LENGTH_SHORT).show() //mensaje de error
                 }
             }
         } catch (e: Exception) {
@@ -170,10 +154,9 @@ fun loginUser(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleCustomTextField(
+fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -184,15 +167,18 @@ fun SimpleCustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        label = { Text(label, color = Color.Black) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.Black) },
+        label = { Text(label, color = Color.Gray) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.Gray) },
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Black,
-            unfocusedBorderColor = Color.Gray,
-            unfocusedTextColor = Color.Black
-        )
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.LightGray,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+        ),
+        shape = RoundedCornerShape(12.dp)
     )
 }

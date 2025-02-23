@@ -32,12 +32,7 @@ fun adminVehiculosRentadosScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Admin - Vehículos Rentados") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
-            )
-        }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier

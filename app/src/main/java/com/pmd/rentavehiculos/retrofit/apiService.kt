@@ -65,12 +65,7 @@ interface ApiService {
         @Header("x-llave-api") apiKey: String,  //Usa el header correcto
         @Path("id") vehiculoId: Int
     ): Response<Unit>
-
-
-
- // compruebo que retorne Response<Unit>
-
-
+ // compruebo que retorne Response<Unit> porque si no tiene unit no me deja actualizar el vehiculo
 
 
     @GET("vehiculos/{id}/rentas")

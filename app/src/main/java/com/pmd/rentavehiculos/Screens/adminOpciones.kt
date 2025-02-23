@@ -16,12 +16,6 @@ import androidx.compose.material.icons.filled.CarRental
 @Composable
 fun adminOpciones(navController: NavHostController) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Panel de Administrador") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
-            )
-        }
     ) { innerPadding ->
         Column(
             modifier = Modifier

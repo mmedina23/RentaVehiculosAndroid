@@ -176,7 +176,7 @@ fun VehiculoCard(
                             diasRenta = diasRenta.toInt(),
                             onResult = { success, message ->
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(message)
+                                    //snackbarHostState.showSnackbar(message) Da mensaje de error que ya no lo uso
                                 }
                             }
                         )

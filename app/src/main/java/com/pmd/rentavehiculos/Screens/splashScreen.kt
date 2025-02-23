@@ -38,10 +38,8 @@ fun SplashScreen(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.vehiculo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(450.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Renta Vehículos", fontSize = 24.sp)
         }
     }
 }

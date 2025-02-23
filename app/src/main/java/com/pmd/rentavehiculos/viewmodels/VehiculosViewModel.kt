@@ -19,6 +19,7 @@ class VehiculosViewModel(
     private val apiService: ApiService
 ) : ViewModel() {
 
+    // Factory para instanciar el ViewModel con un ApiService
     class Factory(private val apiService: ApiService) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(VehiculosViewModel::class.java)) {
@@ -28,7 +29,7 @@ class VehiculosViewModel(
         }
     }
 
-    private var apiKey: String = ""
+    private var apiKey: String = ""     // Aquí almaceno la API key del usuario y la id del ususario
     private var personaId: Int = -1
 
     private val _vehiculosDisponibles = MutableLiveData<List<Vehiculo>>()
@@ -85,7 +86,7 @@ class VehiculosViewModel(
                     return@launch
                 }
 
-                // 🔥 Verificar si el usuario ya tiene 3 rentas activas
+                //Verificar si el usuario ya tiene 3 rentas activas
                 val rentasActuales = apiService.getRentasByPersona(apiKey, personaId)
                 if (rentasActuales.size >= 3) {
                     Log.w("API_DEBUG", "Usuario ya tiene 3 vehículos rentados, no puede rentar más.")
@@ -93,6 +94,7 @@ class VehiculosViewModel(
                     return@launch
                 }
 
+                // logCAT si intenta rentar
                 Log.d("API_DEBUG", "Intentando rentar vehículo con ID: ${vehiculo.id}, Persona ID: $personaId")
 
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -151,7 +153,7 @@ class VehiculosViewModel(
 
 
 
-                val response = apiService.liberarVehiculo(apiKey, vehiculoId)
+                val response = apiService.liberarVehiculo(apiKey, vehiculoId) //consumo la api para liberar el vehiculo
 
 
                 if (response.isSuccessful) {
@@ -203,9 +205,9 @@ class VehiculosViewModel(
             try {
                 Log.d("API_DEBUG", "Ejecutando fetchVehiculosRentadosAdmin()")
 
-                _vehiculosRentados.postValue(emptyList()) // 🔥 Limpia antes de actualizar
+                _vehiculosRentados.postValue(emptyList()) //Limpia antes de actualizar
 
-                val vehiculos = apiService.getVehiculos(apiKey) // ✅ Obtener todos los vehículos
+                val vehiculos = apiService.getVehiculos(apiKey) //Obtener todos los vehículos
                 Log.d("API_DEBUG", "Vehículos obtenidos: ${vehiculos.size}")
 
                 val todasLasRentas = mutableListOf<Renta>()
@@ -214,7 +216,7 @@ class VehiculosViewModel(
                     Log.d("API_DEBUG", "Obteniendo historial de rentas para vehículo ID: ${vehiculo.id}")
 
                     try {
-                        val rentas = apiService.getRentasByVehiculo(apiKey, vehiculo.id) // ✅ Usa el historial de rentas
+                        val rentas = apiService.getRentasByVehiculo(apiKey, vehiculo.id) //Usa el historial de rentas
                         Log.d("API_DEBUG", "Rentas obtenidas para vehículo ${vehiculo.id}: ${rentas.size}")
 
                         todasLasRentas.addAll(rentas)
@@ -223,7 +225,7 @@ class VehiculosViewModel(
                     }
                 }
 
-                _vehiculosRentados.postValue(todasLasRentas) // ✅ Actualiza LiveData con todas las rentas
+                _vehiculosRentados.postValue(todasLasRentas) // Actualiza LiveData con todas las rentas
                 Log.d("API_DEBUG", "Total de rentas obtenidas: ${todasLasRentas.size}")
 
             } catch (e: Exception) {
