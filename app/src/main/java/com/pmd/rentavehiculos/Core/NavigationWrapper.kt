@@ -43,7 +43,8 @@ fun NavigationWrapper() {
             val Persona:PersonaRequestRenta = cliente.Persona
             ClienteScreen(token = token, personaId = personaId, Persona,
                     NavigationRentarVehiculo = {personaId, vehiculoId, token, precioDiaVehiculo, Persona, Vehiculo -> navController.navigate(RentarVehiculo(personaId = personaId, vehiculoId = vehiculoId, token = token, precioDiaVehiculo = precioDiaVehiculo.toDouble(), Persona = Persona, Vehiculo = Vehiculo))},
-                NavigationMisVehiculos = {token, personaId -> navController.navigate(MisVehiculos(token = token, personaId = personaId))}
+                NavigationMisVehiculos = {token, personaId -> navController.navigate(MisVehiculos(token = token, personaId = personaId))},
+                NavigationLogin = {navController.navigate(Login)}
             )
         }
 

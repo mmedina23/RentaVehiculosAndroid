@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit
 fun ListaMisVehiculos(token: String, personaId: Int) {
     val vehiculosList = remember { mutableStateOf<List<Renta>>(emptyList()) }
 
-    LaunchedEffect(personaId) {
+    fun loadVehicles() {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val service = RetrofitInstance.makeRetrofitService()
@@ -49,6 +49,10 @@ fun ListaMisVehiculos(token: String, personaId: Int) {
                 }
             }
         }
+    }
+
+    LaunchedEffect(personaId) {
+        loadVehicles()
     }
 
     LazyColumn(
@@ -137,6 +141,7 @@ fun ListaMisVehiculos(token: String, personaId: Int) {
                         onClick = {
                             GlobalScope.launch {
                                 liberarVehiculo(renta.vehiculo.id, token)
+                                loadVehicles()
                             }
                         },
                         modifier = Modifier

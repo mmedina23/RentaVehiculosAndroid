@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.Api
 
+import com.pmd.rentavehiculos.Entity.Logout
 import com.pmd.rentavehiculos.Entity.Persona
 import com.pmd.rentavehiculos.Entity.Renta
 import com.pmd.rentavehiculos.Entity.RentaAdmin
@@ -44,4 +45,7 @@ interface ApiService{
 
     @PATCH("vehiculos/{id}")
     suspend fun liberarVehiculo(@Path("id") id : Int, @Header("x-llave-api") token : String) : Response<Unit>
+
+    @POST("auth/logout")
+    suspend fun logout(@Body logoutBody : Logout) : Response<Unit>
 }

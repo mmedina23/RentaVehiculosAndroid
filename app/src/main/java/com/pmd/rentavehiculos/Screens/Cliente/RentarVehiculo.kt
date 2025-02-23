@@ -1,5 +1,6 @@
 package com.pmd.rentavehiculos.Screens.Cliente
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pmd.rentavehiculos.Api.RetrofitInstance
 import com.pmd.rentavehiculos.Entity.PersonaRequestRenta
+import com.pmd.rentavehiculos.Entity.Renta
 import com.pmd.rentavehiculos.Entity.RentaRequest
 import com.pmd.rentavehiculos.Entity.UserRequest
 import com.pmd.rentavehiculos.Entity.VehiculoRequestRenta
@@ -59,11 +63,42 @@ fun RentarVehiculoFunction(
     Vehiculo: VehiculoRequestRenta
 ) {
     // Estados para almacenar la selección del usuario
-    var selectedYear by remember { mutableStateOf("2025") }
-    var selectedMonth by remember { mutableStateOf("01") }
-    var selectedDay by remember { mutableStateOf("01") }
-    var diasRentados by remember { mutableStateOf(1) }
-    var fechaGenerada by remember { mutableStateOf("") }
+    var selectedYear by remember { mutableStateOf("0") }
+    var selectedMonth by remember { mutableStateOf("0") }
+    var selectedDay by remember { mutableStateOf("0") }
+    var diasRentados by remember { mutableStateOf(0) }
+    var fechaGenerada by remember { mutableStateOf("0") }
+    var valorTotal by remember { mutableStateOf(0) }
+    var vehiculosRentados by remember { mutableStateOf<List<Renta>>(emptyList()) }
+    var mostrarAlerta by remember { mutableStateOf(false) } // Estado para controlar la alerta
+
+
+    fun obtenerVehiculosRentados(onComplete: (List<Renta>) -> Unit) {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val service = RetrofitInstance.makeRetrofitService()
+                val response = service.obtenerMisVehiculos(personaId, token)
+                withContext(Dispatchers.Main) {
+                    vehiculosRentados = response
+                    onComplete(response) // Llama al callback con la lista actualizada
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("ListaMisVehiculos", "Error obteniendo vehículos: ${e.message}")
+                }
+            }
+        }
+    }
+
+
+    fun limpiarCampos() {
+        selectedYear = "0"
+        selectedMonth = "0"
+        selectedDay = "0"
+        diasRentados = 0
+        fechaGenerada = "0"
+        valorTotal = 0
+    }
 
     Column(
         modifier = Modifier
@@ -135,9 +170,23 @@ fun RentarVehiculoFunction(
             fechaEstimadaEntrega = fechaEstimadaEntrega
         )
 
+        LaunchedEffect(Unit) {
+            obtenerVehiculosRentados { lista ->
+                println("Vehículos rentados actualizados: ${lista.size}")
+            }
+        }
         // Botón para rentar vehículo
         Button(
-            onClick = { rentarVehiculo(RentaRequest, token, vehiculoId) },
+            onClick = {
+                if (vehiculosRentados.size >= 3) {
+                    mostrarAlerta = true
+                    println("ya tiene más de tres vehiculos")
+                } else {
+                    println("Esta es la cantidad de vehiculos rentados ${vehiculosRentados.size} ")
+                    limpiarCampos()
+                    rentarVehiculo(RentaRequest, token, vehiculoId)
+                }
+                      },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
@@ -150,18 +199,54 @@ fun RentarVehiculoFunction(
             )
         }
 
+        if (mostrarAlerta) {
+            AlertDialog(
+                onDismissRequest = {
+                    mostrarAlerta = false // Cerrar la alerta al hacer clic fuera de ella
+                },
+                title = {
+                    Text(text = "Límite alcanzado", fontWeight = FontWeight.Bold)
+                },
+                text = {
+                    Text("No puedes rentar más de 3 vehículos.")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            mostrarAlerta = false // Cerrar la alerta
+                        }
+                    ) {
+                        Text("Aceptar")
+                    }
+                }
+            )
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
 
+        valorTotal = Vehiculo.valorDia.toInt() * diasRentados;
         // Mostrar la fecha generada y los días rentados
         if (fechaGenerada.isNotEmpty()) {
             Text(
-                text = "Fecha Generada: $fechaGenerada",
+                text = "Valor por día: ${Vehiculo.valorDia}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color(0xFF6200EE)
             )
             Text(
                 text = "Días Rentados: $diasRentados",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF6200EE)
+            )
+            Text(
+                text = "Valor Total de las renta: $valorTotal",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF6200EE)
+            )
+            Text(
+                text = "Fecha estimada de entrega: $fechaEstimadaEntrega",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color(0xFF6200EE)

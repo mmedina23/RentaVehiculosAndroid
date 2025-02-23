@@ -16,11 +16,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.pmd.rentavehiculos.Api.RetrofitInstance
+import com.pmd.rentavehiculos.Entity.Logout
 import com.pmd.rentavehiculos.Entity.PersonaRequestRenta
 import com.pmd.rentavehiculos.Entity.Usuario
 import com.pmd.rentavehiculos.Entity.Vehiculo
 import com.pmd.rentavehiculos.Entity.VehiculoRequestRenta
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +37,8 @@ fun ClienteScreen(
                               token : String,
                               precioDiaVehiculo : Double, Persona : PersonaRequestRenta,
                               Vehiculo : VehiculoRequestRenta)->Unit,
-    NavigationMisVehiculos:(token: String, personaId : Int) -> Unit
+    NavigationMisVehiculos:(token: String, personaId : Int) -> Unit,
+    NavigationLogin: () -> Unit
     )
 {
     val service = RetrofitInstance.makeRetrofitService()
@@ -87,6 +92,17 @@ fun ClienteScreen(
 
         Button(onClick = {NavigationMisVehiculos(token, personaId)}) {
             Text(text = "Mis vehiculos")
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        println("personaid $personaId")
+        println("personarequestId ${Persona.personaId}")
+        Button(onClick = {
+            GlobalScope.launch {
+            verificarLogout(token, Persona.personaId, NavigationLogin)}
+        }) {
+            Text(text = "Cerrar sesión")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -245,5 +261,26 @@ fun VehiculoInfoItem(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(text = "$label: ", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
         Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+
+suspend fun verificarLogout(token : String, personaId : Int, NavigationLogin:() -> Unit){
+    println(token)
+    println(personaId)
+    val LogoutBody = Logout(idUsuario = personaId, token = token)
+    try {
+        val service = RetrofitInstance.makeRetrofitService()
+        val response = service.logout(LogoutBody)
+
+        if(response.isSuccessful){
+            withContext(Dispatchers.Main) {  // Asegurar que la navegación ocurre en el hilo principal
+                NavigationLogin()
+            }
+        }else{
+            println("error a la hora de hacer el logout")
+        }
+    }catch (e : Exception){
+        println(e.message)
     }
 }
